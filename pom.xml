@@ -4,18 +4,35 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.dserwin.storm</groupId>
-    <artifactId>storm</artifactId>
+    <groupId>org.cempaka.cyclone</groupId>
+    <artifactId>cyclone</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>storm-core</module>
-        <module>storm-cli</module>
-        <module>storm-examples</module>
+        <module>cyclone-core</module>
+        <module>cyclone-cli</module>
+        <module>cyclone-examples</module>
+        <module>cyclone-daemon</module>
+        <module>cyclone-plugins</module>
     </modules>
 
     <properties>
-        <java.version>10</java.version>
+        <java.version>1.8</java.version>
+
+        <guava.version>26.0-jre</guava.version>
+        <picocli.version>3.5.2</picocli.version>
+        <dropwizard.version>1.3.5</dropwizard.version>
+        <guice.version>4.2.0</guice.version>
+        <metrics-core.version>3.0.2</metrics-core.version>
+
+        <angularjs.version>1.7.2</angularjs.version>
+        <angular-material.version>1.1.5</angular-material.version>
+        <ng-file-upload.version>12.0.4</ng-file-upload.version>
+
+        <junit.version>4.12</junit.version>
+        <assertj-core.version>3.11.0</assertj-core.version>
+        <mockito-all.version>1.9.5</mockito-all.version>
+        <httpclient.version>4.5.6</httpclient.version>
     </properties>
 
     <dependencyManagement>
@@ -23,15 +40,66 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>26.0-jre</version>
+                <version>${guava.version}</version>
             </dependency>
             <dependency>
                 <groupId>info.picocli</groupId>
                 <artifactId>picocli</artifactId>
-                <version>3.5.2</version>
+                <version>${picocli.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-core</artifactId>
+                <version>${dropwizard.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-assets</artifactId>
+                <version>${dropwizard.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard</groupId>
+                <artifactId>dropwizard-forms</artifactId>
+                <version>${dropwizard.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.codahale.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>${metrics-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>${mockito-all.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <pluginManagement>
@@ -48,7 +116,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>${java.version}</release>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
         </plugins>

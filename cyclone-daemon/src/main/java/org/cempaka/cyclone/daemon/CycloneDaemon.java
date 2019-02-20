@@ -1,0 +1,75 @@
+package org.cempaka.cyclone.daemon;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import io.dropwizard.Application;
+import io.dropwizard.forms.MultiPartBundle;
+import io.dropwizard.jersey.setup.JerseyEnvironment;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Objects;
+import org.cempaka.cyclone.configuration.DaemonConfiguration;
+import org.cempaka.cyclone.protocol.DaemonChannel;
+import org.cempaka.cyclone.resources.ParcelResource;
+import org.cempaka.cyclone.resources.TestResource;
+import org.cempaka.cyclone.storage.ParcelIndexer;
+import org.cempaka.cyclone.storage.ParcelMetadataRepository;
+import org.cempaka.cyclone.storage.ParcelRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class CycloneDaemon extends Application<DaemonConfiguration>
+{
+    private static final Logger LOG = LoggerFactory.getLogger(CycloneDaemon.class);
+
+    @Override
+    public void initialize(final Bootstrap<DaemonConfiguration> bootstrap)
+    {
+        bootstrap.addBundle(new MultiPartBundle());
+    }
+
+    public static void main(final String[] args) throws Exception
+    {
+        new CycloneDaemon().run(args);
+    }
+
+    @Override
+    public void run(final DaemonConfiguration daemonConfiguration, final Environment environment)
+        throws SocketException, UnknownHostException
+    {
+        final Injector injector = Guice.createInjector(new DaemonModule(daemonConfiguration));
+
+        registerResources(environment, injector);
+        indexParcels(injector);
+
+        final DaemonChannel daemonChannel = injector.getInstance(DaemonChannel.class);
+        daemonChannel.connect(daemonConfiguration.getChannelConfiguration().getUdpServerPort());
+
+        LOG.info("Daemon started.");
+    }
+
+    private void registerResources(final Environment environment, final Injector injector)
+    {
+        LOG.debug("Registering resources...");
+        final JerseyEnvironment jersey = environment.jersey();
+        jersey.setUrlPattern("/api/*");
+        jersey.register(injector.getInstance(ParcelResource.class));
+        jersey.register(injector.getInstance(TestResource.class));
+        LOG.info("Resources registered.");
+    }
+
+    private void indexParcels(final Injector injector)
+    {
+        final ParcelRepository parcelRepository = injector.getInstance(ParcelRepository.class);
+        final ParcelIndexer parcelIndexer = injector.getInstance(ParcelIndexer.class);
+        final ParcelMetadataRepository parcelMetadataRepository =
+            injector.getInstance(ParcelMetadataRepository.class);
+        parcelRepository.list()
+            .map(parcelRepository::get)
+            .filter(Objects::nonNull)
+            .map(parcelIndexer::index)
+            .forEach(parcelMetadataRepository::put);
+    }
+}

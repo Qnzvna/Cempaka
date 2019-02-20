@@ -1,3 +1,5 @@
 .idea/
 target/
-storm.iml
+*.iml
+tmp/
+dependency-reduced-pom.xml
