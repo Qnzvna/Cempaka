@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.TestSnapshot;
 import org.cempaka.cyclone.protocol.MeasurementsPayload;
 import org.cempaka.cyclone.protocol.Payload;
+import org.cempaka.cyclone.protocol.PayloadType;
 import org.cempaka.cyclone.storage.TestSnapshotRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +31,15 @@ public class MeasurementsListener implements BiConsumer<String, Payload>
     }
 
     @Override
-    public void accept(final String testUuid, final Payload payload)
+    public void accept(final String testId, final Payload payload)
     {
-        final MeasurementsPayload measurementsPayload = (MeasurementsPayload) payload;
-        final TestSnapshot testSnapshot = new TestSnapshot(Instant.now(clock).getEpochSecond(),
-            measurementsPayload.getStatus(),
-            measurementsPayload.getSnapshots());
-        testSnapshotRepository.put(testUuid, testSnapshot);
-        LOG.info("Metrics from {} received. {}", testUuid, measurementsPayload.getSnapshots());
+        if (payload.getType() == PayloadType.MEASUREMENTS) {
+            final MeasurementsPayload measurementsPayload = (MeasurementsPayload) payload;
+            final TestSnapshot testSnapshot = new TestSnapshot(testId, Instant.now(clock).getEpochSecond(),
+                measurementsPayload.getStatus(),
+                measurementsPayload.getSnapshots());
+            testSnapshotRepository.put(testId, testSnapshot);
+            LOG.info("Metrics from {} received. {}", testId, measurementsPayload.getSnapshots());
+        }
     }
 }

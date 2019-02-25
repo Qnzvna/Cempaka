@@ -1,0 +1,11 @@
+<div ng-if="$ctrl.tests.length == 0" class="alert-warning">
+    First upload parcel to run tests.
+</div>
+<div ng-if="$ctrl.tests.length != 0" class="form-group">
+    <label for="runTestSelect">Select test to run</label>
+    <select class="form-control" id="runTestSelect"
+            ng-model="$ctrl.test"
+            ng-options="option.testMetadata.testName for option in $ctrl.tests">
+    </select>
+</div>
+<test ng-if="$ctrl.test" test="$ctrl.test"></test>

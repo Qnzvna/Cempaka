@@ -19,8 +19,11 @@ import org.cempaka.cyclone.annotation.AfterStorm;
 import org.cempaka.cyclone.annotation.BeforeStorm;
 import org.cempaka.cyclone.annotation.Measurements;
 import org.cempaka.cyclone.annotation.Parameter;
+import org.cempaka.cyclone.annotation.Thunderbolt;
+import org.cempaka.cyclone.exceptions.TestFailedException;
 import org.cempaka.cyclone.metrics.Measurement;
 import org.cempaka.cyclone.metrics.MeasurementRegistry;
+import org.cempaka.cyclone.utils.Memoizer;
 import org.cempaka.cyclone.utils.Reflections;
 
 public class ReflectiveInvoker implements Invoker
@@ -34,7 +37,7 @@ public class ReflectiveInvoker implements Invoker
                               final MeasurementRegistry measurementRegistry)
     {
         this.testClass = checkNotNull(testClass);
-        this.testInstance = () -> createTest(testClass, parameters);
+        this.testInstance = Memoizer.memoize(() -> createTest(testClass, parameters));
         this.measurementRegistry = checkNotNull(measurementRegistry);
         this.measurements = createAllMeasurements(testClass);
     }
@@ -97,7 +100,8 @@ public class ReflectiveInvoker implements Invoker
         }
     }
 
-    private void setField(final Map<String, String> parameters, final Object testObject, final Field field)
+    private void setField(final Map<String, String> parameters, final Object testObject,
+                          final Field field)
     {
         final String name = field.getAnnotation(Parameter.class).name();
         final String value = parameters.get(name);
@@ -135,7 +139,14 @@ public class ReflectiveInvoker implements Invoker
         checkState(methods.size() <= 1,
             String.format("Test class should have only one method annotated with '%s'.",
                 annotationClass.getSimpleName()));
-        methods.stream().findFirst().ifPresent(method -> Reflections.invokeMethod(testInstance, method));
+        methods.stream().findFirst()
+            .ifPresent(method -> {
+                try {
+                    Reflections.invokeMethod(testInstance, method);
+                } catch (InvocationTargetException e) {
+                    throw new TestFailedException(e.getCause());
+                }
+            });
     }
 
     private void runThunderbolts(final Class testClass, final Object testInstance)
@@ -143,7 +154,18 @@ public class ReflectiveInvoker implements Invoker
         getThunderboltsMethods(testClass)
             .forEach(method -> {
                 measurements.forEach(Measurement::start);
-                Reflections.invokeMethod(testInstance, method);
+                final List<Class<? extends Throwable>> suppressedThrowables =
+                    getSuppressedThrowables(method);
+                try {
+                    Reflections.invokeMethod(testInstance, method);
+                } catch (InvocationTargetException e) {
+                    final Throwable cause = e.getCause();
+                    final boolean suppressed = suppressedThrowables.stream()
+                        .anyMatch(throwable -> throwable.isInstance(cause));
+                    if (!suppressed) {
+                        throw new TestFailedException(e.getCause());
+                    }
+                }
                 measurements.forEach(Measurement::stop);
             });
     }
@@ -152,5 +174,14 @@ public class ReflectiveInvoker implements Invoker
     {
         return Stream.of(testClass.getDeclaredMethods())
             .filter(Reflections::isThunderboltMethod);
+    }
+
+    private List<Class<? extends Throwable>> getSuppressedThrowables(final Method method)
+    {
+        return Stream.of(method.getDeclaredAnnotations())
+            .filter(Reflections::isThunderboltAnnotation)
+            .map(annotation -> (Thunderbolt) annotation)
+            .flatMap(annotation -> Stream.of(annotation.suppressedThrowables()))
+            .collect(Collectors.toList());
     }
 }

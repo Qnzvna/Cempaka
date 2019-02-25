@@ -20,17 +20,26 @@ public class MetadataPrint
             .filter(MetadataPrint::isTestClass)
             .map(ClassInfo::load)
             .filter(clazz -> Stream.of(clazz.getDeclaredMethods()).anyMatch(Reflections::isThunderboltMethod))
-            .forEach(clazz -> {
-                System.out.print(clazz.getName());
+            .forEach(MetadataPrint::printTestMetadata);
+    }
+
+    private static void printTestMetadata(final Class<?> clazz)
+    {
+        final Object object = Reflections.newInstance(clazz);
+        System.out.print(clazz.getName());
+        printSeparator();
+        Stream.of(clazz.getDeclaredFields())
+            .filter(Reflections::isFieldParameter)
+            .forEach(field -> {
+                field.setAccessible(true);
+                System.out.print(field.getName() +
+                    PARAMETER_SEPARATOR +
+                    field.getType().getSimpleName() +
+                    PARAMETER_SEPARATOR +
+                    Reflections.getFieldValue(object, field));
                 printSeparator();
-                Stream.of(clazz.getDeclaredFields())
-                    .filter(Reflections::isFieldParameter)
-                    .forEach(field -> {
-                        System.out.print(field.getName() + PARAMETER_SEPARATOR + field.getType().getSimpleName());
-                        printSeparator();
-                    });
-                System.out.print(TEST_SEPARATOR);
             });
+        System.out.print(TEST_SEPARATOR);
     }
 
     private static boolean isTestClass(final ClassInfo classInfo)

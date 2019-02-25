@@ -3,6 +3,8 @@ package org.cempaka.cyclone.daemon;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.bundles.webjars.WebJarBundle;
 import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.setup.Bootstrap;
@@ -13,6 +15,7 @@ import java.util.Objects;
 import org.cempaka.cyclone.configuration.DaemonConfiguration;
 import org.cempaka.cyclone.protocol.DaemonChannel;
 import org.cempaka.cyclone.resources.ParcelResource;
+import org.cempaka.cyclone.resources.StatusResource;
 import org.cempaka.cyclone.resources.TestResource;
 import org.cempaka.cyclone.storage.ParcelIndexer;
 import org.cempaka.cyclone.storage.ParcelMetadataRepository;
@@ -28,6 +31,8 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
     public void initialize(final Bootstrap<DaemonConfiguration> bootstrap)
     {
         bootstrap.addBundle(new MultiPartBundle());
+        bootstrap.addBundle(new AssetsBundle("/assets", "/", "index.html"));
+        bootstrap.addBundle(new WebJarBundle("org.webjars.npm", "org.webjars.bower"));
     }
 
     public static void main(final String[] args) throws Exception
@@ -57,6 +62,7 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
         jersey.setUrlPattern("/api/*");
         jersey.register(injector.getInstance(ParcelResource.class));
         jersey.register(injector.getInstance(TestResource.class));
+        jersey.register(injector.getInstance(StatusResource.class));
         LOG.info("Resources registered.");
     }
 

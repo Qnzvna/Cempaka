@@ -1,11 +1,9 @@
 package org.cempaka.cyclone.runner;
 
-import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.cempaka.cyclone.invoker.Invoker;
 import org.cempaka.cyclone.invoker.ReflectiveInvoker;
@@ -14,23 +12,23 @@ import org.cempaka.cyclone.metrics.MeasurementRegistry;
 public class SimpleRunner implements Runner
 {
     private final List<Class> testClasses;
-    private final Map<String, String> parameters;
-    private final MeasurementRegistry measurementRegistry;
+    private final List<Invoker> invokers;
 
     public SimpleRunner(final List<Class> testClasses,
                         final Map<String, String> parameters,
                         final MeasurementRegistry measurementRegistry)
     {
         this.testClasses = new ArrayList<>(testClasses);
-        this.parameters = new HashMap<>(parameters);
-        this.measurementRegistry = checkNotNull(measurementRegistry);
+        this.invokers = getTestClasses().stream()
+            .map(testClass ->
+                ReflectiveInvoker.forTestClass(testClass, parameters, measurementRegistry))
+            .collect(Collectors.toList());
     }
 
     @Override
     public Stream<Invoker> getInvokers()
     {
-        return getTestClasses().stream()
-            .map(testClass -> ReflectiveInvoker.forTestClass(testClass, parameters, measurementRegistry));
+        return invokers.stream();
     }
 
     @Override

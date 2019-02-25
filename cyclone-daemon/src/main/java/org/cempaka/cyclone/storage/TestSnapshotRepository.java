@@ -1,9 +1,11 @@
 package org.cempaka.cyclone.storage;
 
+import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
+
 import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -14,7 +16,7 @@ import org.cempaka.cyclone.beans.TestSnapshot;
 @Singleton
 public class TestSnapshotRepository
 {
-    private final ConcurrentMap<String, PriorityQueue<TestSnapshot>> snapshots;
+    private final ConcurrentMap<String, List<TestSnapshot>> snapshots;
 
     @Inject
     public TestSnapshotRepository()
@@ -29,30 +31,33 @@ public class TestSnapshotRepository
 
     public void put(final String testUuid, final TestSnapshot testSnapshot)
     {
+        checkNotNull(testSnapshot);
         snapshots.compute(testUuid, (key, value) -> {
-            final PriorityQueue<TestSnapshot> queue;
+            final List<TestSnapshot> list;
             if (value == null) {
-                queue = createQueueStore();
+                list = createQueueStore();
             } else {
-                queue = value;
+                list = value;
             }
-            queue.add(testSnapshot);
-            return queue;
+            list.add(testSnapshot);
+            return list;
         });
     }
 
-    private PriorityQueue<TestSnapshot> createQueueStore()
+    private List<TestSnapshot> createQueueStore()
     {
-        return new PriorityQueue<>(Comparator.comparingLong(TestSnapshot::getTimestamp));
+        return new ArrayList<>();
     }
 
     public List<TestSnapshot> get(final String testUuid)
     {
-        final PriorityQueue<TestSnapshot> queue = snapshots.get(testUuid);
+        final List<TestSnapshot> queue = snapshots.get(testUuid);
         if (queue == null) {
             return ImmutableList.of();
         } else {
-            return ImmutableList.copyOf(queue);
+            final List<TestSnapshot> sorted = new ArrayList<>(queue);
+            sorted.sort(Comparator.comparingLong(TestSnapshot::getTimestamp).reversed());
+            return ImmutableList.copyOf(sorted);
         }
     }
 }

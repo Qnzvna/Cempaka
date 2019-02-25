@@ -28,7 +28,7 @@ public class ParcelIndexer
 {
     private static final String PARCEL_PREFIX = "index_tmp_";
     private static final String PARCEL_SUFFIX = ".jar";
-    public static final String METADATA_PRINT = "org.cempaka.cyclone.cli.MetadataPrint";
+    private static final String METADATA_PRINT = "org.cempaka.cyclone.cli.MetadataPrint";
 
     private final String guavaPath;
 
@@ -96,7 +96,7 @@ public class ParcelIndexer
     private ParameterMetadata parseParameterMetadata(final String data)
     {
         final String[] split = data.split(Metadata.PARAMETER_SEPARATOR);
-        checkArgument(split.length == 2);
-        return new ParameterMetadata(split[0], split[1]);
+        checkArgument(split.length == 3);
+        return new ParameterMetadata(split[0], split[1], split[2]);
     }
 }

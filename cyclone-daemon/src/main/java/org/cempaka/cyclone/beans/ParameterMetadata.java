@@ -2,17 +2,19 @@ package org.cempaka.cyclone.beans;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Objects;
+import java.util.Objects;
 
 public class ParameterMetadata
 {
     private final String name;
     private final String type;
+    private final String defaultValue;
 
-    public ParameterMetadata(final String name, final String type)
+    public ParameterMetadata(final String name, final String type, final String defaultValue)
     {
         this.name = checkNotNull(name);
         this.type = checkNotNull(type);
+        this.defaultValue = checkNotNull(defaultValue);
     }
 
     public String getName()
@@ -25,19 +27,25 @@ public class ParameterMetadata
         return type;
     }
 
+    public String getDefaultValue()
+    {
+        return defaultValue;
+    }
+
     @Override
     public boolean equals(final Object o)
     {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         final ParameterMetadata that = (ParameterMetadata) o;
-        return Objects.equal(name, that.name) &&
-            Objects.equal(type, that.type);
+        return Objects.equals(name, that.name) &&
+            Objects.equals(type, that.type) &&
+            Objects.equals(defaultValue, that.defaultValue);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hashCode(name, type);
+        return Objects.hash(name, type, defaultValue);
     }
 }

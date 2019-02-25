@@ -1,0 +1,15 @@
+<form>
+    <div ng-if="parcel.id" class="form-group">
+        <label for="id">Parcel id</label>
+        <input type="text" class="form-control" id="id" ng-value="$ctrl.parcel.id" readonly>
+    </div>
+</form>
+<div class="spinner-grow text-primary" role="status" ng-if="$ctrl.uploading">
+    <span class="sr-only">Loading...</span>
+</div>
+<div class="input-group mb-3" ng-if="$ctrl.parcel.id === undefined && !$ctrl.uploading">
+    <div class="custom-file">
+        <input type="file" ngf-select="$ctrl.uploadParcel($file)" class="custom-file-input" id="parcelFileInput">
+        <label class="custom-file-label" for="parcelFileInput">Choose Parcel</label>
+    </div>
+</div>

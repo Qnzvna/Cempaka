@@ -1,0 +1,36 @@
+<div class="alert alert-info" role="alert" ng-if="$ctrl.metadata.length == 0">
+    You don't have any test snapshots yet. Run the test first.
+</div>
+<div class="row" ng-if="$ctrl.metadata.length > 0">
+    <div class="col-4">
+        <a ng-repeat="option in $ctrl.metadata" href class="list-group-item list-group-item-action"
+           ng-class="{active: $ctrl.isActive(option.id)}"
+           ng-click="$ctrl.showSnapshot(option.id)">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">Short id: {{option.id | limitTo: 8}}</h5>
+                <small>{{option.timestamp * 1000 | date : 'medium'}}</small>
+            </div>
+            <p class="mb-1" ng-repeat="name in option.testNames">{{name}}</p>
+        </a>
+    </div>
+    <div class="col-8">
+        <div class="tab-content">
+            <h4>{{$ctrl.snapshotId}}</h4>
+            <div class="card mb-1" ng-repeat="snapshot in $ctrl.snapshots">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <span class="badge" ng-class="$ctrl.getStatusStyle(snapshot.status)">
+                            {{snapshot.status}}
+                        </span>
+                        {{snapshot.timestamp * 1000 | date : 'medium'}}
+                    </h6>
+                    <div class="card-text">
+                        <p class="h6" ng-repeat="(key, value) in snapshot.measurements">
+                            {{key}} <span class="badge badge-secondary">{{value}}</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

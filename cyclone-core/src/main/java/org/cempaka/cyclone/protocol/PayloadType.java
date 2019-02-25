@@ -2,7 +2,8 @@ package org.cempaka.cyclone.protocol;
 
 public enum PayloadType
 {
-    MEASUREMENTS(1);
+    MEASUREMENTS(1),
+    LOGS(2);
 
     private final int code;
 
@@ -11,6 +12,8 @@ public enum PayloadType
         switch (code) {
             case 1:
                 return MEASUREMENTS;
+            case 2:
+                return LOGS;
             default:
                 throw new IllegalArgumentException();
         }

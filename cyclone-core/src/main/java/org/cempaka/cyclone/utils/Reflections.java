@@ -17,10 +17,11 @@ public final class Reflections
     }
 
     public static void invokeMethod(final Object test, final Method method)
+        throws InvocationTargetException
     {
         try {
             method.invoke(test);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -28,7 +29,12 @@ public final class Reflections
     public static boolean isThunderboltMethod(final Method method)
     {
         return Stream.of(method.getDeclaredAnnotations())
-            .anyMatch(annotation -> annotation.annotationType() == Thunderbolt.class);
+            .anyMatch(Reflections::isThunderboltAnnotation);
+    }
+
+    public static boolean isThunderboltAnnotation(final Annotation annotation)
+    {
+        return annotation.annotationType() == Thunderbolt.class;
     }
 
     public static boolean isFieldParameter(final Field field)
@@ -42,6 +48,16 @@ public final class Reflections
         try {
             return clazz.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Object getFieldValue(final Object object, final Field field)
+    {
+        field.setAccessible(true);
+        try {
+            return field.get(object);
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
