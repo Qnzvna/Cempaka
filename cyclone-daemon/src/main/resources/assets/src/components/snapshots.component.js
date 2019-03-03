@@ -60,6 +60,8 @@ export const SnapshotsComponent = {
                     return 'badge-primary';
                 case 'ENDED':
                     return 'badge-success';
+                case 'FAILED':
+                    return 'badge-danger';
             }
             return 'badge-light';
         }

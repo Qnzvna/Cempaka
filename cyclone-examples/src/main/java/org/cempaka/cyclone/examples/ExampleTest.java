@@ -14,20 +14,27 @@ public class ExampleTest
     private int sleep;
 
     @Parameter(name = "testName")
-    private String name;
+    private String name = "defaultName";
+
+    private String value;
 
     @BeforeStorm
     public void before()
     {
         System.out.println("I'm gonna sleep for " + sleep);
+        value = "before";
     }
 
     @Thunderbolt
     @Measurements(measurements = {RateMeasurement.class, TimeMeasurement.class})
     public void test1() throws InterruptedException
     {
+        System.out.println("Before value: " + value);
         Thread.sleep(sleep);
         System.out.println("run " + name + " on: " + Thread.currentThread().getName());
+        if (name == null) {
+            throw new IllegalArgumentException();
+        }
     }
 
     @AfterStorm

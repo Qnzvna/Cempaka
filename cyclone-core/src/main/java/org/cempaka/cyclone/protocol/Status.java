@@ -5,7 +5,9 @@ public enum Status
     STARTED(0),
     RUNNING(1),
     ENDED(2),
-    INITIALIZED(3);
+    INITIALIZED(3),
+    CLEANED(4),
+    FAILED(5);
 
     private final int code;
 
@@ -20,6 +22,10 @@ public enum Status
                 return ENDED;
             case 3:
                 return INITIALIZED;
+            case 4:
+                return CLEANED;
+            case 5:
+                return FAILED;
             default:
                 throw new IllegalArgumentException();
         }

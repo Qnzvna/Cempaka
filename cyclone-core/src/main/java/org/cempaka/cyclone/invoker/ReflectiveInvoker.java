@@ -33,7 +33,8 @@ public class ReflectiveInvoker implements Invoker
     private final MeasurementRegistry measurementRegistry;
     private final List<? extends Measurement> measurements;
 
-    private ReflectiveInvoker(final Class testClass, final Map<String, String> parameters,
+    private ReflectiveInvoker(final Class testClass,
+                              final Map<String, String> parameters,
                               final MeasurementRegistry measurementRegistry)
     {
         this.testClass = checkNotNull(testClass);
@@ -100,31 +101,34 @@ public class ReflectiveInvoker implements Invoker
         }
     }
 
-    private void setField(final Map<String, String> parameters, final Object testObject,
+    private void setField(final Map<String, String> parameters,
+                          final Object testObject,
                           final Field field)
     {
         final String name = field.getAnnotation(Parameter.class).name();
         final String value = parameters.get(name);
-        try {
-            field.setAccessible(true);
-            final Class<?> fieldType = field.getType();
-            if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
-                field.set(testObject, Integer.valueOf(value));
-            } else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
-                field.set(testObject, Long.valueOf(value));
-            } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
-                field.set(testObject, Double.valueOf(value));
-            } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
-                field.set(testObject, Double.valueOf(value));
-            } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
-                field.set(testObject, Boolean.valueOf(value));
-            } else if (fieldType.equals(String.class)) {
-                field.set(testObject, value);
-            } else {
-                throw new IllegalArgumentException();
+        if (value != null) {
+            try {
+                field.setAccessible(true);
+                final Class<?> fieldType = field.getType();
+                if (fieldType.equals(int.class) || fieldType.equals(Integer.class)) {
+                    field.set(testObject, Integer.valueOf(value));
+                } else if (fieldType.equals(long.class) || fieldType.equals(Long.class)) {
+                    field.set(testObject, Long.valueOf(value));
+                } else if (fieldType.equals(double.class) || fieldType.equals(Double.class)) {
+                    field.set(testObject, Double.valueOf(value));
+                } else if (fieldType.equals(float.class) || fieldType.equals(Float.class)) {
+                    field.set(testObject, Double.valueOf(value));
+                } else if (fieldType.equals(boolean.class) || fieldType.equals(Boolean.class)) {
+                    field.set(testObject, Boolean.valueOf(value));
+                } else if (fieldType.equals(String.class)) {
+                    field.set(testObject, value);
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -154,15 +158,11 @@ public class ReflectiveInvoker implements Invoker
         getThunderboltsMethods(testClass)
             .forEach(method -> {
                 measurements.forEach(Measurement::start);
-                final List<Class<? extends Throwable>> suppressedThrowables =
-                    getSuppressedThrowables(method);
                 try {
                     Reflections.invokeMethod(testInstance, method);
                 } catch (InvocationTargetException e) {
                     final Throwable cause = e.getCause();
-                    final boolean suppressed = suppressedThrowables.stream()
-                        .anyMatch(throwable -> throwable.isInstance(cause));
-                    if (!suppressed) {
+                    if (!isThrowableSuppressed(method, cause)) {
                         throw new TestFailedException(e.getCause());
                     }
                 }
@@ -176,12 +176,15 @@ public class ReflectiveInvoker implements Invoker
             .filter(Reflections::isThunderboltMethod);
     }
 
-    private List<Class<? extends Throwable>> getSuppressedThrowables(final Method method)
+    private boolean isThrowableSuppressed(final Method method, final Throwable throwable)
     {
-        return Stream.of(method.getDeclaredAnnotations())
+        final List<Thunderbolt> annotations = Stream.of(method.getDeclaredAnnotations())
             .filter(Reflections::isThunderboltAnnotation)
             .map(annotation -> (Thunderbolt) annotation)
-            .flatMap(annotation -> Stream.of(annotation.suppressedThrowables()))
             .collect(Collectors.toList());
+        return annotations.stream().allMatch(Thunderbolt::suppressAllThrowables) ||
+            annotations.stream()
+                .flatMap(annotation -> Stream.of(annotation.suppressedThrowables()))
+                .anyMatch(clazz -> clazz.isInstance(throwable));
     }
 }

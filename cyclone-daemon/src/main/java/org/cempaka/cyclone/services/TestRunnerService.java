@@ -41,7 +41,9 @@ public class TestRunnerService
         checkNotNull(testRunConfiguration);
         final UUID testUuid = UUID.randomUUID();
         final int cliPort = portProvider.getPort(testUuid.toString());
-        workerManager.startTest(testUuid, cliPort, testRunConfiguration);
+        workerManager.startTest(testUuid, cliPort, testRunConfiguration)
+            .whenComplete((testId, throwable) ->
+                saveResultSnapshot(testRunConfiguration, testUuid, throwable));
         final TestSnapshot snapshot = new TestSnapshot(testUuid.toString(),
             Instant.now(clock).getEpochSecond(),
             Status.INITIALIZED,
@@ -49,6 +51,27 @@ public class TestRunnerService
             testRunConfiguration.getTestNames());
         testSnapshotRepository.put(testUuid.toString(), snapshot);
         return testUuid;
+    }
+
+    private void saveResultSnapshot(final TestRunConfiguration testRunConfiguration,
+                                   final UUID testUuid,
+                                    final Throwable throwable)
+    {
+        final TestSnapshot snapshot;
+        if (throwable == null) {
+            snapshot = new TestSnapshot(testUuid.toString(),
+                Instant.now(clock).getEpochSecond(),
+                Status.CLEANED,
+                ImmutableMap.of(),
+                testRunConfiguration.getTestNames());
+        } else {
+            snapshot = new TestSnapshot(testUuid.toString(),
+                Instant.now(clock).getEpochSecond(),
+                Status.FAILED,
+                ImmutableMap.of(),
+                testRunConfiguration.getTestNames());
+        }
+        testSnapshotRepository.put(testUuid.toString(), snapshot);
     }
 
     public void abortTest(final UUID testId)

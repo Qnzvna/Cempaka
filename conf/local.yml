@@ -1,13 +1,14 @@
 logging:
   level: INFO
   loggers:
-    me.dserwin: DEBUG
+    org.cempaka: DEBUG
 
 workers:
   workersNumber: 1
   guavaPath: /home/dserwin/.m2/repository/com/google/guava/guava/26.0-jre/guava-26.0-jre.jar
+  logsPath: logs/
 
 storage:
-  storagePath: "tmp/"
+  storagePath: tmp/
   parcelRepository: org.cempaka.cyclone.storage.FileParcelRepository
   parcelMetadataRepository: org.cempaka.cyclone.storage.InMemoryParcelMetadataRepository

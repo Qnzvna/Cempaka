@@ -9,5 +9,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 public @interface Thunderbolt
 {
+    boolean suppressAllThrowables() default false;
+
     Class<? extends Throwable>[] suppressedThrowables() default {};
 }

@@ -1,15 +1,13 @@
 package org.cempaka.cyclone.worker;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.cempaka.cyclone.utils.CliParametrs.CLI_PORT;
-import static org.cempaka.cyclone.utils.CliParametrs.DAEMON_PORT;
-import static org.cempaka.cyclone.utils.CliParametrs.LOOP_COUNT;
-import static org.cempaka.cyclone.utils.CliParametrs.TEST_CLASSES;
-import static org.cempaka.cyclone.utils.CliParametrs.THREADS;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
+import org.cempaka.cyclone.beans.Parcel;
+import org.cempaka.cyclone.beans.exceptions.ProcessFailureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,36 +16,43 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
-import org.cempaka.cyclone.beans.Parcel;
-import org.cempaka.cyclone.beans.exceptions.ProcessFailureException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.cempaka.cyclone.utils.CliParametrs.CLI_PORT;
+import static org.cempaka.cyclone.utils.CliParametrs.DAEMON_PORT;
+import static org.cempaka.cyclone.utils.CliParametrs.LOOP_COUNT;
+import static org.cempaka.cyclone.utils.CliParametrs.TEST_CLASSES;
+import static org.cempaka.cyclone.utils.CliParametrs.THREADS;
 
 class Worker
 {
     private static final Logger LOG = LoggerFactory.getLogger(Worker.class);
     private static final String PARCEL_PREFIX = "tmp_";
     private static final String PARCEL_SUFFIX = ".jar";
+    private static final String OUT_SUFFIX = ".out";
+    private static final String ERROR_SUFFIX = ".err";
 
     private File temporaryParcelFile;
     private Process runningProcess;
 
     synchronized void start(final Parcel parcel,
+                            final String testId,
                             final List<String> testNames,
                             final long loopCount,
                             final int threadsNumber,
                             final int daemonPort,
                             final int cliPort,
+                            final String logsDirectory,
                             final Map<String, String> parameters)
     {
         checkNotNull(parcel);
         try {
             temporaryParcelFile = File.createTempFile(PARCEL_PREFIX + parcel.getId(), PARCEL_SUFFIX);
+            temporaryParcelFile.deleteOnExit();
+            final File temporaryErrorFile = new File(logsDirectory, testId + ERROR_SUFFIX);
+            final File temporaryOutputFile = new File(logsDirectory, testId + OUT_SUFFIX);
             Files.write(temporaryParcelFile.toPath(), parcel.getData());
-
             final String[] command = getCommand(testNames,
                 loopCount,
                 threadsNumber,
@@ -56,8 +61,13 @@ class Worker
                 parameters);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Running command {}", ImmutableList.copyOf(command));
+                LOG.debug("Error file {}", temporaryErrorFile.getAbsolutePath());
+                LOG.debug("Out file {}", temporaryOutputFile.getAbsolutePath());
             }
-            runningProcess = new ProcessBuilder(command).start();
+            runningProcess = new ProcessBuilder(command)
+                    .redirectError(ProcessBuilder.Redirect.to(temporaryErrorFile))
+                    .redirectOutput(ProcessBuilder.Redirect.to(temporaryOutputFile))
+                    .start();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

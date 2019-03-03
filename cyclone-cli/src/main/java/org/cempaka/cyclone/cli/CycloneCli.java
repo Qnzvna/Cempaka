@@ -69,12 +69,13 @@ public class CycloneCli
         final CycloneCli cycloneCli = new CycloneCli();
         new CommandLine(cycloneCli).parse(args);
 
-        cycloneCli.run();
-        System.exit(0);
+        final int status = cycloneCli.run();
+        System.exit(status);
     }
 
-    private void run() throws IOException, InterruptedException
+    private int run() throws IOException, InterruptedException
     {
+        int status = 0;
         if (isUdpEnabled()) {
             checkArgument(daemonPort > 0, "daemon port must be defined");
             daemonChannel.connect(cliPort);
@@ -93,6 +94,7 @@ public class CycloneCli
         } catch (Exception e) {
             e.printStackTrace();
             sendStackTrace(e);
+            status = -1;
         }
         threadRunner.awaitTermination(Duration.ofMinutes(1));
         metricsExecutor.shutdown();
@@ -101,6 +103,7 @@ public class CycloneCli
             daemonChannel.write(new MeasurementsPayload(Status.ENDED), daemonPort);
         }
         daemonChannel.close();
+        return status;
     }
 
     private boolean isUdpEnabled()
@@ -128,9 +131,11 @@ public class CycloneCli
 
     private void sendStackTrace(final Exception exception)
     {
-        final List<String> stackTrace = Stream.of(exception.getStackTrace())
-            .map(StackTraceElement::toString)
-            .collect(Collectors.toList());
-        daemonChannel.write(new LogsPayload(stackTrace), daemonPort);
+        if (isUdpEnabled()) {
+            final List<String> stackTrace = Stream.of(exception.getStackTrace())
+                .map(StackTraceElement::toString)
+                .collect(Collectors.toList());
+            daemonChannel.write(new LogsPayload(stackTrace), daemonPort);
+        }
     }
 }

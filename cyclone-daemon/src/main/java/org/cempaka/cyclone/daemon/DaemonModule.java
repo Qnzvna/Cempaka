@@ -1,16 +1,11 @@
 package org.cempaka.cyclone.daemon;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
-import java.time.Clock;
-import java.util.function.BiConsumer;
-import javax.inject.Inject;
 import org.cempaka.cyclone.configuration.ChannelConfiguration;
 import org.cempaka.cyclone.configuration.DaemonConfiguration;
 import org.cempaka.cyclone.configuration.StorageConfiguration;
@@ -26,6 +21,12 @@ import org.cempaka.cyclone.storage.ParcelMetadataRepository;
 import org.cempaka.cyclone.storage.ParcelRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import java.time.Clock;
+import java.util.function.BiConsumer;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class DaemonModule extends AbstractModule
 {
@@ -55,10 +56,12 @@ public class DaemonModule extends AbstractModule
 
         bind(String.class).annotatedWith(Names.named("storage.path")).toInstance(storageConfiguration.getStoragePath());
         bind(String.class).annotatedWith(Names.named("guava.path")).toInstance(workersConfiguration.getGuavaPath());
+        bind(String.class).annotatedWith(Names.named("worker.logs.directory"))
+                .toInstance(workersConfiguration.getLogsPath());
         bind(Integer.class).annotatedWith(Names.named("worker.number"))
-            .toInstance(workersConfiguration.getWorkersNumber());
+                .toInstance(workersConfiguration.getWorkersNumber());
         bind(Integer.class).annotatedWith(Names.named("udp.server.port"))
-            .toInstance(channelConfiguration.getUdpServerPort());
+                .toInstance(channelConfiguration.getUdpServerPort());
         bind(Clock.class).toInstance(Clock.systemUTC());
     }
 
@@ -78,11 +81,11 @@ public class DaemonModule extends AbstractModule
     @Provides
     @Singleton
     public Multimap<PayloadType, BiConsumer<String, Payload>> payloadListeners(
-        final MeasurementsListener measurementsListener)
+            final MeasurementsListener measurementsListener)
     {
         return ImmutableListMultimap.<PayloadType, BiConsumer<String, Payload>>builder()
-            .put(PayloadType.MEASUREMENTS, measurementsListener)
-            .build();
+                .put(PayloadType.MEASUREMENTS, measurementsListener)
+                .build();
     }
 
     @SuppressWarnings("unchecked")
