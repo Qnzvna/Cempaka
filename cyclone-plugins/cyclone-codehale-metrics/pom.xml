@@ -16,6 +16,7 @@
             <groupId>org.cempaka.cyclone</groupId>
             <artifactId>cyclone-core</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

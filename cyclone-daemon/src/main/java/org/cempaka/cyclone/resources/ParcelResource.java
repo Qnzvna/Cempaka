@@ -72,14 +72,4 @@ public class ParcelResource
     {
         parcelRepository.delete(UUID.fromString(parcelId));
     }
-
-    @GET
-    @Path("/metadata")
-    public Set<ParcelMetadata> getAllMetadata()
-    {
-        return parcelMetadataRepository.list()
-            .map(parcelMetadataRepository::get)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toSet());
-    }
 }

@@ -3,7 +3,6 @@ package org.cempaka.cyclone.resources;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -20,13 +19,11 @@ import org.cempaka.cyclone.worker.WorkerManager;
 @Path("/status")
 public class StatusResource
 {
-    private final int workersNumber;
     private final WorkerManager workerManager;
 
     @Inject
-    public StatusResource(@Named("worker.number") final int workersNumber, final WorkerManager workerManager)
+    public StatusResource(final WorkerManager workerManager)
     {
-        this.workersNumber = workersNumber;
         this.workerManager = checkNotNull(workerManager);
     }
 
@@ -34,7 +31,10 @@ public class StatusResource
     @Path("/node")
     public Response getNodeStatus()
     {
-        final NodeStatus nodeStatus = new NodeStatus(workersNumber, workerManager.getRunningTestsId().size());
+        final int idleWorkers = workerManager.getIdleWorkers().size();
+        final int runningTests = workerManager.getRunningTestsId().size();
+        final NodeStatus nodeStatus = new NodeStatus(idleWorkers,
+            runningTests);
         return Response.ok(nodeStatus).build();
     }
 }

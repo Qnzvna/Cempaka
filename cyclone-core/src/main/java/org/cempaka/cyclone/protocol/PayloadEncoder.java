@@ -8,10 +8,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import org.cempaka.cyclone.protocol.payloads.EndedPayload;
+import org.cempaka.cyclone.protocol.payloads.Payload;
+import org.cempaka.cyclone.protocol.payloads.PayloadType;
+import org.cempaka.cyclone.protocol.payloads.RunningPayload;
+import org.cempaka.cyclone.protocol.payloads.StartedPayload;
 
 class PayloadEncoder
 {
@@ -19,53 +23,59 @@ class PayloadEncoder
     {
         final PayloadType type = payload.getType();
         switch (type) {
-            case MEASUREMENTS:
-                return encodeMeasurements((MeasurementsPayload) payload);
-            case LOGS:
-                return encodeLogs((LogsPayload) payload);
+            case STARTED:
+                return ByteBuffer.wrap(new byte[]{});
+            case RUNNING:
+                return encodeRunning((RunningPayload) payload);
+            case ENDED:
+                return encodeEnded((EndedPayload) payload);
             default:
                 throw new IllegalArgumentException();
         }
     }
 
-    private ByteBuffer encodeLogs(final LogsPayload payload)
+    private ByteBuffer encodeRunning(final RunningPayload payload)
     {
-        final int logsSize = payload.getLogs().size();
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try (final ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream)) {
-            objectOutputStream.writeInt(logsSize);
-            payload.getLogs().forEach(logLine -> {
-                try {
-                    objectOutputStream.writeUTF(logLine);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
-            objectOutputStream.flush();
-            final byte[] data = outputStream.toByteArray();
+        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        try (final ObjectOutputStream outputStream = new ObjectOutputStream(byteStream)) {
+            final Map<String, Double> measurements = payload.getMeasurements();
+            outputStream.writeInt(measurements.size());
+            for (final Map.Entry<String, Double> entry : measurements.entrySet()) {
+                outputStream.writeUTF(entry.getKey());
+                outputStream.writeDouble(entry.getValue());
+            }
+            final Map<String, Long> failedExecutions = payload.getFailedExecutions();
+            outputStream.writeInt(failedExecutions.size());
+            for (final Map.Entry<String, Long> entry : failedExecutions.entrySet()) {
+                outputStream.writeUTF(entry.getKey());
+                outputStream.writeLong(entry.getValue());
+            }
+            final Map<String, Long> successExecutions = payload.getSucccessExecutions();
+            outputStream.writeInt(successExecutions.size());
+            for (final Map.Entry<String, Long> entry : successExecutions.entrySet()) {
+                outputStream.writeUTF(entry.getKey());
+                outputStream.writeLong(entry.getValue());
+            }
+            outputStream.flush();
+            final byte[] data = byteStream.toByteArray();
             return ByteBuffer.wrap(data);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private ByteBuffer encodeMeasurements(final MeasurementsPayload payload)
+    private ByteBuffer encodeEnded(final EndedPayload payload)
     {
-        final Map<String, Double> snapshots = payload.getSnapshots();
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try (final ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream)) {
-            objectOutputStream.writeInt(payload.getStatus().getCode());
-            objectOutputStream.writeInt(snapshots.size());
-            snapshots.forEach((name, value) -> {
-                try {
-                    objectOutputStream.writeUTF(name);
-                    objectOutputStream.writeDouble(value);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
-            objectOutputStream.flush();
-            final byte[] data = outputStream.toByteArray();
+        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        try (final ObjectOutputStream outputStream = new ObjectOutputStream(byteStream)) {
+            outputStream.writeInt(payload.getExitCode());
+            final Optional<String> stackTrace = payload.getStackTrace();
+            outputStream.writeBoolean(stackTrace.isPresent());
+            if (stackTrace.isPresent()) {
+                outputStream.writeUTF(stackTrace.get());
+            }
+            outputStream.flush();
+            final byte[] data = byteStream.toByteArray();
             return ByteBuffer.wrap(data);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -75,43 +85,61 @@ class PayloadEncoder
     Payload decode(final PayloadType type, final byte[] data)
     {
         switch (type) {
-            case MEASUREMENTS:
-                return decodeMeasurements(data);
-            case LOGS:
-                return decodeLogs(data);
+            case STARTED:
+                return new StartedPayload();
+            case RUNNING:
+                return decodeRunning(data);
+            case ENDED:
+                return decodeEnded(data);
             default:
                 throw new IllegalArgumentException();
         }
     }
 
-    private Payload decodeMeasurements(final byte[] data)
+    private Payload decodeRunning(final byte[] data)
     {
         final InputStream inputStream = new ByteArrayInputStream(data);
-        final Map<String, Double> snapshots = new HashMap<>();
+        final Map<String, Double> measurements = new HashMap<>();
+        final Map<String, Long> failedExecutions = new HashMap<>();
+        final Map<String, Long> successExecutions = new HashMap<>();
         try (final ObjectInputStream stream = new ObjectInputStream(inputStream)) {
-            final Status status = Status.fromCode(stream.readInt());
-            final int size = stream.readInt();
-            for (int i = 0; i < size; i++) {
+            final int measurementsSize = stream.readInt();
+            for (int i = 0; i < measurementsSize; i++) {
                 final String name = stream.readUTF();
                 final double value = stream.readDouble();
-                snapshots.put(name, value);
+                measurements.put(name, value);
             }
-            return new MeasurementsPayload(status, snapshots);
+            final int failedSize = stream.readInt();
+            for (int i = 0; i < failedSize; i++) {
+                final String name = stream.readUTF();
+                final long value = stream.readLong();
+                failedExecutions.put(name, value);
+            }
+            final int successSize = stream.readInt();
+            for (int i = 0; i < successSize; i++) {
+                final String name = stream.readUTF();
+                final long value = stream.readLong();
+                successExecutions.put(name, value);
+            }
+            return new RunningPayload(measurements);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private Payload decodeLogs(final byte[] data)
+    private Payload decodeEnded(final byte[] data)
     {
         final InputStream inputStream = new ByteArrayInputStream(data);
         try (final ObjectInputStream stream = new ObjectInputStream(inputStream)) {
-            final int size = stream.readInt();
-            final List<String> logLines = new ArrayList();
-            for (int i = 0; i < size; i++) {
-                logLines.add(stream.readUTF());
+            final int exitCode = stream.readInt();
+            final boolean failed = stream.readBoolean();
+            final String stackTrace;
+            if (failed) {
+                stackTrace = stream.readUTF();
+            } else {
+                stackTrace = null;
             }
-            return new LogsPayload(logLines);
+            return new EndedPayload(exitCode, stackTrace);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

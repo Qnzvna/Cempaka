@@ -5,6 +5,7 @@ import org.cempaka.cyclone.annotation.BeforeStorm;
 import org.cempaka.cyclone.annotation.Measurements;
 import org.cempaka.cyclone.annotation.Parameter;
 import org.cempaka.cyclone.annotation.Thunderbolt;
+import org.cempaka.cyclone.metrics.ExecutionsMeasurement;
 import org.cempaka.cyclone.metrics.codehale.RateMeasurement;
 import org.cempaka.cyclone.metrics.codehale.TimeMeasurement;
 
@@ -26,7 +27,11 @@ public class ExampleTest
     }
 
     @Thunderbolt
-    @Measurements(measurements = {RateMeasurement.class, TimeMeasurement.class})
+    @Measurements(measurements = {
+        RateMeasurement.class,
+        TimeMeasurement.class,
+        ExecutionsMeasurement.class
+    })
     public void test1() throws InterruptedException
     {
         System.out.println("Before value: " + value);

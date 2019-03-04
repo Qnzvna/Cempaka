@@ -1,0 +1,10 @@
+version: '3.1'
+
+services:
+  cyclone-postgres:
+    image: postgres:9.5.16-alpine
+    restart: always
+    ports:
+    - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: cyclone

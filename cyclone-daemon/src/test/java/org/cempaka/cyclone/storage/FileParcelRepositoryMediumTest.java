@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class FileParcelRepositoryTest
+public class FileParcelRepositoryMediumTest
 {
     private static final UUID PARCEL_ID = UUID.randomUUID();
     private static final byte[] PARCEL_DATA = "test".getBytes();

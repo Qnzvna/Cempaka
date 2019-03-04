@@ -9,12 +9,12 @@ import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.ParcelMetadata;
 
 @Singleton
-public class InMemoryParcelMetadataRepository implements ParcelMetadataRepository
+public class MemoryParcelMetadataRepository implements ParcelMetadataRepository
 {
     private final Map<String, ParcelMetadata> storage;
 
     @Inject
-    public InMemoryParcelMetadataRepository()
+    public MemoryParcelMetadataRepository()
     {
         this.storage = new ConcurrentHashMap<>();
     }

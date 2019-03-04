@@ -1,68 +1,76 @@
 package org.cempaka.cyclone.daemon;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
+import io.dropwizard.jdbi3.JdbiFactory;
+import io.dropwizard.setup.Environment;
+import java.time.Clock;
+import java.util.function.BiConsumer;
+import javax.inject.Inject;
 import org.cempaka.cyclone.configuration.ChannelConfiguration;
 import org.cempaka.cyclone.configuration.DaemonConfiguration;
 import org.cempaka.cyclone.configuration.StorageConfiguration;
 import org.cempaka.cyclone.configuration.WorkersConfiguration;
 import org.cempaka.cyclone.protocol.DaemonChannel;
 import org.cempaka.cyclone.protocol.LogFailureListener;
-import org.cempaka.cyclone.protocol.Payload;
 import org.cempaka.cyclone.protocol.PayloadListener;
-import org.cempaka.cyclone.protocol.PayloadType;
 import org.cempaka.cyclone.protocol.UdpDaemonChannel;
-import org.cempaka.cyclone.services.MeasurementsListener;
-import org.cempaka.cyclone.storage.ParcelMetadataRepository;
-import org.cempaka.cyclone.storage.ParcelRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import java.time.Clock;
-import java.util.function.BiConsumer;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.cempaka.cyclone.protocol.payloads.Payload;
+import org.cempaka.cyclone.protocol.payloads.PayloadType;
+import org.cempaka.cyclone.services.listeners.EndedPayloadListener;
+import org.cempaka.cyclone.services.listeners.RunningPayloadListener;
+import org.cempaka.cyclone.services.listeners.StartedPayloadListener;
+import org.cempaka.cyclone.storage.StorageModule;
+import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.jackson2.Jackson2Config;
+import org.jdbi.v3.jackson2.Jackson2Plugin;
+import org.jdbi.v3.postgres.PostgresPlugin;
 
 public class DaemonModule extends AbstractModule
 {
-    private static final Logger LOG = LoggerFactory.getLogger(DaemonModule.class);
-
     private final DaemonConfiguration daemonConfiguration;
+    private final Environment environment;
 
-    DaemonModule(final DaemonConfiguration daemonConfiguration)
+    DaemonModule(final DaemonConfiguration daemonConfiguration,
+                 final Environment environment)
     {
         this.daemonConfiguration = checkNotNull(daemonConfiguration);
+        this.environment = checkNotNull(environment);
     }
 
     @Override
     protected void configure()
     {
-        final StorageConfiguration storageConfiguration = daemonConfiguration.getStorageConfiguration();
-        final WorkersConfiguration workersConfiguration = daemonConfiguration.getWorkersConfiguration();
-        final ChannelConfiguration channelConfiguration = daemonConfiguration.getChannelConfiguration();
+        final StorageConfiguration storageConfiguration = daemonConfiguration
+            .getStorageConfiguration();
+        final WorkersConfiguration workersConfiguration = daemonConfiguration
+            .getWorkersConfiguration();
+        final ChannelConfiguration channelConfiguration = daemonConfiguration
+            .getChannelConfiguration();
 
         bind(ChannelConfiguration.class).toInstance(channelConfiguration);
         bind(StorageConfiguration.class).toInstance(storageConfiguration);
         bind(WorkersConfiguration.class).toInstance(workersConfiguration);
 
-        bind(ParcelRepository.class).to(create(storageConfiguration.getParcelRepository()));
-
-        bind(ParcelMetadataRepository.class).to(create(storageConfiguration.getParcelMetadataRepository()));
-
+        bind(ObjectMapper.class).toInstance(environment.getObjectMapper());
         bind(String.class).annotatedWith(Names.named("storage.path")).toInstance(storageConfiguration.getStoragePath());
         bind(String.class).annotatedWith(Names.named("guava.path")).toInstance(workersConfiguration.getGuavaPath());
-        bind(String.class).annotatedWith(Names.named("worker.logs.directory"))
-                .toInstance(workersConfiguration.getLogsPath());
         bind(Integer.class).annotatedWith(Names.named("worker.number"))
                 .toInstance(workersConfiguration.getWorkersNumber());
+        bind(String.class).annotatedWith(Names.named("worker.logs.directory"))
+            .toInstance(workersConfiguration.getLogsPath());
         bind(Integer.class).annotatedWith(Names.named("udp.server.port"))
                 .toInstance(channelConfiguration.getUdpServerPort());
         bind(Clock.class).toInstance(Clock.systemUTC());
+
+        install(new StorageModule(storageConfiguration));
     }
 
     @Inject
@@ -81,21 +89,27 @@ public class DaemonModule extends AbstractModule
     @Provides
     @Singleton
     public Multimap<PayloadType, BiConsumer<String, Payload>> payloadListeners(
-            final MeasurementsListener measurementsListener)
+        final StartedPayloadListener startedPayloadListener,
+        final RunningPayloadListener runningPayloadListener,
+        final EndedPayloadListener endedPayloadListener)
     {
         return ImmutableListMultimap.<PayloadType, BiConsumer<String, Payload>>builder()
-                .put(PayloadType.MEASUREMENTS, measurementsListener)
-                .build();
+            .put(PayloadType.STARTED, startedPayloadListener)
+            .put(PayloadType.RUNNING, runningPayloadListener)
+            .put(PayloadType.ENDED, endedPayloadListener)
+            .build();
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> Class<T> create(final String className)
+    @Inject
+    @Provides
+    @Singleton
+    public Jdbi dbi(final ObjectMapper objectMapper)
     {
-        try {
-            return (Class<T>) Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            LOG.error("Class [{}] can't be find in the classpath.", className);
-            throw new RuntimeException(e);
-        }
+        final Jdbi jdbi = new JdbiFactory()
+            .build(environment, daemonConfiguration.getDatasourceFactory(), "postgresql");
+        jdbi.installPlugin(new Jackson2Plugin());
+        jdbi.installPlugin(new PostgresPlugin());
+        jdbi.getConfig().get(Jackson2Config.class).setMapper(objectMapper);
+        return jdbi;
     }
 }

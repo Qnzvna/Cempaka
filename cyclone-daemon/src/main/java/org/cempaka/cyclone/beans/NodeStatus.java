@@ -4,18 +4,18 @@ import java.util.Objects;
 
 public class NodeStatus
 {
-    private final int workersNumber;
+    private final int idleWorkers;
     private final int runningTests;
 
-    public NodeStatus(final int workersNumber, final int runningTests)
+    public NodeStatus(final int idleWorkers, final int runningTests)
     {
-        this.workersNumber = workersNumber;
+        this.idleWorkers = idleWorkers;
         this.runningTests = runningTests;
     }
 
-    public int getWorkersNumber()
+    public int getIdleWorkers()
     {
-        return workersNumber;
+        return idleWorkers;
     }
 
     public int getRunningTests()
@@ -29,13 +29,13 @@ public class NodeStatus
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
         final NodeStatus that = (NodeStatus) o;
-        return workersNumber == that.workersNumber &&
+        return idleWorkers == that.idleWorkers &&
             runningTests == that.runningTests;
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(workersNumber, runningTests);
+        return Objects.hash(idleWorkers, runningTests);
     }
 }

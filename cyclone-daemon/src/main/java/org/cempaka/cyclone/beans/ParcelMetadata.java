@@ -2,6 +2,8 @@ package org.cempaka.cyclone.beans;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import java.util.Set;
@@ -12,8 +14,9 @@ public class ParcelMetadata
     private final UUID id;
     private final Set<TestMetadata> testsMetadata;
 
-    public ParcelMetadata(final UUID id,
-                          final Set<TestMetadata> testsMetadata)
+    @JsonCreator
+    public ParcelMetadata(@JsonProperty("id") final UUID id,
+                          @JsonProperty("testsMetadata") final Set<TestMetadata> testsMetadata)
     {
         this.id = checkNotNull(id);
         this.testsMetadata = ImmutableSet.copyOf(testsMetadata);

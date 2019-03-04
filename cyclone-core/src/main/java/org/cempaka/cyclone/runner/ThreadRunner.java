@@ -11,6 +11,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 import java.util.concurrent.TimeUnit;
 import org.cempaka.cyclone.invoker.Invoker;
 
@@ -20,11 +23,11 @@ public class ThreadRunner extends ForwardingRunner
     private final ExecutorService executorService;
     private final Queue<Future> futures = new LinkedBlockingQueue<>();
 
-    public ThreadRunner(final Runner delegated, final int threadNum)
+    public ThreadRunner(final Runner delegated, final int poolSize)
     {
         this.delegated = checkNotNull(delegated);
-        checkArgument(threadNum > 0, "Number of threads has to be greater than 0.");
-        this.executorService = Executors.newFixedThreadPool(threadNum);
+        checkArgument(poolSize > 0, "Number of threads has to be greater than 0.");
+        this.executorService = Executors.newFixedThreadPool(poolSize);
     }
 
     @Override

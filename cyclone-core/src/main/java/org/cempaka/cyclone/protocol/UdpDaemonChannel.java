@@ -1,5 +1,6 @@
 package org.cempaka.cyclone.protocol;
 
+import static java.net.InetAddress.getLoopbackAddress;
 import static org.cempaka.cyclone.utils.Preconditions.checkState;
 
 import java.io.IOException;
@@ -8,8 +9,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -18,6 +17,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import org.cempaka.cyclone.protocol.payloads.Payload;
 
 public class UdpDaemonChannel implements DaemonChannel
 {
@@ -27,6 +27,7 @@ public class UdpDaemonChannel implements DaemonChannel
     private final Queue<Consumer<Exception>> failureListeners;
     private final Queue<BiConsumer<Integer, Payload>> readListeners;
     private final ExecutorService executorService;
+    private final ExecutorService listenersService;
 
     private boolean running;
     private DatagramSocket socket;
@@ -43,6 +44,11 @@ public class UdpDaemonChannel implements DaemonChannel
             thread.setName("UdpDaemonChannel");
             return thread;
         });
+        this.listenersService = Executors.newSingleThreadExecutor(runnable -> {
+            final Thread thread = new Thread(runnable);
+            thread.setName("UdpDaemonChannel-listeners");
+            return thread;
+        });
     }
 
     @Override
@@ -51,9 +57,22 @@ public class UdpDaemonChannel implements DaemonChannel
         try {
             runningLock.lock();
             checkState(socket == null, "Channel already connected");
-            this.socket = new DatagramSocket(port, InetAddress.getLoopbackAddress());
+            socket = new DatagramSocket(port, getLoopbackAddress());
             running = true;
             executorService.submit(this::awaitPacket);
+        } finally {
+            runningLock.unlock();
+        }
+    }
+
+    @Override
+    public void connect() throws SocketException
+    {
+        try {
+            runningLock.lock();
+            checkState(socket == null, "Channel already connected");
+            socket = new DatagramSocket();
+            running = true;
         } finally {
             runningLock.unlock();
         }
@@ -69,7 +88,8 @@ public class UdpDaemonChannel implements DaemonChannel
                 final byte[] data = datagram.getData();
 
                 final Payload payload = messageEncoder.decode(data);
-                readListeners.forEach(listener -> listener.accept(datagram.getPort(), payload)); // TODO async
+                readListeners.forEach(listener ->
+                    listenersService.submit(() -> listener.accept(datagram.getPort(), payload)));
             } catch (Exception e) {
                 failureListeners.forEach(listener -> listener.accept(e));
             }
@@ -80,18 +100,16 @@ public class UdpDaemonChannel implements DaemonChannel
     @Override
     public void write(final Payload payload, final int port)
     {
-        final List<ByteBuffer> buffers = messageEncoder.encode(payload);
-        for (final ByteBuffer data : buffers) {
-            final byte[] bytes = data.array();
-            final DatagramPacket datagramPacket = new DatagramPacket(bytes,
-                bytes.length,
-                InetAddress.getLoopbackAddress(),
-                port);
-            try {
-                socket.send(datagramPacket);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+        checkState(socket != null, "socket not initialized");
+        final byte[] bytes = messageEncoder.encode(payload).array();
+        final DatagramPacket datagramPacket = new DatagramPacket(bytes,
+            bytes.length,
+            getLoopbackAddress(),
+            port);
+        try {
+            socket.send(datagramPacket);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
         writeListeners.forEach(listener -> listener.accept(payload));
     }

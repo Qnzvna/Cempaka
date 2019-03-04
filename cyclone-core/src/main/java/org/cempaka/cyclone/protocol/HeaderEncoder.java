@@ -1,6 +1,7 @@
 package org.cempaka.cyclone.protocol;
 
 import java.nio.ByteBuffer;
+import org.cempaka.cyclone.protocol.payloads.PayloadType;
 
 class HeaderEncoder
 {

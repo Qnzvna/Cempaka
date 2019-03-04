@@ -44,7 +44,8 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
     public void run(final DaemonConfiguration daemonConfiguration, final Environment environment)
         throws SocketException, UnknownHostException
     {
-        final Injector injector = Guice.createInjector(new DaemonModule(daemonConfiguration));
+        final Injector injector = Guice.createInjector(
+            new DaemonModule(daemonConfiguration, environment));
 
         registerResources(environment, injector);
         indexParcels(injector);

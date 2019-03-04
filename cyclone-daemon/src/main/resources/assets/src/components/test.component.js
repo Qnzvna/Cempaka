@@ -17,7 +17,7 @@ export const TestComponent = {
             if (this.runConfiguration === undefined) {
                 this.runConfiguration = {
                     parcelId: this.routeParams.parcelId,
-                    testNames: [this.routeParams.testName],
+                    testName: this.routeParams.testName,
                     loopCount: 1,
                     threadsNumber: 1,
                     parameters: {}
@@ -36,7 +36,7 @@ export const TestComponent = {
                     this.parametersMetadata = test.testMetadata.parameters;
                     this.runConfiguration = {
                         parcelId: test.parcelId,
-                        testNames: [test.testMetadata.testName],
+                        testName: test.testMetadata.testName,
                         loopCount: 1,
                         threadsNumber: 1,
                         parameters:

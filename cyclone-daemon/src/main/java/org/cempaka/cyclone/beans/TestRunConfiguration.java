@@ -4,29 +4,29 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class TestRunConfiguration
 {
     private final UUID parcelId;
-    private final List<String> testNames;
+    private final String testName;
     private final long loopCount;
     private final int threadsNumber;
     private final Map<String, String> parameters;
 
     @JsonCreator
     public TestRunConfiguration(@JsonProperty("parcelId") final UUID parcelId,
-                                @JsonProperty("testNames") final List<String> testNames,
+                                @JsonProperty("testName") final String testNames,
                                 @JsonProperty("loopCount") final long loopCount,
                                 @JsonProperty("threadsNumber") final int threadsNumber,
                                 @JsonProperty("parameters") final Map<String, String> parameters)
     {
         this.parcelId = checkNotNull(parcelId);
-        this.testNames = checkNotNull(testNames);
+        this.testName = checkNotNull(testNames);
         this.loopCount = loopCount;
         this.threadsNumber = threadsNumber;
         this.parameters = ImmutableMap.copyOf(parameters);
@@ -37,9 +37,9 @@ public class TestRunConfiguration
         return parcelId;
     }
 
-    public List<String> getTestNames()
+    public String getTestName()
     {
-        return testNames;
+        return testName;
     }
 
     public long getLoopCount()
@@ -65,14 +65,14 @@ public class TestRunConfiguration
         final TestRunConfiguration that = (TestRunConfiguration) o;
         return loopCount == that.loopCount &&
             threadsNumber == that.threadsNumber &&
-            Objects.equal(parcelId, that.parcelId) &&
-            Objects.equal(testNames, that.testNames) &&
-            Objects.equal(parameters, that.parameters);
+            Objects.equals(parcelId, that.parcelId) &&
+            Objects.equals(testName, that.testName) &&
+            Objects.equals(parameters, that.parameters);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hashCode(parcelId, testNames, loopCount, threadsNumber, parameters);
+        return Objects.hash(parcelId, testName, loopCount, threadsNumber, parameters);
     }
 }

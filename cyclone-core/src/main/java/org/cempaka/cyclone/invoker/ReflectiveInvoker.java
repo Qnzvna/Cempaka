@@ -29,18 +29,17 @@ import org.cempaka.cyclone.utils.Reflections;
 public class ReflectiveInvoker implements Invoker
 {
     private final Class testClass;
-    private final Supplier<Object> testInstance;
     private final MeasurementRegistry measurementRegistry;
-    private final List<? extends Measurement> measurements;
+    private final Supplier<Object> testInstance;
 
     private ReflectiveInvoker(final Class testClass,
                               final Map<String, String> parameters,
                               final MeasurementRegistry measurementRegistry)
     {
         this.testClass = checkNotNull(testClass);
-        this.testInstance = Memoizer.memoize(() -> createTest(testClass, parameters));
         this.measurementRegistry = checkNotNull(measurementRegistry);
-        this.measurements = createAllMeasurements(testClass);
+        this.testInstance = Memoizer.memoize(() -> createTest(testClass, parameters));
+        registerMeasurements(testClass);
     }
 
     public static Invoker forTestClass(final Class testClass,
@@ -68,16 +67,15 @@ public class ReflectiveInvoker implements Invoker
         runOneAnnotatedMethod(testClass, testInstance.get(), AfterStorm.class);
     }
 
-    private List<? extends Measurement> createAllMeasurements(final Class testClass)
+    private void registerMeasurements(final Class testClass)
     {
-        return getThunderboltsMethods(testClass)
+        getThunderboltsMethods(testClass)
             .flatMap(method -> Stream.of(method.getDeclaredAnnotations())
                 .filter(annotation -> annotation.annotationType() == Measurements.class)
                 .map(annotation -> (Measurements) annotation)
                 .flatMap(measurements -> Stream.of(measurements.measurements()))
                 .map(Reflections::newInstance))
-            .peek(measurementRegistry::register)
-            .collect(Collectors.toList());
+            .forEach(measurementRegistry::register);
     }
 
     private Object createTest(final Class testClass, final Map<String, String> parameters)
@@ -157,7 +155,7 @@ public class ReflectiveInvoker implements Invoker
     {
         getThunderboltsMethods(testClass)
             .forEach(method -> {
-                measurements.forEach(Measurement::start);
+                measurementRegistry.getMeasurements().forEach(Measurement::start);
                 try {
                     Reflections.invokeMethod(testInstance, method);
                 } catch (InvocationTargetException e) {
@@ -166,7 +164,7 @@ public class ReflectiveInvoker implements Invoker
                         throw new TestFailedException(e.getCause());
                     }
                 }
-                measurements.forEach(Measurement::stop);
+                measurementRegistry.getMeasurements().forEach(Measurement::stop);
             });
     }
 

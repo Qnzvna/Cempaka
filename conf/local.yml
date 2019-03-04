@@ -3,6 +3,22 @@ logging:
   loggers:
     org.cempaka: DEBUG
 
+database:
+  driverClass: org.postgresql.Driver
+  user: postgres
+  password: cyclone
+  url: jdbc:postgresql://localhost/postgres
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 1s
+  validationQuery: "/* MyService Health Check */ SELECT 1"
+  validationQueryTimeout: 3s
+  minSize: 8
+  maxSize: 32
+  checkConnectionWhileIdle: false
+  evictionInterval: 10s
+  minIdleTime: 1 minute
+
 workers:
   workersNumber: 1
   guavaPath: /home/dserwin/.m2/repository/com/google/guava/guava/26.0-jre/guava-26.0-jre.jar
@@ -11,4 +27,4 @@ workers:
 storage:
   storagePath: tmp/
   parcelRepository: org.cempaka.cyclone.storage.FileParcelRepository
-  parcelMetadataRepository: org.cempaka.cyclone.storage.InMemoryParcelMetadataRepository
+  parcelMetadataRepository: org.cempaka.cyclone.storage.JdbiParcelMetadataRepository

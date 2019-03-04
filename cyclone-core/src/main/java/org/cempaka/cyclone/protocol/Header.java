@@ -1,6 +1,7 @@
 package org.cempaka.cyclone.protocol;
 
 import java.util.Objects;
+import org.cempaka.cyclone.protocol.payloads.PayloadType;
 
 class Header
 {

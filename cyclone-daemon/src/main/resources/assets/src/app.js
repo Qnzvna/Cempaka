@@ -3,7 +3,7 @@ import {ParcelComponent} from './components/parcel.component.js';
 import {RunTestComponent} from './components/run.test.component.js';
 import {TestComponent} from './components/test.component.js';
 import {StatusComponent} from './components/status.component.js';
-import {SnapshotsComponent} from './components/snapshots.component.js';
+import {TestsHistoryComponent} from './components/testsHistoryComponent.js';
 
 export const CycloneModule = angular.module('cyclone', [
     'ngRoute',
@@ -16,7 +16,7 @@ export const CycloneModule = angular.module('cyclone', [
     .component('runTest', RunTestComponent)
     .component('test', TestComponent)
     .component('status', StatusComponent)
-    .component('snapshots', SnapshotsComponent)
+    .component('testsHistory', TestsHistoryComponent)
     .config($routeProvider => {
         $routeProvider.when('/parcels/add', {
             template: '<parcel></parcel>'
@@ -24,8 +24,8 @@ export const CycloneModule = angular.module('cyclone', [
             template: '<test></test>'
         }).when('/tests/run', {
             template: '<run-test></run-test>'
-        }).when('/tests/snapshots', {
-            template: '<snapshots></snapshots>'
+        }).when('/tests/history', {
+            template: '<tests-history></tests-history>'
         }).when('/status', {
             template: '<status></status>'
         }).otherwise('/status');

@@ -1,9 +1,20 @@
 package org.cempaka.cyclone.worker;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.Parcel;
 import org.cempaka.cyclone.beans.TestRunConfiguration;
 import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
@@ -11,18 +22,6 @@ import org.cempaka.cyclone.beans.exceptions.WorkerNotAvailableException;
 import org.cempaka.cyclone.storage.ParcelRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 public class WorkerManager
@@ -74,7 +73,7 @@ public class WorkerManager
             try {
                 worker.start(parcel,
                     testId.toString(),
-                    testRunConfiguration.getTestNames(),
+                    ImmutableList.of(testRunConfiguration.getTestName()),
                     testRunConfiguration.getLoopCount(),
                     testRunConfiguration.getThreadsNumber(),
                     udpServerPort,

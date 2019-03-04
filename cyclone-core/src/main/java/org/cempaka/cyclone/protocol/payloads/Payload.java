@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.protocol;
+package org.cempaka.cyclone.protocol.payloads;
 
 public interface Payload
 {

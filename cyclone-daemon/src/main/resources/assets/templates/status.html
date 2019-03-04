@@ -3,7 +3,8 @@
     <span class="badge badge-danger" ng-if="!$ctrl.healthy">Failure</span>
 </h4>
 <h5>
-    Workers
-    <span class="badge badge-secondary">{{$ctrl.nodeStatus.runningTests}}</span> /
-    <span class="badge badge-secondary">{{$ctrl.nodeStatus.workersNumber}}</span>
+    Running tests: <span class="badge badge-secondary">{{$ctrl.nodeStatus.runningTests}}</span>
+</h5>
+<h5>
+    Idle workers: <span class="badge badge-secondary">{{$ctrl.nodeStatus.idleWorkers}}</span>
 </h5>

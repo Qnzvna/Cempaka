@@ -9,6 +9,8 @@ import static org.cempaka.cyclone.utils.CliParametrs.THREADS;
 import static org.cempaka.cyclone.utils.Preconditions.checkArgument;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -20,10 +22,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.cempaka.cyclone.metrics.MeasurementRegistry;
 import org.cempaka.cyclone.protocol.DaemonChannel;
-import org.cempaka.cyclone.protocol.LogsPayload;
-import org.cempaka.cyclone.protocol.MeasurementsPayload;
-import org.cempaka.cyclone.protocol.Status;
 import org.cempaka.cyclone.protocol.UdpDaemonChannel;
+import org.cempaka.cyclone.protocol.payloads.EndedPayload;
+import org.cempaka.cyclone.protocol.payloads.RunningPayload;
+import org.cempaka.cyclone.protocol.payloads.StartedPayload;
 import org.cempaka.cyclone.runner.LoopRunner;
 import org.cempaka.cyclone.runner.Runner;
 import org.cempaka.cyclone.runner.SimpleRunner;
@@ -33,6 +35,8 @@ import picocli.CommandLine.Option;
 
 public class CycloneCli
 {
+    private static final Duration RUNNER_AWAIT_TIME = Duration.ofMinutes(1);
+
     @Option(names = {TEST_CLASSES,
         "--test-classes"}, description = "test names to run", required = true, split = ",")
     private String[] testNames;
@@ -69,20 +73,32 @@ public class CycloneCli
         final CycloneCli cycloneCli = new CycloneCli();
         new CommandLine(cycloneCli).parse(args);
 
-        final int status = cycloneCli.run();
-        System.exit(status);
+        final int exitCode = cycloneCli.run();
+        System.exit(exitCode);
     }
 
     private int run() throws IOException, InterruptedException
     {
-        int status = 0;
+
         if (isUdpEnabled()) {
             checkArgument(daemonPort > 0, "daemon port must be defined");
-            daemonChannel.connect(cliPort);
-            daemonChannel.write(new MeasurementsPayload(Status.STARTED), daemonPort);
-            metricsExecutor.scheduleAtFixedRate(this::reportMeasurements, 1, measurementsPeriod,
+            daemonChannel.connect();
+            daemonChannel.write(new StartedPayload(), daemonPort);
+            metricsExecutor.scheduleAtFixedRate(this::reportMetrics, 1, measurementsPeriod,
                 TimeUnit.SECONDS);
         }
+        final EndedPayload endedPayload = runTest();
+        metricsExecutor.shutdown();
+        metricsExecutor.awaitTermination(1, TimeUnit.MINUTES);
+        if (isUdpEnabled()) {
+            daemonChannel.write(endedPayload, daemonPort);
+        }
+        daemonChannel.close();
+        return endedPayload.getExitCode();
+    }
+
+    private EndedPayload runTest() throws InterruptedException
+    {
         final List<Class> testClasses = loadTestClasses();
         final SimpleRunner simpleRunner = new SimpleRunner(testClasses,
             parameters,
@@ -91,19 +107,16 @@ public class CycloneCli
         final Runner runner = new LoopRunner(threadRunner, loopCount);
         try {
             runner.run();
+            reportMetrics();
+            return new EndedPayload(0, null);
         } catch (Exception e) {
             e.printStackTrace();
-            sendStackTrace(e);
-            status = -1;
+            final StringWriter writer = new StringWriter();
+            e.printStackTrace(new PrintWriter(writer));
+            return new EndedPayload(-1, writer.toString());
+        } finally {
+            threadRunner.awaitTermination(RUNNER_AWAIT_TIME);
         }
-        threadRunner.awaitTermination(Duration.ofMinutes(1));
-        metricsExecutor.shutdown();
-        metricsExecutor.awaitTermination(1, TimeUnit.MINUTES);
-        if (isUdpEnabled()) {
-            daemonChannel.write(new MeasurementsPayload(Status.ENDED), daemonPort);
-        }
-        daemonChannel.close();
-        return status;
     }
 
     private boolean isUdpEnabled()
@@ -111,10 +124,13 @@ public class CycloneCli
         return cliPort > 0;
     }
 
-    private void reportMeasurements()
+    private void reportMetrics()
     {
-        final Map<String, Double> snapshots = measurementRegistry.getSnapshots();
-        daemonChannel.write(new MeasurementsPayload(Status.RUNNING, snapshots), daemonPort);
+        if (isUdpEnabled()) {
+            final Map<String, Double> measurements = measurementRegistry.getSnapshots();
+            final RunningPayload runningPayload = new RunningPayload(measurements);
+            daemonChannel.write(runningPayload, daemonPort);
+        }
     }
 
     private List<Class> loadTestClasses()
@@ -127,15 +143,5 @@ public class CycloneCli
                     throw new RuntimeException(e);
                 }
             }).collect(Collectors.toList());
-    }
-
-    private void sendStackTrace(final Exception exception)
-    {
-        if (isUdpEnabled()) {
-            final List<String> stackTrace = Stream.of(exception.getStackTrace())
-                .map(StackTraceElement::toString)
-                .collect(Collectors.toList());
-            daemonChannel.write(new LogsPayload(stackTrace), daemonPort);
-        }
     }
 }

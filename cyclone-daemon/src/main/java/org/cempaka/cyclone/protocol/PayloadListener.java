@@ -7,6 +7,8 @@ import com.google.common.collect.Multimap;
 import java.util.function.BiConsumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.cempaka.cyclone.protocol.payloads.Payload;
+import org.cempaka.cyclone.protocol.payloads.PayloadType;
 
 @Singleton
 public class PayloadListener implements BiConsumer<Integer, Payload>
@@ -27,6 +29,7 @@ public class PayloadListener implements BiConsumer<Integer, Payload>
     public void accept(final Integer integer, final Payload payload)
     {
         final String testUuid = portProvider.getTestUuid(integer);
-        listeners.get(payload.getType()).forEach(listener -> listener.accept(testUuid, payload));
+        listeners.get(payload.getType())
+            .forEach(listener -> listener.accept(testUuid, payload));
     }
 }

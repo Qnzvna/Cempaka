@@ -2,6 +2,8 @@ package org.cempaka.cyclone.beans;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 public class ParameterMetadata
@@ -10,7 +12,10 @@ public class ParameterMetadata
     private final String type;
     private final String defaultValue;
 
-    public ParameterMetadata(final String name, final String type, final String defaultValue)
+    @JsonCreator
+    public ParameterMetadata(@JsonProperty("name") final String name,
+                             @JsonProperty("type") final String type,
+                             @JsonProperty("defaultValue") final String defaultValue)
     {
         this.name = checkNotNull(name);
         this.type = checkNotNull(type);
