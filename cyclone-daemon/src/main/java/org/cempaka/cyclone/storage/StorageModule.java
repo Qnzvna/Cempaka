@@ -1,7 +1,5 @@
 package org.cempaka.cyclone.storage;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.inject.Exposed;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
@@ -10,6 +8,8 @@ import org.cempaka.cyclone.configuration.StorageConfiguration;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class StorageModule extends PrivateModule
 {
@@ -26,8 +26,9 @@ public class StorageModule extends PrivateModule
     protected void configure()
     {
         bind(ParcelRepository.class).to(create(storageConfiguration.getParcelRepository()));
-        bind(ParcelMetadataRepository.class)
-            .to(create(storageConfiguration.getParcelMetadataRepository()));
+        bind(ParcelMetadataRepository.class).to(create(storageConfiguration.getParcelMetadataRepository()));
+        expose(ParcelRepository.class);
+        expose(ParcelMetadataRepository.class);
     }
 
     @Exposed
@@ -62,7 +63,6 @@ public class StorageModule extends PrivateModule
         return jdbi.onDemand(TestRunStackTraceDataAcess.class);
     }
 
-    @Exposed
     @Provides
     @Singleton
     ParcelMetadataDataAcess parcelMetadataDataAcess(final Jdbi jdbi)
