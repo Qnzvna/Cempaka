@@ -39,6 +39,7 @@ export const TestComponent = {
                         testName: test.testMetadata.testName,
                         loopCount: 1,
                         threadsNumber: 1,
+                        nodeIdentifiers: [],
                         parameters:
                             TestController.getParametersPlaceholders(test.testMetadata.parameters)
                     };

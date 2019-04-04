@@ -1,20 +1,25 @@
 package org.cempaka.cyclone.storage;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.inject.Exposed;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
-import com.google.inject.Singleton;
+import javax.inject.Singleton;
 import org.cempaka.cyclone.configuration.StorageConfiguration;
+import org.cempaka.cyclone.daemon.DaemonModule;
+import org.cempaka.cyclone.storage.data.NodeStateDataAccess;
+import org.cempaka.cyclone.storage.data.ParcelMetadataDataAccess;
+import org.cempaka.cyclone.storage.data.TestRunConfigurationDataAccess;
+import org.cempaka.cyclone.storage.data.TestRunMetricDataAccess;
+import org.cempaka.cyclone.storage.data.TestRunStackTraceDataAccess;
+import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
+import org.cempaka.cyclone.storage.repository.ParcelMetadataRepository;
+import org.cempaka.cyclone.storage.repository.ParcelRepository;
 import org.jdbi.v3.core.Jdbi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class StorageModule extends PrivateModule
 {
-    private static final Logger LOG = LoggerFactory.getLogger(StorageModule.class);
-
     private final StorageConfiguration storageConfiguration;
 
     public StorageModule(final StorageConfiguration storageConfiguration)
@@ -25,8 +30,10 @@ public class StorageModule extends PrivateModule
     @Override
     protected void configure()
     {
-        bind(ParcelRepository.class).to(create(storageConfiguration.getParcelRepository()));
-        bind(ParcelMetadataRepository.class).to(create(storageConfiguration.getParcelMetadataRepository()));
+        bind(ParcelRepository.class)
+            .to(DaemonModule.createClass(storageConfiguration.getParcelRepository()));
+        bind(ParcelMetadataRepository.class)
+            .to(DaemonModule.createClass(storageConfiguration.getParcelMetadataRepository()));
         expose(ParcelRepository.class);
         expose(ParcelMetadataRepository.class);
     }
@@ -34,50 +41,47 @@ public class StorageModule extends PrivateModule
     @Exposed
     @Provides
     @Singleton
-    TestRunEventDataAccess testRunEventRepository(final Jdbi jdbi)
+    TestRunConfigurationDataAccess testRunMetadataRepository(final Jdbi jdbi)
     {
-        return jdbi.onDemand(TestRunEventDataAccess.class);
+        return jdbi.onDemand(TestRunConfigurationDataAccess.class);
     }
 
     @Exposed
     @Provides
     @Singleton
-    TestRunMetadataDataAcess testRunMetadataRepository(final Jdbi jdbi)
+    TestRunMetricDataAccess testRunMetricsRepository(final Jdbi jdbi)
     {
-        return jdbi.onDemand(TestRunMetadataDataAcess.class);
+        return jdbi.onDemand(TestRunMetricDataAccess.class);
     }
 
     @Exposed
     @Provides
     @Singleton
-    TestRunMetricDataAcess testRunMetricsRepository(final Jdbi jdbi)
+    TestRunStackTraceDataAccess testRunStackTracesRepository(final Jdbi jdbi)
     {
-        return jdbi.onDemand(TestRunMetricDataAcess.class);
+        return jdbi.onDemand(TestRunStackTraceDataAccess.class);
     }
 
     @Exposed
     @Provides
     @Singleton
-    TestRunStackTraceDataAcess testRunStackTracesRepository(final Jdbi jdbi)
+    NodeStateDataAccess nodeStateDataAccess(final Jdbi jdbi)
     {
-        return jdbi.onDemand(TestRunStackTraceDataAcess.class);
+        return jdbi.onDemand(NodeStateDataAccess.class);
+    }
+
+    @Exposed
+    @Provides
+    @Singleton
+    TestRunStatusDataAccess testRunStateDataAccess(final Jdbi jdbi)
+    {
+        return jdbi.onDemand(TestRunStatusDataAccess.class);
     }
 
     @Provides
     @Singleton
-    ParcelMetadataDataAcess parcelMetadataDataAcess(final Jdbi jdbi)
+    ParcelMetadataDataAccess parcelMetadataDataAccess(final Jdbi jdbi)
     {
-        return jdbi.onDemand(ParcelMetadataDataAcess.class);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> Class<T> create(final String className)
-    {
-        try {
-            return (Class<T>) Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            LOG.error("Class [{}] can't be find in the classpath.", className);
-            throw new RuntimeException(e);
-        }
+        return jdbi.onDemand(ParcelMetadataDataAccess.class);
     }
 }

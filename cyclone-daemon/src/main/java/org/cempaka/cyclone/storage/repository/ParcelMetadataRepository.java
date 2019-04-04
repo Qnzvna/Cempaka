@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.storage;
+package org.cempaka.cyclone.storage.repository;
 
 import java.util.stream.Stream;
 import javax.annotation.Nullable;

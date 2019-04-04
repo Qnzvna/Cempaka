@@ -24,7 +24,7 @@ public class TestRunMetadataRowMapper implements RowMapper<TestRunMetadata>
         final ObjectMapper mapper = context.getConfig(Jackson2Config.class).getMapper();
         try {
             return new TestRunMetadata(resultSet.getString("test_run_id"),
-                resultSet.getTimestamp("timestamp").getTime() / 1000,
+                TimestampConverter.getSeconds(resultSet.getTimestamp("timestamp")),
                 resultSet.getString("test_running"),
                 mapper.readValue(resultSet.getString("parameters"), TYPE_REFERENCE));
         } catch (IOException e) {

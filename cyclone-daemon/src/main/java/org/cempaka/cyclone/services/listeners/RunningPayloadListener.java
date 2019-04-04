@@ -11,19 +11,19 @@ import javax.inject.Singleton;
 import org.cempaka.cyclone.protocol.payloads.Payload;
 import org.cempaka.cyclone.protocol.payloads.PayloadType;
 import org.cempaka.cyclone.protocol.payloads.RunningPayload;
-import org.cempaka.cyclone.storage.TestRunMetricDataAcess;
+import org.cempaka.cyclone.storage.data.TestRunMetricDataAccess;
 
 @Singleton
 public class RunningPayloadListener implements BiConsumer<String, Payload>
 {
-    private final TestRunMetricDataAcess testRunMetricDataAcess;
+    private final TestRunMetricDataAccess testRunMetricDataAccess;
     private final Clock clock;
 
     @Inject
-    public RunningPayloadListener(final TestRunMetricDataAcess testRunMetricDataAcess,
+    public RunningPayloadListener(final TestRunMetricDataAccess testRunMetricDataAccess,
                                   final Clock clock)
     {
-        this.testRunMetricDataAcess = checkNotNull(testRunMetricDataAcess);
+        this.testRunMetricDataAccess = checkNotNull(testRunMetricDataAccess);
         this.clock = checkNotNull(clock);
     }
 
@@ -34,19 +34,19 @@ public class RunningPayloadListener implements BiConsumer<String, Payload>
             final RunningPayload runningPayload = (RunningPayload) payload;
             final Timestamp timestamp = Timestamp.from(Instant.now(clock));
             runningPayload.getMeasurements().forEach((name, value) ->
-                testRunMetricDataAcess.insertMetric(testRunId,
+                testRunMetricDataAccess.insertMetric(testRunId,
                     timestamp,
                     MetricType.MEASUREMENT.toString(),
                     name,
                     value));
             runningPayload.getFailedExecutions().forEach((name, value) ->
-                testRunMetricDataAcess.insertMetric(testRunId,
+                testRunMetricDataAccess.insertMetric(testRunId,
                     timestamp,
                     MetricType.FAILURE.toString(),
                     name,
                     value));
             runningPayload.getSucccessExecutions().forEach((name, value) ->
-                testRunMetricDataAcess.insertMetric(testRunId,
+                testRunMetricDataAccess.insertMetric(testRunId,
                     timestamp,
                     MetricType.SUCCESS.toString(),
                     name,

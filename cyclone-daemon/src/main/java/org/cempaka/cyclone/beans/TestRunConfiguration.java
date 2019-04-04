@@ -5,31 +5,35 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
-import java.util.List;
+import com.google.common.collect.ImmutableSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 public class TestRunConfiguration
 {
     private final UUID parcelId;
     private final String testName;
-    private final long loopCount;
+    private final int loopCount;
     private final int threadsNumber;
     private final Map<String, String> parameters;
+    private final Set<String> nodeIdentifiers;
 
     @JsonCreator
     public TestRunConfiguration(@JsonProperty("parcelId") final UUID parcelId,
                                 @JsonProperty("testName") final String testNames,
-                                @JsonProperty("loopCount") final long loopCount,
+                                @JsonProperty("loopCount") final int loopCount,
                                 @JsonProperty("threadsNumber") final int threadsNumber,
-                                @JsonProperty("parameters") final Map<String, String> parameters)
+                                @JsonProperty("parameters") final Map<String, String> parameters,
+                                @JsonProperty("nodeIdentifiers") final Set<String> nodeIdentifiers)
     {
         this.parcelId = checkNotNull(parcelId);
         this.testName = checkNotNull(testNames);
         this.loopCount = loopCount;
         this.threadsNumber = threadsNumber;
         this.parameters = ImmutableMap.copyOf(parameters);
+        this.nodeIdentifiers = ImmutableSet.copyOf(nodeIdentifiers);
     }
 
     public UUID getParcelId()
@@ -42,7 +46,7 @@ public class TestRunConfiguration
         return testName;
     }
 
-    public long getLoopCount()
+    public int getLoopCount()
     {
         return loopCount;
     }
@@ -57,6 +61,11 @@ public class TestRunConfiguration
         return parameters;
     }
 
+    public Set<String> getNodeIdentifiers()
+    {
+        return nodeIdentifiers;
+    }
+
     @Override
     public boolean equals(final Object o)
     {
@@ -67,12 +76,14 @@ public class TestRunConfiguration
             threadsNumber == that.threadsNumber &&
             Objects.equals(parcelId, that.parcelId) &&
             Objects.equals(testName, that.testName) &&
-            Objects.equals(parameters, that.parameters);
+            Objects.equals(parameters, that.parameters) &&
+            Objects.equals(nodeIdentifiers, that.nodeIdentifiers);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(parcelId, testName, loopCount, threadsNumber, parameters);
+        return Objects
+            .hash(parcelId, testName, loopCount, threadsNumber, parameters, nodeIdentifiers);
     }
 }

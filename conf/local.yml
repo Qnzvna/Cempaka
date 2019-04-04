@@ -26,5 +26,8 @@ workers:
 
 storage:
   storagePath: tmp/
-  parcelRepository: org.cempaka.cyclone.storage.FileParcelRepository
-  parcelMetadataRepository: org.cempaka.cyclone.storage.JdbiParcelMetadataRepository
+  parcelRepository: org.cempaka.cyclone.storage.repository.FileParcelRepository
+  parcelMetadataRepository: org.cempaka.cyclone.storage.repository.JdbiParcelMetadataRepository
+
+cluster:
+  nodeId: localhost

@@ -5,16 +5,17 @@ import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Resources;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.cempaka.cyclone.beans.Parcel;
-import org.cempaka.cyclone.beans.TestRunConfiguration;
 import org.cempaka.cyclone.beans.exceptions.ProcessFailureException;
-import org.cempaka.cyclone.storage.ParcelRepository;
+import org.cempaka.cyclone.storage.repository.ParcelRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +32,7 @@ public class WorkerManagerMediumTest
     private static final String FAILING_TEST = "org.cempaka.cyclone.examples.FailingTest";
     private static final String SUPPRESSED_FAILING_TEST =
         "org.cempaka.cyclone.examples.SupressedFailingTest";
+    private static final Set<String> LOCAL = ImmutableSet.of("127.0.0.1");
 
     @Mock
     private ParcelRepository parcelRepository;
@@ -51,13 +53,10 @@ public class WorkerManagerMediumTest
     public void shouldRunExampleWithoutFailures()
     {
         //given
-        final TestRunConfiguration testRunConfiguration = new TestRunConfiguration(EXAMPLE_ID,
-            EXAMPLE_TEST,
-            1,
-            1,
-            ImmutableMap.of("sleep", "1", "testName", "test"));
+        final UUID testId = UUID.randomUUID();
+        final Map<String, String> parameters = ImmutableMap.of("sleep", "1", "testName", "test");
         //when
-        workerManager.startTest(UUID.randomUUID(), 0, testRunConfiguration).join();
+        workerManager.startTest(testId, EXAMPLE_ID, EXAMPLE_TEST, 1, 1, parameters).join();
         //then
     }
 
@@ -65,13 +64,10 @@ public class WorkerManagerMediumTest
     public void shouldPreserveDefaultParameters()
     {
         //given
-        final TestRunConfiguration testRunConfiguration = new TestRunConfiguration(EXAMPLE_ID,
-            EXAMPLE_TEST,
-            1,
-            1,
-            ImmutableMap.of("sleep", "1"));
+        final UUID testId = UUID.randomUUID();
+        final Map<String, String> parameters = ImmutableMap.of("sleep", "1");
         //when
-        workerManager.startTest(UUID.randomUUID(), 0, testRunConfiguration).join();
+        workerManager.startTest(testId, EXAMPLE_ID, EXAMPLE_TEST, 1, 1, parameters).join();
         //then
     }
 
@@ -79,13 +75,11 @@ public class WorkerManagerMediumTest
     public void shouldSuppressFailures()
     {
         //given
-        final TestRunConfiguration testRunConfiguration = new TestRunConfiguration(EXAMPLE_ID,
-            SUPPRESSED_FAILING_TEST,
-            1,
-            1,
-            ImmutableMap.of());
+        final UUID testId = UUID.randomUUID();
+        final Map<String, String> parameters = ImmutableMap.of();
         //when
-        workerManager.startTest(UUID.randomUUID(), 0, testRunConfiguration).join();
+        workerManager.startTest(testId, EXAMPLE_ID, SUPPRESSED_FAILING_TEST, 1, 1, parameters)
+            .join();
         //then
     }
 
@@ -93,15 +87,13 @@ public class WorkerManagerMediumTest
     public void shouldFailExecution()
     {
         //given
-        final TestRunConfiguration testRunConfiguration = new TestRunConfiguration(EXAMPLE_ID,
-            FAILING_TEST,
-            1,
-            1,
-            ImmutableMap.of());
+        final UUID testId = UUID.randomUUID();
+        final Map<String, String> parameters = ImmutableMap.of();
         //when
         //then
         assertThatThrownBy(
-            () -> workerManager.startTest(UUID.randomUUID(), 0, testRunConfiguration).join())
+            () -> workerManager
+                .startTest(UUID.randomUUID(), EXAMPLE_ID, FAILING_TEST, 1, 1, parameters).join())
             .hasCauseInstanceOf(ProcessFailureException.class);
     }
 
@@ -109,16 +101,13 @@ public class WorkerManagerMediumTest
     public void shouldRunTestsInParallel()
     {
         //given
-        final TestRunConfiguration testRunConfiguration = new TestRunConfiguration(EXAMPLE_ID,
-            EXAMPLE_TEST,
-            1,
-            1,
-            ImmutableMap.of("sleep", "1000", "testName", "test"));
+        final Map<String, String> parameters = ImmutableMap.of("sleep", "1000", "testName", "test");
+
         //when
         final CompletableFuture<UUID> runId1 = workerManager
-            .startTest(UUID.randomUUID(), 0, testRunConfiguration);
+            .startTest(UUID.randomUUID(), EXAMPLE_ID, EXAMPLE_TEST, 1, 1, parameters);
         final CompletableFuture<UUID> runId2 = workerManager
-            .startTest(UUID.randomUUID(), 0, testRunConfiguration);
+            .startTest(UUID.randomUUID(), EXAMPLE_ID, EXAMPLE_TEST, 1, 1, parameters);
         final Set<UUID> runningTests = workerManager.getRunningTestsId();
         final List<Worker> idleWorkers = workerManager.getIdleWorkers();
         //then
@@ -131,14 +120,10 @@ public class WorkerManagerMediumTest
     public void shouldAbortTest()
     {
         //given
-        final TestRunConfiguration testRunConfiguration = new TestRunConfiguration(EXAMPLE_ID,
-            EXAMPLE_TEST,
-            1,
-            1,
-            ImmutableMap.of("sleep", "1000", "testName", "test"));
+        final Map<String, String> parameters = ImmutableMap.of("sleep", "1000", "testName", "test");
         //when
         final CompletableFuture<UUID> runId = workerManager
-            .startTest(UUID.randomUUID(), 0, testRunConfiguration);
+            .startTest(UUID.randomUUID(), EXAMPLE_ID, EXAMPLE_TEST, 1, 1, parameters);
         final Set<UUID> runningTests = workerManager.getRunningTestsId();
         workerManager.abortTest(runId.join());
         final List<Worker> idleWorkers = workerManager.getIdleWorkers();

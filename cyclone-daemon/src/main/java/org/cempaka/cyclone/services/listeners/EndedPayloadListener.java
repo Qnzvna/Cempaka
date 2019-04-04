@@ -2,34 +2,33 @@ package org.cempaka.cyclone.services.listeners;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.sql.Timestamp;
-import java.time.Clock;
-import java.time.Instant;
 import java.util.function.BiConsumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.cempaka.cyclone.beans.EventType;
+import org.cempaka.cyclone.beans.TestState;
 import org.cempaka.cyclone.protocol.payloads.EndedPayload;
 import org.cempaka.cyclone.protocol.payloads.Payload;
 import org.cempaka.cyclone.protocol.payloads.PayloadType;
-import org.cempaka.cyclone.storage.TestRunEventDataAccess;
-import org.cempaka.cyclone.storage.TestRunStackTraceDataAcess;
+import org.cempaka.cyclone.services.NodeIdentifierProvider;
+import org.cempaka.cyclone.storage.data.TestRunStackTraceDataAccess;
+import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
 
 @Singleton
 public class EndedPayloadListener implements BiConsumer<String, Payload>
 {
-    private final TestRunEventDataAccess testRunEventDataAccess;
-    private final TestRunStackTraceDataAcess testRunStackTraceDataAcess;
-    private final Clock clock;
+    private final NodeIdentifierProvider nodeIdentifierProvider;
+    private final TestRunStatusDataAccess testRunStatusDataAccess;
+    private final TestRunStackTraceDataAccess testRunStackTraceDataAccess;
 
     @Inject
-    public EndedPayloadListener(final TestRunEventDataAccess testRunEventDataAccess,
-                                final TestRunStackTraceDataAcess testRunStackTraceDataAcess,
-                                final Clock clock)
+    public EndedPayloadListener(
+        final NodeIdentifierProvider nodeIdentifierProvider,
+        final TestRunStatusDataAccess testRunStatusDataAccess,
+        final TestRunStackTraceDataAccess testRunStackTraceDataAccess)
     {
-        this.testRunEventDataAccess = checkNotNull(testRunEventDataAccess);
-        this.testRunStackTraceDataAcess = checkNotNull(testRunStackTraceDataAcess);
-        this.clock = checkNotNull(clock);
+        this.nodeIdentifierProvider = checkNotNull(nodeIdentifierProvider);
+        this.testRunStatusDataAccess = checkNotNull(testRunStatusDataAccess);
+        this.testRunStackTraceDataAccess = checkNotNull(testRunStackTraceDataAccess);
     }
 
     @Override
@@ -37,10 +36,11 @@ public class EndedPayloadListener implements BiConsumer<String, Payload>
     {
         if (payload.getType() == PayloadType.ENDED) {
             final EndedPayload endedPayload = (EndedPayload) payload;
-            final Timestamp timestamp = Timestamp.from(Instant.now(clock));
-            testRunEventDataAccess.insertEvent(testRunId, timestamp, EventType.ENDED.toString());
+            testRunStatusDataAccess.updateState(TestState.ENDED,
+                testRunId,
+                nodeIdentifierProvider.get());
             endedPayload.getStackTrace().ifPresent(stackTrace ->
-                testRunStackTraceDataAcess.insertEvent(testRunId, stackTrace));
+                testRunStackTraceDataAccess.insertEvent(testRunId, stackTrace));
         }
     }
 }

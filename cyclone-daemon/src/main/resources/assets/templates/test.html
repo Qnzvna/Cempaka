@@ -4,6 +4,12 @@
         <input type="text" class="form-control" id="id" ng-value="$ctrl.runConfiguration.parcelId" readonly>
     </div>
     <div class="form-group">
+        <label for="runOnNodes">Select nodes to run</label>
+        <select ng-model="$ctrl.runConfiguration.nodeIdentifiers" class="custom-select" id="runOnNodes" multiple>
+            <option selected value="localhost">localhost</option>
+        </select>
+    </div>
+    <div class="form-group">
         <label for="loopCount">Loop count</label>
         <input type="number" class="form-control" id="loopCount" aria-describedby="loopCountHelp"
                ng-model="$ctrl.runConfiguration.loopCount">

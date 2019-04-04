@@ -22,10 +22,14 @@ import org.cempaka.cyclone.beans.ParcelMetadata;
 import org.cempaka.cyclone.beans.TestMetadata;
 import org.cempaka.cyclone.beans.exceptions.IndexingParcelException;
 import org.cempaka.cyclone.utils.Metadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class ParcelIndexer
 {
+    private static final Logger LOG = LoggerFactory.getLogger(ParcelIndexer.class);
+
     private static final String PARCEL_PREFIX = "index_tmp_";
     private static final String PARCEL_SUFFIX = ".jar";
     private static final String METADATA_PRINT = "org.cempaka.cyclone.cli.MetadataPrint";
@@ -57,9 +61,13 @@ public class ParcelIndexer
                 "-cp",
                 temporaryParcelFile.getPath() + ":" + guavaPath,
                 METADATA_PRINT).start();
-            final List<String> response = CharStreams.readLines(new InputStreamReader(process.getInputStream()));
+            final List<String> response =
+                CharStreams.readLines(new InputStreamReader(process.getInputStream()));
             final int exitCode = process.waitFor();
             if (exitCode != 0) {
+                final String error = String.join("",
+                    CharStreams.readLines(new InputStreamReader(process.getErrorStream())));
+                LOG.error("Indexing parcel failed with errors {}", error);
                 throw new IndexingParcelException();
             }
             return response;
@@ -68,6 +76,7 @@ public class ParcelIndexer
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } finally {
+            //noinspection ResultOfMethodCallIgnored
             temporaryParcelFile.delete();
         }
     }

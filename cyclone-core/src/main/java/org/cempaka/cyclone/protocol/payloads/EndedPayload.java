@@ -3,15 +3,25 @@ package org.cempaka.cyclone.protocol.payloads;
 import java.util.Objects;
 import java.util.Optional;
 
+import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
+
 public class EndedPayload implements Payload
 {
+    private final String testId;
     private final int exitCode;
     private final Optional<String> stackTrace;
 
-    public EndedPayload(final int exitCode, final String stackTrace)
+    public EndedPayload(final String testId, final int exitCode, final String stackTrace)
     {
+        this.testId = checkNotNull(testId);
         this.exitCode = exitCode;
         this.stackTrace = Optional.ofNullable(stackTrace);
+    }
+
+    @Override
+    public String getTestId()
+    {
+        return testId;
     }
 
     @Override
@@ -33,16 +43,17 @@ public class EndedPayload implements Payload
     @Override
     public boolean equals(final Object o)
     {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         final EndedPayload that = (EndedPayload) o;
         return exitCode == that.exitCode &&
-            Objects.equals(stackTrace, that.stackTrace);
+                Objects.equals(testId, that.testId) &&
+                Objects.equals(stackTrace, that.stackTrace);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(exitCode, stackTrace);
+        return Objects.hash(testId, exitCode, stackTrace);
     }
 }

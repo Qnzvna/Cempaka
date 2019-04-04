@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.storage;
+package org.cempaka.cyclone.storage.data;
 
 import java.util.stream.Stream;
 import org.cempaka.cyclone.beans.ParcelMetadata;
@@ -7,7 +7,7 @@ import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
-public interface ParcelMetadataDataAcess
+public interface ParcelMetadataDataAccess
 {
     @SqlUpdate("INSERT INTO parcels_metadata (id, value) VALUES (:id, :value) ON CONFLICT (id) DO UPDATE SET  value = :value")
     void upsert(@Bind("id") String id, @Bind("value") @Json ParcelMetadata parcelMetadata);

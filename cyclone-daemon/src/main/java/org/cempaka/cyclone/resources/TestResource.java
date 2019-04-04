@@ -1,12 +1,16 @@
 package org.cempaka.cyclone.resources;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.cempaka.cyclone.TestRunMetric;
+import org.cempaka.cyclone.beans.ParcelMetadata;
+import org.cempaka.cyclone.beans.TestMetadata;
+import org.cempaka.cyclone.beans.TestRunConfiguration;
+import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
+import org.cempaka.cyclone.services.TestRunnerService;
+import org.cempaka.cyclone.storage.repository.ParcelMetadataRepository;
+import org.cempaka.cyclone.storage.data.TestRunConfigurationDataAccess;
+import org.cempaka.cyclone.storage.data.TestRunMetricDataAccess;
+import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
@@ -20,21 +24,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import org.cempaka.cyclone.TestRunMetric;
-import org.cempaka.cyclone.beans.ParcelMetadata;
-import org.cempaka.cyclone.beans.TestMetadata;
-import org.cempaka.cyclone.beans.TestRunConfiguration;
-import org.cempaka.cyclone.beans.TestRunEvent;
-import org.cempaka.cyclone.beans.TestRunMetadata;
-import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
-import org.cempaka.cyclone.beans.exceptions.ProcessFailureException;
-import org.cempaka.cyclone.beans.exceptions.TestFailureException;
-import org.cempaka.cyclone.beans.exceptions.WorkerNotAvailableException;
-import org.cempaka.cyclone.services.TestRunnerService;
-import org.cempaka.cyclone.storage.ParcelMetadataRepository;
-import org.cempaka.cyclone.storage.TestRunEventDataAccess;
-import org.cempaka.cyclone.storage.TestRunMetadataDataAcess;
-import org.cempaka.cyclone.storage.TestRunMetricDataAcess;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 @Produces(MediaType.APPLICATION_JSON)
@@ -44,22 +40,22 @@ public class TestResource
 {
     private final ParcelMetadataRepository parcelMetadataRepository;
     private final TestRunnerService testRunnerService;
-    private final TestRunEventDataAccess testRunEventDataAccess;
-    private final TestRunMetadataDataAcess testRunMetadataDataAcess;
-    private final TestRunMetricDataAcess testRunMetricDataAcess;
+    private final TestRunConfigurationDataAccess testRunConfigurationDataAccess;
+    private final TestRunMetricDataAccess testRunMetricDataAccess;
+    private final TestRunStatusDataAccess testRunStatusDataAccess;
 
     @Inject
     public TestResource(final ParcelMetadataRepository parcelMetadataRepository,
                         final TestRunnerService testRunnerService,
-                        final TestRunEventDataAccess testRunEventDataAccess,
-                        final TestRunMetadataDataAcess testRunMetadataDataAcess,
-                        final TestRunMetricDataAcess testRunMetricDataAcess)
+                        final TestRunConfigurationDataAccess testRunConfigurationDataAccess,
+                        final TestRunMetricDataAccess testRunMetricDataAccess,
+                        final TestRunStatusDataAccess testRunStatusDataAccess)
     {
         this.parcelMetadataRepository = checkNotNull(parcelMetadataRepository);
         this.testRunnerService = checkNotNull(testRunnerService);
-        this.testRunEventDataAccess = checkNotNull(testRunEventDataAccess);
-        this.testRunMetadataDataAcess = checkNotNull(testRunMetadataDataAcess);
-        this.testRunMetricDataAcess = checkNotNull(testRunMetricDataAcess);
+        this.testRunConfigurationDataAccess = checkNotNull(testRunConfigurationDataAccess);
+        this.testRunMetricDataAccess = checkNotNull(testRunMetricDataAccess);
+        this.testRunStatusDataAccess = checkNotNull(testRunStatusDataAccess);
     }
 
     @GET
@@ -72,7 +68,7 @@ public class TestResource
     }
 
     @GET
-    @Path("/parcel/{parcelId}/name/{testName}")
+    @Path("/parcels/{parcelId}/names/{testName}")
     public Response getTest(final @PathParam("parcelId") String parcelId,
                             final @PathParam("testName") String testName)
     {
@@ -93,14 +89,6 @@ public class TestResource
             return Response.accepted(uuid).build();
         } catch (ParcelNotFoundException e) {
             return Response.status(Status.NOT_FOUND).entity("Parcel for test not found.").build();
-        } catch (WorkerNotAvailableException e) {
-            return Response.status(Status.CONFLICT)
-                .entity("Not enough workers to run the test.")
-                .build();
-        } catch (ProcessFailureException e) {
-            return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        } catch (TestFailureException e) {
-            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -113,35 +101,35 @@ public class TestResource
     }
 
     @GET
-    @Path("/metadata")
-    public Response getMetadata()
+    @Path("/{id}/configuration")
+    public Response getConfiguration(@PathParam("id") final String testId)
     {
-        final List<TestRunMetadata> metadata = testRunMetadataDataAcess
-            .getInitializationMetadata();
-        return Response.ok(metadata).build();
+        final TestRunConfiguration configuration = testRunConfigurationDataAccess
+            .getConfiguration(testId);
+        return Response.ok(configuration).build();
     }
 
     @GET
-    @Path("/events/{id}")
-    public Response getEvents(@PathParam("id") final String testId)
+    @Path("/{id}/nodes/{node}/state")
+    public Response getStatus(@PathParam("id") final String testId, @PathParam("node") final String nodeIdentifier)
     {
-        final List<TestRunEvent> events = testRunEventDataAccess.getEventsById(testId);
-        return Response.ok().entity(events).build();
+        final String state = testRunStatusDataAccess.getState(testId, nodeIdentifier);
+        return Response.ok().entity(state).build();
     }
 
     @GET
-    @Path("/metrics/{id}")
+    @Path("/{id}/metrics")
     public Response getMetrics(@PathParam("id") final String testId)
     {
-        final List<TestRunMetric> events = testRunMetricDataAcess.getMetricsById(testId);
+        final List<TestRunMetric> events = testRunMetricDataAccess.getMetricsById(testId);
         return Response.ok().entity(events).build();
     }
 
     @GET
-    @Path("/running")
-    public Response getRunningTests()
+    @Path("/states/{state}")
+    public Response getTestsWithState(@PathParam("state") final String state)
     {
-        final Set<UUID> runningTests = testRunnerService.getRunningTestsId();
-        return Response.ok().entity(runningTests).build();
+        final Set<String> testsId = testRunStatusDataAccess.getTestsWithState(state);
+        return Response.ok().entity(testsId).build();
     }
 }

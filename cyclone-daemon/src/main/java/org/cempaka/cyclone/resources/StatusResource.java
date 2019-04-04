@@ -2,6 +2,7 @@ package org.cempaka.cyclone.resources;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
@@ -10,8 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.cempaka.cyclone.beans.NodeStatus;
-import org.cempaka.cyclone.worker.WorkerManager;
+import org.cempaka.cyclone.services.NodeStatusService;
 
 @Singleton
 @Produces(MediaType.APPLICATION_JSON)
@@ -19,22 +19,18 @@ import org.cempaka.cyclone.worker.WorkerManager;
 @Path("/status")
 public class StatusResource
 {
-    private final WorkerManager workerManager;
+    private final NodeStatusService nodeStatusService;
 
     @Inject
-    public StatusResource(final WorkerManager workerManager)
+    public StatusResource(final NodeStatusService nodeStatusService)
     {
-        this.workerManager = checkNotNull(workerManager);
+        this.nodeStatusService = checkNotNull(nodeStatusService);
     }
 
     @GET
-    @Path("/node")
-    public Response getNodeStatus()
+    public Response getClusterStatus()
     {
-        final int idleWorkers = workerManager.getIdleWorkers().size();
-        final int runningTests = workerManager.getRunningTestsId().size();
-        final NodeStatus nodeStatus = new NodeStatus(idleWorkers,
-            runningTests);
-        return Response.ok(nodeStatus).build();
+        final Set<String> liveNodes = nodeStatusService.getLiveNodes();
+        return Response.ok(liveNodes).build();
     }
 }

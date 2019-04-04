@@ -1,5 +1,11 @@
 package org.cempaka.cyclone.protocol;
 
+import org.cempaka.cyclone.protocol.payloads.EndedPayload;
+import org.cempaka.cyclone.protocol.payloads.Payload;
+import org.cempaka.cyclone.protocol.payloads.PayloadType;
+import org.cempaka.cyclone.protocol.payloads.RunningPayload;
+import org.cempaka.cyclone.protocol.payloads.StartedPayload;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,11 +17,6 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import org.cempaka.cyclone.protocol.payloads.EndedPayload;
-import org.cempaka.cyclone.protocol.payloads.Payload;
-import org.cempaka.cyclone.protocol.payloads.PayloadType;
-import org.cempaka.cyclone.protocol.payloads.RunningPayload;
-import org.cempaka.cyclone.protocol.payloads.StartedPayload;
 
 class PayloadEncoder
 {
@@ -82,21 +83,21 @@ class PayloadEncoder
         }
     }
 
-    Payload decode(final PayloadType type, final byte[] data)
+    Payload decode(final PayloadType type, final String testId, final byte[] data)
     {
         switch (type) {
             case STARTED:
-                return new StartedPayload();
+                return new StartedPayload(testId);
             case RUNNING:
-                return decodeRunning(data);
+                return decodeRunning(testId, data);
             case ENDED:
-                return decodeEnded(data);
+                return decodeEnded(testId, data);
             default:
                 throw new IllegalArgumentException();
         }
     }
 
-    private Payload decodeRunning(final byte[] data)
+    private Payload decodeRunning(final String testId, final byte[] data)
     {
         final InputStream inputStream = new ByteArrayInputStream(data);
         final Map<String, Double> measurements = new HashMap<>();
@@ -121,13 +122,13 @@ class PayloadEncoder
                 final long value = stream.readLong();
                 successExecutions.put(name, value);
             }
-            return new RunningPayload(measurements);
+            return new RunningPayload(testId, measurements);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    private Payload decodeEnded(final byte[] data)
+    private Payload decodeEnded(final String testId, final byte[] data)
     {
         final InputStream inputStream = new ByteArrayInputStream(data);
         try (final ObjectInputStream stream = new ObjectInputStream(inputStream)) {
@@ -139,7 +140,7 @@ class PayloadEncoder
             } else {
                 stackTrace = null;
             }
-            return new EndedPayload(exitCode, stackTrace);
+            return new EndedPayload(testId, exitCode, stackTrace);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

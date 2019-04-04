@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.cempaka.cyclone.utils.CliParametrs.CLI_PORT;
+import static org.cempaka.cyclone.utils.CliParametrs.TEST_ID;
 import static org.cempaka.cyclone.utils.CliParametrs.DAEMON_PORT;
 import static org.cempaka.cyclone.utils.CliParametrs.LOOP_COUNT;
 import static org.cempaka.cyclone.utils.CliParametrs.TEST_CLASSES;
@@ -42,7 +42,6 @@ class Worker
                             final long loopCount,
                             final int threadsNumber,
                             final int daemonPort,
-                            final int cliPort,
                             final String logsDirectory,
                             final Map<String, String> parameters)
     {
@@ -54,11 +53,11 @@ class Worker
             final File temporaryOutputFile = new File(logsDirectory, testId + OUT_SUFFIX);
             Files.write(temporaryParcelFile.toPath(), parcel.getData());
             final String[] command = getCommand(testNames,
-                loopCount,
-                threadsNumber,
-                daemonPort,
-                cliPort,
-                parameters);
+                    loopCount,
+                    threadsNumber,
+                    daemonPort,
+                    testId,
+                    parameters);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Running command {}", ImmutableList.copyOf(command));
                 LOG.debug("Error file {}", temporaryErrorFile.getAbsolutePath());
@@ -77,21 +76,21 @@ class Worker
                                 final long loopCount,
                                 final int threadsNumber,
                                 final int daemonPort,
-                                final int cliPort,
+                                final String testId,
                                 final Map<String, String> parameters)
     {
         final String joinedTestNames = Joiner.on(',').join(testNames);
         final ImmutableList.Builder<String> commandBuilder = ImmutableList.builder();
         commandBuilder.add("java", "-jar", temporaryParcelFile.getPath(),
-            TEST_CLASSES, joinedTestNames,
-            LOOP_COUNT, Long.toString(loopCount),
-            DAEMON_PORT, Integer.toString(daemonPort),
-            CLI_PORT, Integer.toString(cliPort),
-            THREADS, Integer.toString(threadsNumber));
+                TEST_CLASSES, joinedTestNames,
+                LOOP_COUNT, Long.toString(loopCount),
+                DAEMON_PORT, Integer.toString(daemonPort),
+                TEST_ID, testId,
+                THREADS, Integer.toString(threadsNumber));
         if (!parameters.isEmpty()) {
             final String joinedParameters = parameters.entrySet().stream()
-                .map(entry -> entry.getKey() + "=" + entry.getValue())
-                .collect(Collectors.joining(","));
+                    .map(entry -> entry.getKey() + "=" + entry.getValue())
+                    .collect(Collectors.joining(","));
             commandBuilder.add("-p", joinedParameters);
         }
         return commandBuilder.build().toArray(new String[]{});

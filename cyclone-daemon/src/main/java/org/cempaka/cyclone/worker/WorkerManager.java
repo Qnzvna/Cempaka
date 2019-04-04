@@ -1,27 +1,27 @@
 package org.cempaka.cyclone.worker;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.cempaka.cyclone.beans.Parcel;
+import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
+import org.cempaka.cyclone.beans.exceptions.WorkerNotAvailableException;
+import org.cempaka.cyclone.storage.repository.ParcelRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import org.cempaka.cyclone.beans.Parcel;
-import org.cempaka.cyclone.beans.TestRunConfiguration;
-import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
-import org.cempaka.cyclone.beans.exceptions.WorkerNotAvailableException;
-import org.cempaka.cyclone.storage.ParcelRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 public class WorkerManager
@@ -33,7 +33,6 @@ public class WorkerManager
 
     private final ParcelRepository parcelRepository;
     private final int udpServerPort;
-    private final List<Worker> workers;
     private final String logsDirectory;
 
     @Inject
@@ -45,27 +44,26 @@ public class WorkerManager
         this.parcelRepository = checkNotNull(parcelRepository);
         this.udpServerPort = udpServerPort;
         this.logsDirectory = checkNotNull(logsDirectory);
-        this.workers = initializeWorkers(workerNumber);
+        initializeWorkers(workerNumber);
     }
 
-    private List<Worker> initializeWorkers(final int workerNumber)
+    private void initializeWorkers(final int workerNumber)
     {
         LOG.debug("Initializing workers...");
-        final ImmutableList.Builder<Worker> builder = ImmutableList.builder();
         for (int i = 0; i < workerNumber; i++) {
             final Worker worker = new Worker();
             workerPool.add(worker);
-            builder.add(worker);
         }
         LOG.info("Workers initialized.");
-        return builder.build();
     }
 
     public CompletableFuture<UUID> startTest(final UUID testId,
-                                             final int cliPort,
-                                             final TestRunConfiguration testRunConfiguration)
+                                             final UUID parcelId,
+                                             final String testName,
+                                             final int loopCount,
+                                             final int threadsNumber,
+                                             final Map<String, String> parameters)
     {
-        final UUID parcelId = testRunConfiguration.getParcelId();
         LOG.debug("About to start test for parcel {} ...", parcelId);
         final Parcel parcel = parcelRepository.get(parcelId);
         if (parcel != null) {
@@ -73,13 +71,12 @@ public class WorkerManager
             try {
                 worker.start(parcel,
                     testId.toString(),
-                    ImmutableList.of(testRunConfiguration.getTestName()),
-                    testRunConfiguration.getLoopCount(),
-                    testRunConfiguration.getThreadsNumber(),
+                    ImmutableList.of(testName),
+                    loopCount,
+                    threadsNumber,
                     udpServerPort,
-                    cliPort,
                     logsDirectory,
-                    testRunConfiguration.getParameters());
+                    parameters);
                 LOG.debug("Test started successfully.");
                 final CompletableFuture<?> testFuture = worker.onDone();
                 testFuture.whenComplete((ignore, throwable) -> cleanResources(worker, testId));
@@ -111,7 +108,7 @@ public class WorkerManager
         LOG.debug("Resources cleaned.");
     }
 
-    public void abortTest(final UUID testId)
+    void abortTest(final UUID testId)
     {
         runningTests.computeIfPresent(testId, (handler, worker) -> {
             worker.abort();
@@ -123,11 +120,6 @@ public class WorkerManager
     public Set<UUID> getRunningTestsId()
     {
         return ImmutableMap.copyOf(runningTests).keySet();
-    }
-
-    public List<Worker> getWorkers()
-    {
-        return workers;
     }
 
     public List<Worker> getIdleWorkers()

@@ -25,19 +25,20 @@
         <dropwizard.version>1.3.5</dropwizard.version>
         <guice.version>4.2.0</guice.version>
         <metrics-core.version>3.0.2</metrics-core.version>
+        <httpclient.version>4.5.7</httpclient.version>
+        <postgresql.version>42.2.5</postgresql.version>
+        <jdbi3.version>3.6.0</jdbi3.version>
 
         <junit.version>4.12</junit.version>
         <assertj-core.version>3.11.0</assertj-core.version>
         <mockito-all.version>1.9.5</mockito-all.version>
-        <httpclient.version>4.5.6</httpclient.version>
+        <awaitility.version>3.1.6</awaitility.version>
 
         <angularjs.version>1.7.7</angularjs.version>
         <bootstrap.version>4.3.1</bootstrap.version>
         <font-awesome.version>5.7.2</font-awesome.version>
         <ngtoast.version>1.5.6</ngtoast.version>
         <ng-file-upload.version>12.0.4</ng-file-upload.version>
-        <postgresql.version>42.2.5</postgresql.version>
-        <jdbi3.version>3.6.0</jdbi3.version>
     </properties>
 
     <dependencyManagement>
@@ -168,6 +169,12 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>${mockito-all.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>${awaitility.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

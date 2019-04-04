@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.UUID;
 import org.cempaka.cyclone.protocol.payloads.EndedPayload;
 import org.cempaka.cyclone.protocol.payloads.Payload;
 import org.cempaka.cyclone.protocol.payloads.RunningPayload;
@@ -28,14 +29,15 @@ public class MessageEncoderSmallTest
     @Parameters
     public static Object[][] parameters()
     {
+        final String testId = UUID.randomUUID().toString();
         final HashMap<String, Double> measurements = new HashMap<>();
         measurements.put("m", 42D);
         return new Object[][]{
-            new Object[]{new StartedPayload()},
-            new Object[]{new RunningPayload(new HashMap<>())},
-            new Object[]{new RunningPayload(measurements)},
-            new Object[]{new EndedPayload(0, null)},
-            new Object[]{new EndedPayload(-1, "failure")},
+            new Object[]{new StartedPayload(testId)},
+            new Object[]{new RunningPayload(testId, new HashMap<>())},
+            new Object[]{new RunningPayload(testId, measurements)},
+            new Object[]{new EndedPayload(testId, 0, null)},
+            new Object[]{new EndedPayload(testId, -1, "failure")},
         };
     }
 

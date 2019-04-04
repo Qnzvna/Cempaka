@@ -13,13 +13,15 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Objects;
 import org.cempaka.cyclone.configuration.DaemonConfiguration;
+import org.cempaka.cyclone.managed.HeartbeatManaged;
+import org.cempaka.cyclone.managed.DaemonTestRunnerManaged;
 import org.cempaka.cyclone.protocol.DaemonChannel;
 import org.cempaka.cyclone.resources.ParcelResource;
 import org.cempaka.cyclone.resources.StatusResource;
 import org.cempaka.cyclone.resources.TestResource;
 import org.cempaka.cyclone.storage.ParcelIndexer;
-import org.cempaka.cyclone.storage.ParcelMetadataRepository;
-import org.cempaka.cyclone.storage.ParcelRepository;
+import org.cempaka.cyclone.storage.repository.ParcelMetadataRepository;
+import org.cempaka.cyclone.storage.repository.ParcelRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +50,8 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
             new DaemonModule(daemonConfiguration, environment));
 
         registerResources(environment, injector);
+        registerManaged(environment, injector);
+
         indexParcels(injector);
 
         final DaemonChannel daemonChannel = injector.getInstance(DaemonChannel.class);
@@ -65,6 +69,12 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
         jersey.register(injector.getInstance(TestResource.class));
         jersey.register(injector.getInstance(StatusResource.class));
         LOG.info("Resources registered.");
+    }
+
+    private void registerManaged(final Environment environment, final Injector injector)
+    {
+        environment.lifecycle().manage(injector.getInstance(HeartbeatManaged.class));
+        environment.lifecycle().manage(injector.getInstance(DaemonTestRunnerManaged.class));
     }
 
     private void indexParcels(final Injector injector)

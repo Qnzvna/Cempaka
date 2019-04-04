@@ -1,12 +1,17 @@
 package org.cempaka.cyclone.cli;
 
-import static org.cempaka.cyclone.utils.CliParametrs.CLI_PORT;
-import static org.cempaka.cyclone.utils.CliParametrs.DAEMON_PORT;
-import static org.cempaka.cyclone.utils.CliParametrs.LOOP_COUNT;
-import static org.cempaka.cyclone.utils.CliParametrs.PARAMETERS;
-import static org.cempaka.cyclone.utils.CliParametrs.TEST_CLASSES;
-import static org.cempaka.cyclone.utils.CliParametrs.THREADS;
-import static org.cempaka.cyclone.utils.Preconditions.checkArgument;
+import org.cempaka.cyclone.metrics.MeasurementRegistry;
+import org.cempaka.cyclone.protocol.DaemonChannel;
+import org.cempaka.cyclone.protocol.UdpDaemonChannel;
+import org.cempaka.cyclone.protocol.payloads.EndedPayload;
+import org.cempaka.cyclone.protocol.payloads.RunningPayload;
+import org.cempaka.cyclone.protocol.payloads.StartedPayload;
+import org.cempaka.cyclone.runner.LoopRunner;
+import org.cempaka.cyclone.runner.Runner;
+import org.cempaka.cyclone.runner.SimpleRunner;
+import org.cempaka.cyclone.runner.ThreadRunner;
+import picocli.CommandLine;
+import picocli.CommandLine.Option;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,18 +25,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.cempaka.cyclone.metrics.MeasurementRegistry;
-import org.cempaka.cyclone.protocol.DaemonChannel;
-import org.cempaka.cyclone.protocol.UdpDaemonChannel;
-import org.cempaka.cyclone.protocol.payloads.EndedPayload;
-import org.cempaka.cyclone.protocol.payloads.RunningPayload;
-import org.cempaka.cyclone.protocol.payloads.StartedPayload;
-import org.cempaka.cyclone.runner.LoopRunner;
-import org.cempaka.cyclone.runner.Runner;
-import org.cempaka.cyclone.runner.SimpleRunner;
-import org.cempaka.cyclone.runner.ThreadRunner;
-import picocli.CommandLine;
-import picocli.CommandLine.Option;
+
+import static org.cempaka.cyclone.utils.CliParametrs.TEST_ID;
+import static org.cempaka.cyclone.utils.CliParametrs.DAEMON_PORT;
+import static org.cempaka.cyclone.utils.CliParametrs.LOOP_COUNT;
+import static org.cempaka.cyclone.utils.CliParametrs.PARAMETERS;
+import static org.cempaka.cyclone.utils.CliParametrs.TEST_CLASSES;
+import static org.cempaka.cyclone.utils.CliParametrs.THREADS;
+import static org.cempaka.cyclone.utils.Preconditions.checkArgument;
 
 public class CycloneCli
 {
@@ -51,8 +52,8 @@ public class CycloneCli
     private Map<String, String> parameters = new HashMap<>();
     @Option(names = {DAEMON_PORT}, description = "daemon port to send updates")
     private int daemonPort;
-    @Option(names = {CLI_PORT}, description = "cli port to receive updates")
-    private int cliPort;
+    @Option(names = {TEST_ID}, description = "test id to receive updates")
+    private String testId = "unknown";
     @Option(names = {
         "--measurement-period"}, description = "measurements period in seconds", defaultValue = "5")
     private int measurementsPeriod;
@@ -81,9 +82,8 @@ public class CycloneCli
     {
 
         if (isUdpEnabled()) {
-            checkArgument(daemonPort > 0, "daemon port must be defined");
             daemonChannel.connect();
-            daemonChannel.write(new StartedPayload(), daemonPort);
+            daemonChannel.write(new StartedPayload(testId), daemonPort);
             metricsExecutor.scheduleAtFixedRate(this::reportMetrics, 1, measurementsPeriod,
                 TimeUnit.SECONDS);
         }
@@ -108,12 +108,12 @@ public class CycloneCli
         try {
             runner.run();
             reportMetrics();
-            return new EndedPayload(0, null);
+            return new EndedPayload(testId, 0, null);
         } catch (Exception e) {
             e.printStackTrace();
             final StringWriter writer = new StringWriter();
             e.printStackTrace(new PrintWriter(writer));
-            return new EndedPayload(-1, writer.toString());
+            return new EndedPayload(testId, -1, writer.toString());
         } finally {
             threadRunner.awaitTermination(RUNNER_AWAIT_TIME);
         }
@@ -121,14 +121,14 @@ public class CycloneCli
 
     private boolean isUdpEnabled()
     {
-        return cliPort > 0;
+        return daemonPort > 0;
     }
 
     private void reportMetrics()
     {
         if (isUdpEnabled()) {
             final Map<String, Double> measurements = measurementRegistry.getSnapshots();
-            final RunningPayload runningPayload = new RunningPayload(measurements);
+            final RunningPayload runningPayload = new RunningPayload(testId, measurements);
             daemonChannel.write(runningPayload, daemonPort);
         }
     }

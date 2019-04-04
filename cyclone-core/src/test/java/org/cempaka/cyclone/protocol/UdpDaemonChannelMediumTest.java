@@ -3,6 +3,7 @@ package org.cempaka.cyclone.protocol;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.SocketException;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import org.cempaka.cyclone.protocol.payloads.Payload;
 import org.cempaka.cyclone.protocol.payloads.StartedPayload;
@@ -21,7 +22,7 @@ public class UdpDaemonChannelMediumTest
         //given
         final AtomicReference<Payload> payloadReference = new AtomicReference<>();
         server.addReadListener((receivedPort, payload) -> payloadReference.set(payload));
-        final StartedPayload payload = new StartedPayload();
+        final StartedPayload payload = new StartedPayload(UUID.randomUUID().toString());
         //when
         client.connect();
         server.connect(SERVER_PORT);
