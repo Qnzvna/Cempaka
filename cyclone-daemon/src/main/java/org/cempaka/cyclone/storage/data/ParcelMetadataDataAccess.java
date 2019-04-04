@@ -1,11 +1,13 @@
 package org.cempaka.cyclone.storage.data;
 
-import java.util.stream.Stream;
 import org.cempaka.cyclone.beans.ParcelMetadata;
 import org.jdbi.v3.json.Json;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+
+import java.util.Set;
+import java.util.stream.Stream;
 
 public interface ParcelMetadataDataAccess
 {
@@ -21,4 +23,8 @@ public interface ParcelMetadataDataAccess
     @Json
     @SqlQuery("SELECT value FROM parcels_metadata WHERE id = ?")
     ParcelMetadata findById(String id);
+
+    @Json
+    @SqlQuery("SELECT value FROM parcels_metadata")
+    Set<ParcelMetadata> getAll();
 }

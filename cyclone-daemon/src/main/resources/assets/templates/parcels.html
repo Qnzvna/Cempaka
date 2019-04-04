@@ -1,0 +1,15 @@
+<div ng-if="$ctrl.parcels.length == 0" class="alert-warning">
+    No parcels.
+</div>
+<ul class="list-group">
+    <li class="list-group-item" ng-repeat="metadata in $ctrl.parcels">
+        <button type="button" class="btn btn-danger float-right" ng-click="$ctrl.deleteParcel(metadata.id)">
+            Delete parcel
+        </button>
+        <h5 class="mb-3">{{metadata.id}}</h5>
+        <h6>Tests</h6>
+        <ul class="list-inline">
+            <li ng-repeat="testMetadata in metadata.testsMetadata">{{testMetadata.testName}}</li>
+        </ul>
+    </li>
+</ul>

@@ -1,5 +1,5 @@
 export const ParcelComponent = {
-    templateUrl: "templates/parcel.html",
+    templateUrl: 'templates/parcel.html',
     controller: class ParcelController
     {
         constructor(Upload, ngToast)

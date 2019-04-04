@@ -5,11 +5,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.io.ByteStreams;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -46,6 +48,12 @@ public class ParcelResource
         this.parcelMetadataRepository = checkNotNull(parcelMetadataRepository);
     }
 
+    @GET
+    public Set<ParcelMetadata> getParcels()
+    {
+        return parcelMetadataRepository.getAll();
+    }
+
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public UUID addParcel(@FormDataParam("file") final InputStream data) throws IOException
@@ -66,6 +74,7 @@ public class ParcelResource
     @Path("/{id}")
     public void deleteParcel(@PathParam("id") final String parcelId)
     {
+        parcelMetadataRepository.delete(parcelId);
         parcelRepository.delete(UUID.fromString(parcelId));
     }
 }

@@ -1,8 +1,10 @@
 package org.cempaka.cyclone.storage.repository;
 
-import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.cempaka.cyclone.beans.ParcelMetadata;
+
+import javax.annotation.Nullable;
+import java.util.Set;
+import java.util.stream.Stream;
 
 public interface ParcelMetadataRepository
 {
@@ -11,7 +13,9 @@ public interface ParcelMetadataRepository
 
     void put(ParcelMetadata parcelMetadata);
 
-    void delete(String name);
+    void delete(String id);
+
+    Set<ParcelMetadata> getAll();
 
     Stream<String> list();
 }
