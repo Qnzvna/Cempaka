@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.util.stream.Stream;
 import org.cempaka.cyclone.utils.Reflections;
 
+/**
+ * Extract metadata from load test and print them on stdout.
+ */
 public class MetadataPrint
 {
     public static void main(String[] args) throws IOException

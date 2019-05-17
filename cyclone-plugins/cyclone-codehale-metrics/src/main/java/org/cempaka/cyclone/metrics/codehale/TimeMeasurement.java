@@ -1,5 +1,9 @@
 package org.cempaka.cyclone.metrics.codehale;
 
+/**
+ * Measure median execution time (ns) of {@link org.cempaka.cyclone.annotation.Thunderbolt}
+ * execution.
+ */
 public class TimeMeasurement extends TimerMeasurement
 {
     @Override

@@ -1,5 +1,8 @@
 package org.cempaka.cyclone.metrics.codehale;
 
+/**
+ * Measure rate (event per second) of {@link org.cempaka.cyclone.annotation.Thunderbolt} execution.
+ */
 public class RateMeasurement extends TimerMeasurement
 {
     @Override

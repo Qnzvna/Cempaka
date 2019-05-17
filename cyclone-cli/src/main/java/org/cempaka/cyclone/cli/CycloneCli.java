@@ -1,17 +1,11 @@
 package org.cempaka.cyclone.cli;
 
-import org.cempaka.cyclone.metrics.MeasurementRegistry;
-import org.cempaka.cyclone.protocol.DaemonChannel;
-import org.cempaka.cyclone.protocol.UdpDaemonChannel;
-import org.cempaka.cyclone.protocol.payloads.EndedPayload;
-import org.cempaka.cyclone.protocol.payloads.RunningPayload;
-import org.cempaka.cyclone.protocol.payloads.StartedPayload;
-import org.cempaka.cyclone.runner.LoopRunner;
-import org.cempaka.cyclone.runner.Runner;
-import org.cempaka.cyclone.runner.SimpleRunner;
-import org.cempaka.cyclone.runner.ThreadRunner;
-import picocli.CommandLine;
-import picocli.CommandLine.Option;
+import static org.cempaka.cyclone.utils.CliParametrs.DAEMON_PORT;
+import static org.cempaka.cyclone.utils.CliParametrs.LOOP_COUNT;
+import static org.cempaka.cyclone.utils.CliParametrs.PARAMETERS;
+import static org.cempaka.cyclone.utils.CliParametrs.TEST_CLASSES;
+import static org.cempaka.cyclone.utils.CliParametrs.TEST_ID;
+import static org.cempaka.cyclone.utils.CliParametrs.THREADS;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,21 +19,29 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.cempaka.cyclone.metrics.MeasurementRegistry;
+import org.cempaka.cyclone.protocol.DaemonChannel;
+import org.cempaka.cyclone.protocol.UdpDaemonChannel;
+import org.cempaka.cyclone.protocol.payloads.EndedPayload;
+import org.cempaka.cyclone.protocol.payloads.RunningPayload;
+import org.cempaka.cyclone.protocol.payloads.StartedPayload;
+import org.cempaka.cyclone.runner.LoopRunner;
+import org.cempaka.cyclone.runner.Runner;
+import org.cempaka.cyclone.runner.SimpleRunner;
+import org.cempaka.cyclone.runner.ThreadRunner;
+import picocli.CommandLine;
+import picocli.CommandLine.Option;
 
-import static org.cempaka.cyclone.utils.CliParametrs.TEST_ID;
-import static org.cempaka.cyclone.utils.CliParametrs.DAEMON_PORT;
-import static org.cempaka.cyclone.utils.CliParametrs.LOOP_COUNT;
-import static org.cempaka.cyclone.utils.CliParametrs.PARAMETERS;
-import static org.cempaka.cyclone.utils.CliParametrs.TEST_CLASSES;
-import static org.cempaka.cyclone.utils.CliParametrs.THREADS;
-import static org.cempaka.cyclone.utils.Preconditions.checkArgument;
-
+/**
+ * Main load tests runner.
+ */
 public class CycloneCli
 {
     private static final Duration RUNNER_AWAIT_TIME = Duration.ofMinutes(1);
 
-    @Option(names = {TEST_CLASSES,
-        "--test-classes"}, description = "test names to run", required = true, split = ",")
+    @Option(names = {TEST_CLASSES, "--test-classes"},
+        description = "test names to run", required = true,
+        split = ",")
     private String[] testNames;
     @Option(names = {LOOP_COUNT,
         "--loopCount"}, description = "number of loops to run", defaultValue = "1")
@@ -54,8 +56,8 @@ public class CycloneCli
     private int daemonPort;
     @Option(names = {TEST_ID}, description = "test id to receive updates")
     private String testId = "unknown";
-    @Option(names = {
-        "--measurement-period"}, description = "measurements period in seconds", defaultValue = "5")
+    @Option(names = {"--measurement-period"},
+        description = "measurements period in seconds", defaultValue = "5")
     private int measurementsPeriod;
 
     private final MeasurementRegistry measurementRegistry;
