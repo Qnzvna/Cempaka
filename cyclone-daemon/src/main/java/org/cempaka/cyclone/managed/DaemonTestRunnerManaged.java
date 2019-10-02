@@ -16,7 +16,6 @@ import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
 import org.cempaka.cyclone.beans.exceptions.WorkerNotAvailableException;
 import org.cempaka.cyclone.configuration.TestRunnerConfiguration;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
-import org.cempaka.cyclone.storage.data.TestRunConfigurationDataAccess;
 import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
 import org.cempaka.cyclone.worker.WorkerManager;
 import org.slf4j.Logger;
@@ -30,7 +29,6 @@ public class DaemonTestRunnerManaged implements Managed
     private final TestRunStatusDataAccess testRunStatusDataAccess;
     private final NodeIdentifierProvider nodeIdentifierProvider;
     private final WorkerManager workerManager;
-    private final TestRunConfigurationDataAccess testRunConfigurationDataAccess;
     private final TestRunnerConfiguration testRunnerConfiguration;
     private final ScheduledExecutorService executorService;
 
@@ -38,13 +36,11 @@ public class DaemonTestRunnerManaged implements Managed
     public DaemonTestRunnerManaged(final TestRunStatusDataAccess testRunStatusDataAccess,
                                    final NodeIdentifierProvider nodeIdentifierProvider,
                                    final WorkerManager workerManager,
-                                   final TestRunConfigurationDataAccess testRunConfigurationDataAccess,
                                    final TestRunnerConfiguration testRunnerConfiguration)
     {
         this.testRunStatusDataAccess = checkNotNull(testRunStatusDataAccess);
         this.nodeIdentifierProvider = checkNotNull(nodeIdentifierProvider);
         this.workerManager = checkNotNull(workerManager);
-        this.testRunConfigurationDataAccess = checkNotNull(testRunConfigurationDataAccess);
         this.testRunnerConfiguration = checkNotNull(testRunnerConfiguration);
         this.executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
             .setNameFormat("DaemonTestRunnerManaged-%d")
@@ -73,8 +69,7 @@ public class DaemonTestRunnerManaged implements Managed
 
     private void startTest(final String nodeIdentifier, final String testId)
     {
-        final TestRunConfiguration testRunConfiguration = testRunConfigurationDataAccess
-            .getConfiguration(testId);
+        final TestRunConfiguration testRunConfiguration = testRunStatusDataAccess.getConfiguration(testId);
         final UUID testUuid = UUID.fromString(testId);
         try {
             workerManager.startTest(testUuid,

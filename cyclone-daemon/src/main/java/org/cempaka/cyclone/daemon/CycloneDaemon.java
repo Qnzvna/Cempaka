@@ -13,12 +13,13 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Objects;
 import org.cempaka.cyclone.configuration.DaemonConfiguration;
-import org.cempaka.cyclone.managed.HeartbeatManaged;
 import org.cempaka.cyclone.managed.DaemonTestRunnerManaged;
+import org.cempaka.cyclone.managed.HeartbeatManaged;
 import org.cempaka.cyclone.protocol.DaemonChannel;
 import org.cempaka.cyclone.resources.ParcelResource;
 import org.cempaka.cyclone.resources.StatusResource;
 import org.cempaka.cyclone.resources.TestResource;
+import org.cempaka.cyclone.storage.MigrationRunner;
 import org.cempaka.cyclone.storage.ParcelIndexer;
 import org.cempaka.cyclone.storage.repository.ParcelMetadataRepository;
 import org.cempaka.cyclone.storage.repository.ParcelRepository;
@@ -46,8 +47,9 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
     public void run(final DaemonConfiguration daemonConfiguration, final Environment environment)
         throws SocketException, UnknownHostException
     {
-        final Injector injector = Guice.createInjector(
-            new DaemonModule(daemonConfiguration, environment));
+        final Injector injector = Guice.createInjector(new DaemonModule(daemonConfiguration, environment));
+
+        new MigrationRunner(daemonConfiguration).run();
 
         registerResources(environment, injector);
         registerManaged(environment, injector);

@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.TestRunConfiguration;
 import org.cempaka.cyclone.beans.TestState;
-import org.cempaka.cyclone.storage.data.TestRunConfigurationDataAccess;
 import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
 
 @Singleton
@@ -17,16 +16,13 @@ public class DistributedTestRunnerService implements TestRunnerService
 {
     private final NodeStatusService nodeStatusService;
     private final TestRunStatusDataAccess testRunStatusDataAccess;
-    private final TestRunConfigurationDataAccess testRunConfigurationDataAccess;
 
     @Inject
     public DistributedTestRunnerService(final NodeStatusService nodeStatusService,
-                                        final TestRunStatusDataAccess testRunStatusDataAccess,
-                                        final TestRunConfigurationDataAccess testRunConfigurationDataAccess)
+                                        final TestRunStatusDataAccess testRunStatusDataAccess)
     {
         this.nodeStatusService = checkNotNull(nodeStatusService);
         this.testRunStatusDataAccess = checkNotNull(testRunStatusDataAccess);
-        this.testRunConfigurationDataAccess = checkNotNull(testRunConfigurationDataAccess);
     }
 
     @Override
@@ -36,11 +32,11 @@ public class DistributedTestRunnerService implements TestRunnerService
         final Set<String> nodesToRun = testRunConfiguration.getNodeIdentifiers();
         checkState(liveNodes.containsAll(nodesToRun), "Not all nodes are alive");
         final UUID testRunId = UUID.randomUUID();
-        testRunConfigurationDataAccess.insertTestRunConfiguration(testRunId.toString(),
-            testRunConfiguration);
-        nodesToRun.forEach(nodeIdentifier -> testRunStatusDataAccess.insert(testRunId.toString(),
-            nodeIdentifier,
-            TestState.INITIALIZED));
+        nodesToRun.forEach(nodeIdentifier ->
+            testRunStatusDataAccess.insert(testRunId.toString(),
+                nodeIdentifier,
+                TestState.INITIALIZED,
+                testRunConfiguration));
         return testRunId;
     }
 

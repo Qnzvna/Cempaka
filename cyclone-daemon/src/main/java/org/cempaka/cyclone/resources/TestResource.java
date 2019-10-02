@@ -1,16 +1,12 @@
 package org.cempaka.cyclone.resources;
 
-import org.cempaka.cyclone.TestRunMetric;
-import org.cempaka.cyclone.beans.ParcelMetadata;
-import org.cempaka.cyclone.beans.TestMetadata;
-import org.cempaka.cyclone.beans.TestRunConfiguration;
-import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
-import org.cempaka.cyclone.services.TestRunnerService;
-import org.cempaka.cyclone.storage.repository.ParcelMetadataRepository;
-import org.cempaka.cyclone.storage.data.TestRunConfigurationDataAccess;
-import org.cempaka.cyclone.storage.data.TestRunMetricDataAccess;
-import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
+import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
@@ -24,13 +20,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.cempaka.cyclone.TestRunMetric;
+import org.cempaka.cyclone.beans.ParcelMetadata;
+import org.cempaka.cyclone.beans.TestMetadata;
+import org.cempaka.cyclone.beans.TestRunConfiguration;
+import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
+import org.cempaka.cyclone.services.TestRunnerService;
+import org.cempaka.cyclone.storage.data.TestRunMetricDataAccess;
+import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
+import org.cempaka.cyclone.storage.repository.ParcelMetadataRepository;
 
 @Singleton
 @Produces(MediaType.APPLICATION_JSON)
@@ -40,20 +38,17 @@ public class TestResource
 {
     private final ParcelMetadataRepository parcelMetadataRepository;
     private final TestRunnerService testRunnerService;
-    private final TestRunConfigurationDataAccess testRunConfigurationDataAccess;
     private final TestRunMetricDataAccess testRunMetricDataAccess;
     private final TestRunStatusDataAccess testRunStatusDataAccess;
 
     @Inject
     public TestResource(final ParcelMetadataRepository parcelMetadataRepository,
                         final TestRunnerService testRunnerService,
-                        final TestRunConfigurationDataAccess testRunConfigurationDataAccess,
                         final TestRunMetricDataAccess testRunMetricDataAccess,
                         final TestRunStatusDataAccess testRunStatusDataAccess)
     {
         this.parcelMetadataRepository = checkNotNull(parcelMetadataRepository);
         this.testRunnerService = checkNotNull(testRunnerService);
-        this.testRunConfigurationDataAccess = checkNotNull(testRunConfigurationDataAccess);
         this.testRunMetricDataAccess = checkNotNull(testRunMetricDataAccess);
         this.testRunStatusDataAccess = checkNotNull(testRunStatusDataAccess);
     }
@@ -104,8 +99,7 @@ public class TestResource
     @Path("/{id}/configuration")
     public Response getConfiguration(@PathParam("id") final String testId)
     {
-        final TestRunConfiguration configuration = testRunConfigurationDataAccess
-            .getConfiguration(testId);
+        final TestRunConfiguration configuration = testRunStatusDataAccess.getConfiguration(testId);
         return Response.ok(configuration).build();
     }
 

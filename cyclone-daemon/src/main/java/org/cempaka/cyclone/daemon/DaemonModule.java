@@ -1,5 +1,7 @@
 package org.cempaka.cyclone.daemon;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
@@ -10,6 +12,9 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Environment;
+import java.time.Clock;
+import java.util.function.BiConsumer;
+import javax.inject.Inject;
 import org.cempaka.cyclone.configuration.ChannelConfiguration;
 import org.cempaka.cyclone.configuration.ClusterConfiguration;
 import org.cempaka.cyclone.configuration.DaemonConfiguration;
@@ -33,12 +38,6 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.jackson2.Jackson2Config;
 import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
-
-import javax.inject.Inject;
-import java.time.Clock;
-import java.util.function.BiConsumer;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 public class DaemonModule extends AbstractModule
 {
@@ -84,7 +83,7 @@ public class DaemonModule extends AbstractModule
         bind(Long.class).annotatedWith(Names.named("heartbeat.interval"))
             .toInstance(clusterConfiguration.getHeartbeatInterval());
         bind(String.class).annotatedWith(Names.named("node.id"))
-                .toInstance(clusterConfiguration.getNodeId());
+            .toInstance(clusterConfiguration.getNodeId());
 
         bind(NodeIdentifierProvider.class).to(StaticNodeIdentifierProvider.class);
         bind(Clock.class).toInstance(Clock.systemUTC());

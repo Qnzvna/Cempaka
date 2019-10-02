@@ -10,7 +10,6 @@ import org.cempaka.cyclone.configuration.StorageConfiguration;
 import org.cempaka.cyclone.daemon.DaemonModule;
 import org.cempaka.cyclone.storage.data.NodeStateDataAccess;
 import org.cempaka.cyclone.storage.data.ParcelMetadataDataAccess;
-import org.cempaka.cyclone.storage.data.TestRunConfigurationDataAccess;
 import org.cempaka.cyclone.storage.data.TestRunMetricDataAccess;
 import org.cempaka.cyclone.storage.data.TestRunStackTraceDataAccess;
 import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
@@ -36,14 +35,6 @@ public class StorageModule extends PrivateModule
             .to(DaemonModule.createClass(storageConfiguration.getParcelMetadataRepository()));
         expose(ParcelRepository.class);
         expose(ParcelMetadataRepository.class);
-    }
-
-    @Exposed
-    @Provides
-    @Singleton
-    TestRunConfigurationDataAccess testRunMetadataRepository(final Jdbi jdbi)
-    {
-        return jdbi.onDemand(TestRunConfigurationDataAccess.class);
     }
 
     @Exposed

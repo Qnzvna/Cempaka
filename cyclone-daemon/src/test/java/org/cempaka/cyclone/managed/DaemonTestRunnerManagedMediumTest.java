@@ -14,7 +14,6 @@ import org.cempaka.cyclone.beans.TestRunConfiguration;
 import org.cempaka.cyclone.beans.TestState;
 import org.cempaka.cyclone.configuration.TestRunnerConfiguration;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
-import org.cempaka.cyclone.storage.data.TestRunConfigurationDataAccess;
 import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
 import org.cempaka.cyclone.worker.WorkerManager;
 import org.junit.Before;
@@ -33,8 +32,6 @@ public class DaemonTestRunnerManagedMediumTest
     @Mock
     private TestRunStatusDataAccess testRunStatusDataAccess;
     @Mock
-    private TestRunConfigurationDataAccess testRunConfigurationDataAccess;
-    @Mock
     private NodeIdentifierProvider nodeIdentifierProvider;
     @Mock
     private WorkerManager workerManager;
@@ -51,8 +48,7 @@ public class DaemonTestRunnerManagedMediumTest
     {
         given(testRunnerConfiguration.getPeriodInterval()).willReturn(1);
         given(nodeIdentifierProvider.get()).willReturn(NODE_IDENTIFIER);
-        given(testRunConfigurationDataAccess.getConfiguration(TEST_ID.toString()))
-            .willReturn(testRunConfiguration);
+        given(testRunStatusDataAccess.getConfiguration(TEST_ID.toString())).willReturn(testRunConfiguration);
     }
 
     @Test

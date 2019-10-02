@@ -1,7 +1,7 @@
 version: '3.1'
 
 services:
-  cyclone-postgres:
+  postgres:
     image: postgres:9.5.16-alpine
     restart: always
     ports:
