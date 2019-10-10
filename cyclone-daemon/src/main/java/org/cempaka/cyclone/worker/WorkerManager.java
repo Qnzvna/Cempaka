@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import org.cempaka.cyclone.beans.Parcel;
+import org.cempaka.cyclone.beans.TestRunConfiguration;
 import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
 import org.cempaka.cyclone.beans.exceptions.WorkerNotAvailableException;
 import org.cempaka.cyclone.storage.repository.ParcelRepository;
@@ -57,13 +58,16 @@ public class WorkerManager
         LOG.info("Workers initialized.");
     }
 
-    public CompletableFuture<UUID> startTest(final UUID testId,
-                                             final UUID parcelId,
-                                             final String testName,
-                                             final int loopCount,
-                                             final int threadsNumber,
-                                             final Map<String, String> parameters)
+    public CompletableFuture<UUID> startTest(final UUID testId, final TestRunConfiguration testRunConfiguration)
     {
+        checkNotNull(testId);
+        checkNotNull(testRunConfiguration);
+        final UUID parcelId = testRunConfiguration.getParcelId();
+        final String testName = testRunConfiguration.getTestName();
+        final int loopCount = testRunConfiguration.getLoopCount();
+        final int threadsNumber = testRunConfiguration.getThreadsNumber();
+        final Map<String, String> parameters = testRunConfiguration.getParameters();
+        final String jvmOptions = testRunConfiguration.getJvmOptions();
         LOG.debug("About to start test for parcel {} ...", parcelId);
         final Parcel parcel = parcelRepository.get(parcelId);
         if (parcel != null) {
@@ -76,7 +80,8 @@ public class WorkerManager
                     threadsNumber,
                     udpServerPort,
                     logsDirectory,
-                    parameters);
+                    parameters,
+                    jvmOptions);
                 LOG.debug("Test started successfully.");
                 final CompletableFuture<?> testFuture = worker.onDone();
                 testFuture.whenComplete((ignore, throwable) -> cleanResources(worker, testId));

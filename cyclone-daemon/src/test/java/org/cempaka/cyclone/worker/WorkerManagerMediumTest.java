@@ -1,7 +1,7 @@
 package org.cempaka.cyclone.worker;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Java6Assertions.catchThrowable;
 import static org.mockito.BDDMockito.given;
 
 import com.google.common.collect.ImmutableMap;
@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.cempaka.cyclone.beans.Parcel;
+import org.cempaka.cyclone.beans.TestRunConfiguration;
 import org.cempaka.cyclone.beans.exceptions.ProcessFailureException;
 import org.cempaka.cyclone.storage.repository.ParcelRepository;
 import org.junit.Before;
@@ -30,9 +31,9 @@ public class WorkerManagerMediumTest
     private static final int WORKER_NUMBER = 2;
     private static final String EXAMPLE_TEST = "org.cempaka.cyclone.examples.ExampleTest";
     private static final String FAILING_TEST = "org.cempaka.cyclone.examples.FailingTest";
-    private static final String SUPPRESSED_FAILING_TEST =
-        "org.cempaka.cyclone.examples.SupressedFailingTest";
+    private static final String SUPPRESSED_FAILING_TEST = "org.cempaka.cyclone.examples.SupressedFailingTest";
     private static final Set<String> LOCAL = ImmutableSet.of("127.0.0.1");
+    private static final String JVM_OPTIONS = "";
 
     @Mock
     private ParcelRepository parcelRepository;
@@ -55,8 +56,9 @@ public class WorkerManagerMediumTest
         //given
         final UUID testId = UUID.randomUUID();
         final Map<String, String> parameters = ImmutableMap.of("sleep", "1", "testName", "test");
+        final TestRunConfiguration testRunConfiguration = getTestRunConfiguration(EXAMPLE_TEST, parameters);
         //when
-        workerManager.startTest(testId, EXAMPLE_ID, EXAMPLE_TEST, 1, 1, parameters).join();
+        workerManager.startTest(testId, testRunConfiguration).join();
         //then
     }
 
@@ -66,8 +68,9 @@ public class WorkerManagerMediumTest
         //given
         final UUID testId = UUID.randomUUID();
         final Map<String, String> parameters = ImmutableMap.of("sleep", "1");
+        final TestRunConfiguration testRunConfiguration = getTestRunConfiguration(EXAMPLE_TEST, parameters);
         //when
-        workerManager.startTest(testId, EXAMPLE_ID, EXAMPLE_TEST, 1, 1, parameters).join();
+        workerManager.startTest(testId, testRunConfiguration).join();
         //then
     }
 
@@ -77,9 +80,9 @@ public class WorkerManagerMediumTest
         //given
         final UUID testId = UUID.randomUUID();
         final Map<String, String> parameters = ImmutableMap.of();
+        final TestRunConfiguration testRunConfiguration = getTestRunConfiguration(SUPPRESSED_FAILING_TEST, parameters);
         //when
-        workerManager.startTest(testId, EXAMPLE_ID, SUPPRESSED_FAILING_TEST, 1, 1, parameters)
-            .join();
+        workerManager.startTest(testId, testRunConfiguration).join();
         //then
     }
 
@@ -89,12 +92,11 @@ public class WorkerManagerMediumTest
         //given
         final UUID testId = UUID.randomUUID();
         final Map<String, String> parameters = ImmutableMap.of();
+        final TestRunConfiguration testRunConfiguration = getTestRunConfiguration(FAILING_TEST, parameters);
         //when
+        final Throwable throwable = catchThrowable(() -> workerManager.startTest(testId, testRunConfiguration).join());
         //then
-        assertThatThrownBy(
-            () -> workerManager
-                .startTest(UUID.randomUUID(), EXAMPLE_ID, FAILING_TEST, 1, 1, parameters).join())
-            .hasCauseInstanceOf(ProcessFailureException.class);
+        assertThat(throwable).hasCauseInstanceOf(ProcessFailureException.class);
     }
 
     @Test
@@ -102,12 +104,12 @@ public class WorkerManagerMediumTest
     {
         //given
         final Map<String, String> parameters = ImmutableMap.of("sleep", "1000", "testName", "test");
-
+        final TestRunConfiguration testRunConfiguration = getTestRunConfiguration(EXAMPLE_TEST, parameters);
         //when
         final CompletableFuture<UUID> runId1 = workerManager
-            .startTest(UUID.randomUUID(), EXAMPLE_ID, EXAMPLE_TEST, 1, 1, parameters);
+            .startTest(UUID.randomUUID(), testRunConfiguration);
         final CompletableFuture<UUID> runId2 = workerManager
-            .startTest(UUID.randomUUID(), EXAMPLE_ID, EXAMPLE_TEST, 1, 1, parameters);
+            .startTest(UUID.randomUUID(), testRunConfiguration);
         final Set<UUID> runningTests = workerManager.getRunningTestsId();
         final List<Worker> idleWorkers = workerManager.getIdleWorkers();
         //then
@@ -121,14 +123,43 @@ public class WorkerManagerMediumTest
     {
         //given
         final Map<String, String> parameters = ImmutableMap.of("sleep", "1000", "testName", "test");
+        final TestRunConfiguration testRunConfiguration = getTestRunConfiguration(EXAMPLE_TEST, parameters);
         //when
-        final CompletableFuture<UUID> runId = workerManager
-            .startTest(UUID.randomUUID(), EXAMPLE_ID, EXAMPLE_TEST, 1, 1, parameters);
+        final CompletableFuture<UUID> runId = workerManager.startTest(UUID.randomUUID(), testRunConfiguration);
         final Set<UUID> runningTests = workerManager.getRunningTestsId();
         workerManager.abortTest(runId.join());
         final List<Worker> idleWorkers = workerManager.getIdleWorkers();
         //then
         assertThat(runningTests).containsExactly(runId.join());
         assertThat(idleWorkers).hasSize(2);
+    }
+
+    @Test
+    public void shouldRunWithJvmOptions()
+    {
+        //given
+        final UUID testId = UUID.randomUUID();
+        final Map<String, String> parameters = ImmutableMap.of("sleep", "1", "testName", "test");
+        final TestRunConfiguration testRunConfiguration = new TestRunConfiguration(EXAMPLE_ID,
+            EXAMPLE_TEST,
+            1,
+            1,
+            parameters,
+            LOCAL,
+            "-Xmx64M");
+        //when
+        workerManager.startTest(testId, testRunConfiguration).join();
+        //then
+    }
+
+    public TestRunConfiguration getTestRunConfiguration(final String testName, final Map<String, String> parameters)
+    {
+        return new TestRunConfiguration(EXAMPLE_ID,
+            testName,
+            1,
+            1,
+            parameters,
+            LOCAL,
+            JVM_OPTIONS);
     }
 }

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 public class TestRunConfiguration
 {
@@ -19,6 +20,7 @@ public class TestRunConfiguration
     private final int threadsNumber;
     private final Map<String, String> parameters;
     private final Set<String> nodeIdentifiers;
+    private final String jvmOptions;
 
     @JsonCreator
     public TestRunConfiguration(@JsonProperty("parcelId") final UUID parcelId,
@@ -26,7 +28,8 @@ public class TestRunConfiguration
                                 @JsonProperty("loopCount") final int loopCount,
                                 @JsonProperty("threadsNumber") final int threadsNumber,
                                 @JsonProperty("parameters") final Map<String, String> parameters,
-                                @JsonProperty("nodeIdentifiers") final Set<String> nodeIdentifiers)
+                                @JsonProperty("nodeIdentifiers") final Set<String> nodeIdentifiers,
+                                @Nullable @JsonProperty("jvmOptions") final String jvmOptions)
     {
         this.parcelId = checkNotNull(parcelId);
         this.testName = checkNotNull(testNames);
@@ -34,6 +37,7 @@ public class TestRunConfiguration
         this.threadsNumber = threadsNumber;
         this.parameters = ImmutableMap.copyOf(parameters);
         this.nodeIdentifiers = ImmutableSet.copyOf(nodeIdentifiers);
+        this.jvmOptions = jvmOptions == null ? "" : jvmOptions;
     }
 
     public UUID getParcelId()
@@ -66,6 +70,11 @@ public class TestRunConfiguration
         return nodeIdentifiers;
     }
 
+    public String getJvmOptions()
+    {
+        return jvmOptions;
+    }
+
     @Override
     public boolean equals(final Object o)
     {
@@ -77,13 +86,27 @@ public class TestRunConfiguration
             Objects.equals(parcelId, that.parcelId) &&
             Objects.equals(testName, that.testName) &&
             Objects.equals(parameters, that.parameters) &&
-            Objects.equals(nodeIdentifiers, that.nodeIdentifiers);
+            Objects.equals(nodeIdentifiers, that.nodeIdentifiers) &&
+            Objects.equals(jvmOptions, that.jvmOptions);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects
-            .hash(parcelId, testName, loopCount, threadsNumber, parameters, nodeIdentifiers);
+        return Objects.hash(parcelId, testName, loopCount, threadsNumber, parameters, nodeIdentifiers, jvmOptions);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "TestRunConfiguration{" +
+            "parcelId=" + parcelId +
+            ", testName='" + testName + '\'' +
+            ", loopCount=" + loopCount +
+            ", threadsNumber=" + threadsNumber +
+            ", parameters=" + parameters +
+            ", nodeIdentifiers=" + nodeIdentifiers +
+            ", jvmOptions='" + jvmOptions + '\'' +
+            '}';
     }
 }

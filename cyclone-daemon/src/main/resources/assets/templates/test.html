@@ -18,6 +18,12 @@
     <label for="threadsNumber">Threads <span class="badge badge-light">{{$ctrl.runConfiguration.threadsNumber}}</span></label>
     <input type="range" class="custom-range" id="threadsNumber" min="1" max="512"
            ng-model="$ctrl.runConfiguration.threadsNumber">
+    <div class="form-group">
+        <label for="jvmOptions">Jvm options</label>
+        <input type="text" class="form-control" id="jvmOptions" aria-describedby="jvmOptions"
+               ng-model="$ctrl.runConfiguration.jvmOptions">
+        <small id="jvmOptionsHelp" class="form-text text-muted">Enter custom jvm options for test run.</small>
+    </div>
     <label ng-if="$ctrl.parametersMetadata.length > 0">Test custom parameters</label>
     <div class="form-group row" ng-repeat="metadata in $ctrl.parametersMetadata">
         <label class="col-sm-2 col-form-label">{{metadata.name}}</label>

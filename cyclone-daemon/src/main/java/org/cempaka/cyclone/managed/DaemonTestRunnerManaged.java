@@ -72,12 +72,7 @@ public class DaemonTestRunnerManaged implements Managed
         final TestRunConfiguration testRunConfiguration = testRunStatusDataAccess.getConfiguration(testId);
         final UUID testUuid = UUID.fromString(testId);
         try {
-            workerManager.startTest(testUuid,
-                testRunConfiguration.getParcelId(),
-                testRunConfiguration.getTestName(),
-                testRunConfiguration.getLoopCount(),
-                testRunConfiguration.getThreadsNumber(),
-                testRunConfiguration.getParameters());
+            workerManager.startTest(testUuid, testRunConfiguration);
             testRunStatusDataAccess.updateState(TestState.STARTED, testId, nodeIdentifier);
         } catch (ParcelNotFoundException e) {
             LOG.warn("Parcel for test {} could'nt be found.", testId);

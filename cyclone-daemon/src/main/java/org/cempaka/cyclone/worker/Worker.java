@@ -1,13 +1,15 @@
 package org.cempaka.cyclone.worker;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.cempaka.cyclone.utils.CliParametrs.DAEMON_PORT;
+import static org.cempaka.cyclone.utils.CliParametrs.LOOP_COUNT;
+import static org.cempaka.cyclone.utils.CliParametrs.TEST_CLASSES;
+import static org.cempaka.cyclone.utils.CliParametrs.TEST_ID;
+import static org.cempaka.cyclone.utils.CliParametrs.THREADS;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
-import org.cempaka.cyclone.beans.Parcel;
-import org.cempaka.cyclone.beans.exceptions.ProcessFailureException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,13 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.cempaka.cyclone.utils.CliParametrs.TEST_ID;
-import static org.cempaka.cyclone.utils.CliParametrs.DAEMON_PORT;
-import static org.cempaka.cyclone.utils.CliParametrs.LOOP_COUNT;
-import static org.cempaka.cyclone.utils.CliParametrs.TEST_CLASSES;
-import static org.cempaka.cyclone.utils.CliParametrs.THREADS;
+import org.cempaka.cyclone.beans.Parcel;
+import org.cempaka.cyclone.beans.exceptions.ProcessFailureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class Worker
 {
@@ -43,7 +42,8 @@ class Worker
                             final int threadsNumber,
                             final int daemonPort,
                             final String logsDirectory,
-                            final Map<String, String> parameters)
+                            final Map<String, String> parameters,
+                            final String jvmOptions)
     {
         checkNotNull(parcel);
         try {
@@ -53,20 +53,21 @@ class Worker
             final File temporaryOutputFile = new File(logsDirectory, testId + OUT_SUFFIX);
             Files.write(temporaryParcelFile.toPath(), parcel.getData());
             final String[] command = getCommand(testNames,
-                    loopCount,
-                    threadsNumber,
-                    daemonPort,
-                    testId,
-                    parameters);
+                loopCount,
+                threadsNumber,
+                daemonPort,
+                testId,
+                parameters,
+                jvmOptions);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Running command {}", ImmutableList.copyOf(command));
                 LOG.debug("Error file {}", temporaryErrorFile.getAbsolutePath());
                 LOG.debug("Out file {}", temporaryOutputFile.getAbsolutePath());
             }
             runningProcess = new ProcessBuilder(command)
-                    .redirectError(ProcessBuilder.Redirect.to(temporaryErrorFile))
-                    .redirectOutput(ProcessBuilder.Redirect.to(temporaryOutputFile))
-                    .start();
+                .redirectError(ProcessBuilder.Redirect.to(temporaryErrorFile))
+                .redirectOutput(ProcessBuilder.Redirect.to(temporaryOutputFile))
+                .start();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -77,20 +78,25 @@ class Worker
                                 final int threadsNumber,
                                 final int daemonPort,
                                 final String testId,
-                                final Map<String, String> parameters)
+                                final Map<String, String> parameters,
+                                final String jvmOptions)
     {
         final String joinedTestNames = Joiner.on(',').join(testNames);
         final ImmutableList.Builder<String> commandBuilder = ImmutableList.builder();
-        commandBuilder.add("java", "-jar", temporaryParcelFile.getPath(),
-                TEST_CLASSES, joinedTestNames,
-                LOOP_COUNT, Long.toString(loopCount),
-                DAEMON_PORT, Integer.toString(daemonPort),
-                TEST_ID, testId,
-                THREADS, Integer.toString(threadsNumber));
+        commandBuilder.add("java");
+        if (!jvmOptions.isEmpty()) {
+            commandBuilder.add(jvmOptions);
+        }
+        commandBuilder.add("-jar", temporaryParcelFile.getPath());
+        commandBuilder.add(TEST_CLASSES, joinedTestNames,
+            LOOP_COUNT, Long.toString(loopCount),
+            DAEMON_PORT, Integer.toString(daemonPort),
+            TEST_ID, testId,
+            THREADS, Integer.toString(threadsNumber));
         if (!parameters.isEmpty()) {
             final String joinedParameters = parameters.entrySet().stream()
-                    .map(entry -> entry.getKey() + "=" + entry.getValue())
-                    .collect(Collectors.joining(","));
+                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .collect(Collectors.joining(","));
             commandBuilder.add("-p", joinedParameters);
         }
         return commandBuilder.build().toArray(new String[]{});

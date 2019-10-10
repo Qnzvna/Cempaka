@@ -3,7 +3,6 @@ package org.cempaka.cyclone.managed;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -24,7 +23,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DaemonTestRunnerManagedMediumTest
+public class DaemonTestRunnerManagedSmallTest
 {
     private static final UUID TEST_ID = UUID.randomUUID();
     private static final String NODE_IDENTIFIER = "localhost";
@@ -62,8 +61,7 @@ public class DaemonTestRunnerManagedMediumTest
         //then
         await().atMost(2, TimeUnit.SECONDS)
             .untilAsserted(() -> {
-                verify(workerManager, times(1))
-                    .startTest(any(), any(), any(), anyInt(), anyInt(), any());
+                verify(workerManager, times(1)).startTest(any(), any());
                 verify(testRunStatusDataAccess, times(1))
                     .updateState(TestState.STARTED, TEST_ID.toString(), NODE_IDENTIFIER);
             });
