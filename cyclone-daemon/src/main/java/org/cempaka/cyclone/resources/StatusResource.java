@@ -30,7 +30,6 @@ public class StatusResource
     @GET
     public Response getClusterStatus()
     {
-        final Set<String> liveNodes = nodeStatusService.getLiveNodes();
-        return Response.ok(liveNodes).build();
+        return Response.ok(nodeStatusService.getNodesStatus()).build();
     }
 }

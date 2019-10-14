@@ -32,6 +32,11 @@ public class NodeState
         return timestamp;
     }
 
+    public boolean isUp()
+    {
+        return getNodeStatus().equals(NodeStatus.UP);
+    }
+
     @Override
     public boolean equals(final Object o)
     {

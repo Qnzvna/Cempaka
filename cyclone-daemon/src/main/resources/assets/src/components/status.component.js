@@ -15,8 +15,7 @@ export const StatusComponent = {
                 method: 'GET',
                 url: '/api/status'
             }).then(response => {
-                this.liveNodes = response.data;
-                this.healthy = true;
+                this.nodes = response.data;
             }, error => {
                 this.ngToast.danger(`Failed to get the status. ${error.data.message}`);
             })

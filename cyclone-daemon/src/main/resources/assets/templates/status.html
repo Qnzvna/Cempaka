@@ -1,7 +1,21 @@
-<h4>
-    <span class="badge badge-success" ng-if="$ctrl.healthy">Healthy</span>
-    <span class="badge badge-danger" ng-if="!$ctrl.healthy">Failure</span>
-</h4>
-<h5>
-    Live nodes: {{$ctrl.liveNodes}}
-</h5>
+<h5>Live nodes</h5>
+
+<table class="table">
+<thead>
+<tr>
+    <th scope="col">#</th>
+    <th scope="col">Ip</th>
+    <th scope="col">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr ng-repeat="(key, value) in $ctrl.nodes track by $index">
+    <th scope="row">{{$index + 1}}</th>
+    <td>{{key}}</td>
+    <td>
+        <span class="badge badge-success" ng-if="value">Healthy</span>
+        <span class="badge badge-danger" ng-if="!value">Failure</span>
+    </td>
+</tr>
+</tbody>
+</table>

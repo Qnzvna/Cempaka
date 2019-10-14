@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -47,13 +48,21 @@ public class NodeStatusService
     {
         final long now = Instant.now(clock).getEpochSecond();
         return nodeStateDataAccess.getNodes().stream()
-            .filter(nodeState -> nodeState.getNodeStatus().equals(NodeStatus.UP))
-            .filter(nodeState -> checkHeartbeat(now, nodeState))
+            .filter(NodeState::isUp)
+            .filter(nodeState -> isAlive(now, nodeState))
             .map(NodeState::getIdentifier)
             .collect(Collectors.toSet());
     }
 
-    private boolean checkHeartbeat(final long now, final NodeState nodeState)
+    public Map<String, Boolean> getNodesStatus()
+    {
+        final long now = Instant.now(clock).getEpochSecond();
+        return nodeStateDataAccess.getNodes().stream()
+            .collect(Collectors.toMap(NodeState::getIdentifier,
+                nodeState -> nodeState.isUp() && isAlive(now, nodeState)));
+    }
+
+    private boolean isAlive(final long now, final NodeState nodeState)
     {
         return nodeState.getTimestamp() > now - heartbeatInterval * HEARTBEAT_RATIO;
     }

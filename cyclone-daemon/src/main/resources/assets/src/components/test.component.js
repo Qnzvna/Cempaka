@@ -74,8 +74,8 @@ export const TestComponent = {
                 method: 'POST',
                 url: '/api/tests/run',
                 data: this.runConfiguration
-            }).then(ignore => {
-                this.ngToast.success('Test started successfully.');
+            }).then(response => {
+                this.ngToast.success('Test started successfully: ' + response.data);
             }, error => {
                 this.ngToast.danger(`Failed to run test. ${error.data.message}`);
             })
