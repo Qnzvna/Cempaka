@@ -6,8 +6,15 @@
         <input type="text" class="form-control" id="id" ng-value="$ctrl.parcel.id" readonly>
     </div>
 </form>
-<div class="spinner-grow text-primary" role="status" ng-if="$ctrl.uploading">
-    <span class="sr-only">Loading...</span>
+<div class="progress" ng-if="$ctrl.uploading">
+    <div class="progress-bar"
+         role="progressbar"
+         ng-style="{width: $ctrl.uploaded + '%'}"
+         aria-valuenow="{{$ctrl.uploaded}}"
+         aria-valuemin="0"
+         aria-valuemax="100">
+        {{$ctrl.uploaded}}%
+    </div>
 </div>
 <div class="input-group mb-3" ng-if="$ctrl.parcel.id === undefined && !$ctrl.uploading">
     <div class="custom-file">
