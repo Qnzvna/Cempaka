@@ -1,0 +1,9 @@
+language: java
+jdk:
+  - openjdk8
+sudo: false
+script: mvn clean verify
+
+before_install:
+  - mkdir logs
+  - export PATH=$JAVA_HOME/bin:$PATH

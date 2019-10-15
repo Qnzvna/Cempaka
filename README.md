@@ -1,5 +1,7 @@
 # Cyclone
 
+[![Build Status](https://travis-ci.org/Qnzvna/Cempaka.svg?branch=master)](https://travis-ci.org/Qnzvna/Cempaka)
+
 Cempaka Cyclone is a pure java open source application made to load test
 and measure performance of systems.
 
@@ -30,7 +32,7 @@ cyclone-cli dependency
 <dependency>
     <groupId>org.cempaka.cyclone</groupId>
     <artifactId>cyclone-cli</artifactId>
-    <version>1.0</version>
+    <version>0.1</version>
 </dependency>
 ```
 
@@ -166,7 +168,7 @@ java -jar <parcelPath> -c <testClasses> [-n <numberOfLoops>] [-t <numberOfThread
 
 Example: 
 ```
-java -jar cyclone-examples/target/cyclone-examples-1.0-SNAPSHOT.jar -c org.cempaka.cyclone.examples.ExampleTest -n 1 -t 1 -p sleep=1,testName=example
+java -jar cyclone-examples/target/cyclone-examples-0.1-SNAPSHOT.jar -c org.cempaka.cyclone.examples.ExampleTest -n 1 -t 1 -p sleep=1,testName=example
 ```
 
 ### Development
