@@ -31,7 +31,7 @@ class MessageEncoder
 
     Payload decode(final byte[] data)
     {
-        final ByteBuffer buffer = ByteBuffer.allocate(SIZE).put(data);
+        final ByteBuffer buffer = ByteBuffer.allocate(data.length).put(data);
         buffer.flip();
         final byte[] headerData = new byte[HeaderEncoder.SIZE];
         buffer.get(headerData);

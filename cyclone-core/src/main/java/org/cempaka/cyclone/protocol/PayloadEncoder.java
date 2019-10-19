@@ -51,7 +51,7 @@ class PayloadEncoder
                 outputStream.writeUTF(entry.getKey());
                 outputStream.writeLong(entry.getValue());
             }
-            final Map<String, Long> successExecutions = payload.getSucccessExecutions();
+            final Map<String, Long> successExecutions = payload.getSuccessExecutions();
             outputStream.writeInt(successExecutions.size());
             for (final Map.Entry<String, Long> entry : successExecutions.entrySet()) {
                 outputStream.writeUTF(entry.getKey());

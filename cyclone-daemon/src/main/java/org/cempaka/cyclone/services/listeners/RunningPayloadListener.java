@@ -45,7 +45,7 @@ public class RunningPayloadListener implements BiConsumer<String, Payload>
                     MetricType.FAILURE.toString(),
                     name,
                     value));
-            runningPayload.getSucccessExecutions().forEach((name, value) ->
+            runningPayload.getSuccessExecutions().forEach((name, value) ->
                 testRunMetricDataAccess.insertMetric(testRunId,
                     timestamp,
                     MetricType.SUCCESS.toString(),

@@ -34,7 +34,7 @@ public class RunningPayload implements Payload
         return PayloadType.RUNNING;
     }
 
-    public Map<String, Long> getSucccessExecutions()
+    public Map<String, Long> getSuccessExecutions()
     {
         return succcessExecutions;
     }

@@ -1,9 +1,9 @@
 package org.cempaka.cyclone.protocol.payloads;
 
+import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
+
 import java.util.Objects;
 import java.util.Optional;
-
-import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
 
 public class EndedPayload implements Payload
 {
@@ -43,12 +43,12 @@ public class EndedPayload implements Payload
     @Override
     public boolean equals(final Object o)
     {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
         final EndedPayload that = (EndedPayload) o;
         return exitCode == that.exitCode &&
-                Objects.equals(testId, that.testId) &&
-                Objects.equals(stackTrace, that.stackTrace);
+            Objects.equals(testId, that.testId) &&
+            Objects.equals(stackTrace, that.stackTrace);
     }
 
     @Override
