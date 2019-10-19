@@ -399,6 +399,7 @@
                     <version>2.5.3</version>
                     <configuration>
                         <tagNameFormat>@{project.version}</tagNameFormat>
+                        <arguments>-Dmaven.test.skip=true</arguments>
                     </configuration>
                 </plugin>
                 <plugin>
