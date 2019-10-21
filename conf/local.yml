@@ -1,8 +1,30 @@
-logging:
-  level: INFO
-  loggers:
-    org.cempaka: DEBUG
+# Cyclone configuration file
 
+cluster:
+  # Node id's should be unique across all nodes in cluster.
+  nodeId: localhost
+  # Controls when node will be marked as dead. Values are in seconds.
+#  heartbeatInterval: 10
+#  heartbeatManagedAwaitInterval: 60
+
+storage:
+  # Location where to store uploaded parcels. Filesystem should be shared between all nodes.
+  storagePath: tmp/
+
+workers:
+  # Number of test runners.
+  workersNumber: 1
+  # Path to the guava jar. Used for gathering parcels metadata.
+  guavaPath: /home/dserwin/.m2/repository/com/google/guava/guava/26.0-jre/guava-26.0-jre.jar
+  # Path to store logs from load tests.
+  logsPath: logs/
+
+auth:
+  # Type of the authentication mechanism. Allowed values are: NONE, BASIC.
+  type: BASIC
+#  properties: {}
+
+# JDBI configuration see: https://www.dropwizard.io/en/stable/manual/jdbi.html#configuration
 database:
   driverClass: org.postgresql.Driver
   user: postgres
@@ -19,15 +41,8 @@ database:
   evictionInterval: 10s
   minIdleTime: 1 minute
 
-workers:
-  workersNumber: 1
-  guavaPath: /home/dserwin/.m2/repository/com/google/guava/guava/26.0-jre/guava-26.0-jre.jar
-  logsPath: logs/
-
-storage:
-  storagePath: tmp/
-  parcelRepository: org.cempaka.cyclone.storage.repository.FileParcelRepository
-  parcelMetadataRepository: org.cempaka.cyclone.storage.repository.JdbiParcelMetadataRepository
-
-cluster:
-  nodeId: localhost
+# Dropwizard logging configuration
+logging:
+  level: INFO
+  loggers:
+    org.cempaka: DEBUG

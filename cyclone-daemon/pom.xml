@@ -47,6 +47,10 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>io.dropwizard</groupId>
+            <artifactId>dropwizard-auth</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.dropwizard-bundles</groupId>
             <artifactId>dropwizard-webjars-bundle</artifactId>
         </dependency>

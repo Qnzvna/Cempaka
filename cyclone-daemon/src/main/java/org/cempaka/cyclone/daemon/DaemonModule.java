@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.google.inject.ProvisionException;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 import io.dropwizard.jdbi3.JdbiFactory;
@@ -15,6 +14,7 @@ import io.dropwizard.setup.Environment;
 import java.time.Clock;
 import java.util.function.BiConsumer;
 import javax.inject.Inject;
+import org.cempaka.cyclone.configuration.AuthenticationConfiguration;
 import org.cempaka.cyclone.configuration.ChannelConfiguration;
 import org.cempaka.cyclone.configuration.ClusterConfiguration;
 import org.cempaka.cyclone.configuration.DaemonConfiguration;
@@ -54,19 +54,18 @@ public class DaemonModule extends AbstractModule
     @Override
     protected void configure()
     {
-        final StorageConfiguration storageConfiguration =
-            daemonConfiguration.getStorageConfiguration();
-        final WorkersConfiguration workersConfiguration =
-            daemonConfiguration.getWorkersConfiguration();
-        final ChannelConfiguration channelConfiguration =
-            daemonConfiguration.getChannelConfiguration();
-        final ClusterConfiguration clusterConfiguration =
-            daemonConfiguration.getClusterConfiguration();
+        final StorageConfiguration storageConfiguration = daemonConfiguration.getStorageConfiguration();
+        final WorkersConfiguration workersConfiguration = daemonConfiguration.getWorkersConfiguration();
+        final ChannelConfiguration channelConfiguration = daemonConfiguration.getChannelConfiguration();
+        final ClusterConfiguration clusterConfiguration = daemonConfiguration.getClusterConfiguration();
+        final AuthenticationConfiguration authenticationConfiguration =
+            daemonConfiguration.getAuthenticationConfiguration();
 
         bind(ChannelConfiguration.class).toInstance(channelConfiguration);
         bind(StorageConfiguration.class).toInstance(storageConfiguration);
         bind(WorkersConfiguration.class).toInstance(workersConfiguration);
         bind(ClusterConfiguration.class).toInstance(clusterConfiguration);
+        bind(AuthenticationConfiguration.class).toInstance(authenticationConfiguration);
 
         bind(TestRunnerService.class).to(DistributedTestRunnerService.class);
         bind(ObjectMapper.class).toInstance(environment.getObjectMapper());
@@ -88,7 +87,7 @@ public class DaemonModule extends AbstractModule
         bind(NodeIdentifierProvider.class).to(StaticNodeIdentifierProvider.class);
         bind(Clock.class).toInstance(Clock.systemUTC());
 
-        install(new StorageModule(storageConfiguration));
+        install(new StorageModule());
     }
 
     @Inject
@@ -129,16 +128,5 @@ public class DaemonModule extends AbstractModule
         jdbi.installPlugin(new PostgresPlugin());
         jdbi.getConfig().get(Jackson2Config.class).setMapper(objectMapper);
         return jdbi;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> Class<T> createClass(final String className)
-    {
-        try {
-            return (Class<T>) Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            final String message = String.format("Can't find %s in classpath.", className);
-            throw new ProvisionException(message, e);
-        }
     }
 }

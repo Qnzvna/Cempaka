@@ -3,7 +3,6 @@ package org.cempaka.cyclone.configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -26,7 +25,10 @@ public class DaemonConfiguration extends Configuration
     private ClusterConfiguration clusterConfiguration;
     @Valid
     @NotNull
-    private TestRunnerConfiguration testRunnerConfiguration= new TestRunnerConfiguration();
+    private TestRunnerConfiguration testRunnerConfiguration = new TestRunnerConfiguration();
+    @Valid
+    @NotNull
+    private AuthenticationConfiguration authenticationConfiguration = new AuthenticationConfiguration();
 
     @JsonProperty("database")
     public void setDataSourceFactory(final DataSourceFactory dataSourceFactory)
@@ -68,5 +70,11 @@ public class DaemonConfiguration extends Configuration
     public TestRunnerConfiguration getTestRunnerConfiguration()
     {
         return testRunnerConfiguration;
+    }
+
+    @JsonProperty("auth")
+    public AuthenticationConfiguration getAuthenticationConfiguration()
+    {
+        return authenticationConfiguration;
     }
 }

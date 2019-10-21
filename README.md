@@ -137,18 +137,7 @@ You can access the Daemon UI in your browser by typing
 #### Configuration
 
 Daemon use YAML configuration file that is specified as an argument
-after _server_ command.
-
-| Key                              | Description                                |
-|:---------------------------------|:-------------------------------------------|
-| logging                          | Dropwizard logging config                  |
-| database                         | Dropwizard DatasourceFactory               |
-| workers.workerNumber             | Number of workers cyclone workers          |
-| workers.guavaPath                | Path to guava jar used for parcel indexing |
-| workers.logsPath                 | Workers will create logs in this directory |
-| storage.storagePath              | Directory to store test parcels            |
-| storage.parcelRepository         | Class name of parcel repository            |
-| storage.parcelMetadataRepository | Class name for parcel metadata repository  |
+after _server_ command. You can find out more about configuration by inspecting `conf/local.yml`.
 
 ### Running the tests
 

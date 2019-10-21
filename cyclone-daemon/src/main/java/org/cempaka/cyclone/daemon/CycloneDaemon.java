@@ -12,6 +12,7 @@ import io.dropwizard.setup.Environment;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Objects;
+import org.cempaka.cyclone.auth.AuthFilterFactory;
 import org.cempaka.cyclone.configuration.DaemonConfiguration;
 import org.cempaka.cyclone.managed.DaemonTestRunnerManaged;
 import org.cempaka.cyclone.managed.HeartbeatManaged;
@@ -53,6 +54,7 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
 
         registerResources(environment, injector);
         registerManaged(environment, injector);
+        registerFilters(environment, injector);
 
         indexParcels(injector);
 
@@ -60,6 +62,11 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
         daemonChannel.connect(daemonConfiguration.getChannelConfiguration().getUdpServerPort());
 
         LOG.info("Daemon started.");
+    }
+
+    private void registerFilters(final Environment environment, final Injector injector)
+    {
+        environment.jersey().register(injector.getInstance(AuthFilterFactory.class).create());
     }
 
     private void registerResources(final Environment environment, final Injector injector)
