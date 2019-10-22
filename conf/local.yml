@@ -20,7 +20,7 @@ workers:
   logsPath: logs/
 
 auth:
-  # Type of the authentication mechanism. Allowed values are: NONE, BASIC.
+  # Type of the authentication mechanism. Allowed values are: NONE, BASIC, HEADER.
   type: BASIC
 #  properties: {}
 

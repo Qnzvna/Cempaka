@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import io.dropwizard.auth.AuthFilter;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.cempaka.cyclone.configuration.AuthenticationConfiguration;
@@ -14,21 +15,22 @@ public class AuthFilterFactory
     private final AuthenticationConfiguration authenticationConfiguration;
 
     @Inject
-    public AuthFilterFactory(final AuthenticationConfiguration authenticationConfiguration)
+    AuthFilterFactory(final AuthenticationConfiguration authenticationConfiguration)
     {
         this.authenticationConfiguration = checkNotNull(authenticationConfiguration);
     }
 
     public AuthFilter create()
     {
+        final Map<String, String> properties = authenticationConfiguration.getProperties();
         switch (authenticationConfiguration.getType()) {
             case BASIC:
                 return new BasicCredentialAuthFilter.Builder<AdminUser>()
                     .setAuthenticator(createPasswordAuthenticator())
-                    .setRealm(authenticationConfiguration.getProperties().getOrDefault("realm", ""))
+                    .setRealm(properties.getOrDefault("realm", ""))
                     .buildAuthFilter();
             case HEADER:
-                throw new IllegalArgumentException("Header type authorization is not supported yet.");
+                return new HeaderAuthFilter(properties.getOrDefault("header", "X-Auth"));
             case NONE:
             default:
                 return new NoopAuthFilter();

@@ -38,14 +38,15 @@ public class AuthFilterFactoryTest
     }
 
     @Test
-    public void shouldFailRegisterHeaderAuth()
+    public void shouldProviderHeaderAuthFilter()
     {
         //given
         final AuthenticationConfiguration configuration = new AuthenticationConfiguration();
         configuration.setType(Type.HEADER);
         authFilterFactory = new AuthFilterFactory(configuration);
         //when
+        final AuthFilter authFilter = authFilterFactory.create();
         //then
-        assertThatThrownBy(() -> authFilterFactory.create()).isInstanceOf(IllegalArgumentException.class);
+        assertThat(authFilter).isInstanceOf(HeaderAuthFilter.class);
     }
 }

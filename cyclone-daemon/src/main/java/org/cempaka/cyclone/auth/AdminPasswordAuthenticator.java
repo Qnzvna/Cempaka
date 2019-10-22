@@ -6,7 +6,7 @@ import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
 import java.util.Optional;
 
-public class AdminPasswordAuthenticator implements Authenticator<BasicCredentials, AdminUser>
+class AdminPasswordAuthenticator implements Authenticator<BasicCredentials, AdminUser>
 {
     private final String password;
 
