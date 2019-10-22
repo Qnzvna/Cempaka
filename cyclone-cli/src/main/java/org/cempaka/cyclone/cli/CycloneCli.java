@@ -19,7 +19,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.cempaka.cyclone.metrics.MeasurementRegistry;
+import org.cempaka.cyclone.measurements.MeasurementRegistry;
 import org.cempaka.cyclone.protocol.DaemonChannel;
 import org.cempaka.cyclone.protocol.UdpDaemonChannel;
 import org.cempaka.cyclone.protocol.payloads.EndedPayload;

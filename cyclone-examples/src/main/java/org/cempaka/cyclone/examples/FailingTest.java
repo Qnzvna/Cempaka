@@ -1,6 +1,6 @@
 package org.cempaka.cyclone.examples;
 
-import org.cempaka.cyclone.annotation.Thunderbolt;
+import org.cempaka.cyclone.annotations.Thunderbolt;
 
 public class FailingTest
 {

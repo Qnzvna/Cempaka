@@ -3,16 +3,19 @@ package org.cempaka.cyclone.invoker;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 
+import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.cempaka.cyclone.exceptions.TestFailedException;
-import org.cempaka.cyclone.metrics.MeasurementRegistry;
+import org.cempaka.cyclone.measurements.CounterMeasurement;
+import org.cempaka.cyclone.measurements.MeasurementRegistry;
 import org.junit.Before;
 import org.junit.Test;
 
 public class ReflectiveInvokerSmallTest
 {
-    private static final HashMap<String, String> EMPTY_PARAMETERS = new HashMap<>();
+    private static final Map<String, String> EMPTY_PARAMETERS = Collections.emptyMap();
     private static final MeasurementRegistry MEASUREMENT_REGISTRY = new MeasurementRegistry();
 
     private Invoker reflectiveInvoker;
@@ -20,7 +23,7 @@ public class ReflectiveInvokerSmallTest
     @Before
     public void setUp()
     {
-        TestExample.reset();
+        AbstractTestExample.reset();
         reflectiveInvoker = ReflectiveInvoker.forTestClass(TestExample.class, EMPTY_PARAMETERS, MEASUREMENT_REGISTRY);
     }
 
@@ -105,5 +108,34 @@ public class ReflectiveInvokerSmallTest
         reflectiveInvoker.invoke();
         //then
         assertThat(TestExample.getParameter()).isEqualTo(value);
+    }
+
+    @Test
+    public void shouldRegisterMeasurements() throws NoSuchMethodException
+    {
+        //given
+        final Method customCount = MeasurementsExample.class.getMethod("customCount");
+        //when
+        ReflectiveInvoker.forTestClass(MeasurementsExample.class, EMPTY_PARAMETERS, MEASUREMENT_REGISTRY);
+        //then
+        assertThat(MEASUREMENT_REGISTRY.get(customCount, "custom_counter"))
+            .isInstanceOf(CounterMeasurement.class);
+    }
+
+    @Test
+    public void shouldCountInvocations()
+    {
+        //given
+        final Invoker reflectiveInvoker = ReflectiveInvoker.forTestClass(MeasurementsExample.class,
+            EMPTY_PARAMETERS,
+            MEASUREMENT_REGISTRY);
+        //when
+        reflectiveInvoker.invoke();
+        MeasurementsExample.setThrow(new IllegalStateException());
+        reflectiveInvoker.invoke();
+        //then
+        assertThat(MEASUREMENT_REGISTRY.getSnapshots())
+            .containsEntry("counted:success:count", 1D)
+            .containsEntry("counted:failure:count", 1D);
     }
 }

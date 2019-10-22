@@ -1,12 +1,15 @@
 package org.cempaka.cyclone.utils;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.stream.Stream;
-import org.cempaka.cyclone.annotation.Parameter;
-import org.cempaka.cyclone.annotation.Thunderbolt;
+import org.cempaka.cyclone.annotations.Parameter;
+import org.cempaka.cyclone.annotations.Thunderbolt;
+import org.cempaka.cyclone.measurements.Measured;
 
 public final class Reflections
 {
@@ -24,6 +27,12 @@ public final class Reflections
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static Stream<Method> getThunderboltMethods(final Class testClass)
+    {
+        return Stream.of(testClass.getDeclaredMethods())
+            .filter(Reflections::isThunderboltMethod);
     }
 
     public static boolean isThunderboltMethod(final Method method)
@@ -52,6 +61,30 @@ public final class Reflections
         }
     }
 
+    public static <T> T newInstance(final Class<T> clazz, final Object... arguments)
+    {
+        try {
+            //noinspection unchecked
+            return Arrays.stream(clazz.getConstructors())
+                .filter(constructor -> constructor.getParameterCount() == arguments.length)
+                .filter(constructor -> {
+                    final Class<?>[] types = constructor.getParameterTypes();
+                    for (int i = 0; i < types.length; i++) {
+                        if (!arguments[i].getClass().equals(types[i])) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                .findFirst()
+                .map(constructor -> (Constructor<T>) constructor)
+                .orElseThrow(() -> new IllegalArgumentException("Matching constructor can't be found."))
+                .newInstance(arguments);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static Object getFieldValue(final Object object, final Field field)
     {
         field.setAccessible(true);
@@ -60,5 +93,18 @@ public final class Reflections
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static Stream<Measured> getMeasureAnnotations(final Method method)
+    {
+        return Stream.of(method.getAnnotations())
+            .flatMap(annotation -> {
+                final Class<? extends Annotation> annotationType = annotation.annotationType();
+                if (annotationType.equals(Measured.class)) {
+                    return Stream.of((Measured) annotation);
+                } else {
+                    return Arrays.stream(annotationType.getDeclaredAnnotationsByType(Measured.class));
+                }
+            });
     }
 }

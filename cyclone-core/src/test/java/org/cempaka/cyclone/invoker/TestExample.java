@@ -1,81 +1,36 @@
 package org.cempaka.cyclone.invoker;
 
-import java.util.concurrent.atomic.LongAdder;
-import org.cempaka.cyclone.annotation.AfterStorm;
-import org.cempaka.cyclone.annotation.BeforeStorm;
-import org.cempaka.cyclone.annotation.Parameter;
-import org.cempaka.cyclone.annotation.Thunderbolt;
+import org.cempaka.cyclone.annotations.AfterStorm;
+import org.cempaka.cyclone.annotations.BeforeStorm;
+import org.cempaka.cyclone.annotations.Parameter;
+import org.cempaka.cyclone.annotations.Thunderbolt;
 
-public class TestExample
+public class TestExample extends AbstractTestExample
 {
-    private static LongAdder BEFORE_COUNTER = new LongAdder();
-    private static LongAdder THUNDERBOLT_COUNTER = new LongAdder();
-    private static LongAdder AFTER_COUNTER = new LongAdder();
-    private static RuntimeException TO_THROW;
-    private static String PARAMETER_HOLDER;
-
     @Parameter(name = "parameter")
     private String parameter;
 
     @BeforeStorm
     public void beforeStorm()
     {
-        BEFORE_COUNTER.increment();
-        throwIfWanted();
+        before();
     }
 
     @Thunderbolt
     public void thunderbolt()
     {
-        THUNDERBOLT_COUNTER.increment();
-        PARAMETER_HOLDER = parameter;
-        throwIfWanted();
-    }
-
-    private void throwIfWanted()
-    {
-        if (TO_THROW != null) {
-            throw TO_THROW;
-        }
+        thunder();
     }
 
     @AfterStorm
     public void afterStorm()
     {
-        AFTER_COUNTER.increment();
+        after();
     }
 
-    static void reset()
+    @Override
+    void setParameter()
     {
-        BEFORE_COUNTER.reset();
-        THUNDERBOLT_COUNTER.reset();
-        AFTER_COUNTER.reset();
-        TO_THROW = null;
-        PARAMETER_HOLDER = null;
-    }
-
-    static int getBeforeCounter()
-    {
-        return BEFORE_COUNTER.intValue();
-    }
-
-    static int getThunderboltCounter()
-    {
-        return THUNDERBOLT_COUNTER.intValue();
-    }
-
-    static int getAfterCounter()
-    {
-        return AFTER_COUNTER.intValue();
-    }
-
-    static void setThrow(final RuntimeException throwable)
-    {
-        TO_THROW = throwable;
-    }
-
-    static String getParameter()
-    {
-        return PARAMETER_HOLDER;
+        setParameterHolder(parameter);
     }
 }

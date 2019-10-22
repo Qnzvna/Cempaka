@@ -15,14 +15,13 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.cempaka.cyclone.annotation.AfterStorm;
-import org.cempaka.cyclone.annotation.BeforeStorm;
-import org.cempaka.cyclone.annotation.Measurements;
-import org.cempaka.cyclone.annotation.Parameter;
-import org.cempaka.cyclone.annotation.Thunderbolt;
+import org.cempaka.cyclone.annotations.AfterStorm;
+import org.cempaka.cyclone.annotations.BeforeStorm;
+import org.cempaka.cyclone.annotations.Parameter;
+import org.cempaka.cyclone.annotations.Thunderbolt;
 import org.cempaka.cyclone.exceptions.TestFailedException;
-import org.cempaka.cyclone.metrics.Measurement;
-import org.cempaka.cyclone.metrics.MeasurementRegistry;
+import org.cempaka.cyclone.measurements.Measurement;
+import org.cempaka.cyclone.measurements.MeasurementRegistry;
 import org.cempaka.cyclone.utils.Memoizer;
 import org.cempaka.cyclone.utils.Reflections;
 
@@ -32,6 +31,8 @@ public class ReflectiveInvoker implements Invoker
     private final MeasurementRegistry measurementRegistry;
     private final Supplier<Object> testInstance;
 
+    private final MeasurementRegistrar measurementRegistrar = new MeasurementRegistrar();
+
     private ReflectiveInvoker(final Class testClass,
                               final Map<String, String> parameters,
                               final MeasurementRegistry measurementRegistry)
@@ -39,7 +40,7 @@ public class ReflectiveInvoker implements Invoker
         this.testClass = checkNotNull(testClass);
         this.measurementRegistry = checkNotNull(measurementRegistry);
         this.testInstance = Memoizer.memoize(() -> createTest(testClass, parameters));
-        registerMeasurements(testClass);
+        measurementRegistrar.registerAll(testClass, measurementRegistry);
     }
 
     public static Invoker forTestClass(final Class testClass,
@@ -65,17 +66,6 @@ public class ReflectiveInvoker implements Invoker
     public void invokeAfter()
     {
         runOneAnnotatedMethod(testClass, testInstance.get(), AfterStorm.class);
-    }
-
-    private void registerMeasurements(final Class testClass)
-    {
-        getThunderboltsMethods(testClass)
-            .flatMap(method -> Stream.of(method.getDeclaredAnnotations())
-                .filter(annotation -> annotation.annotationType() == Measurements.class)
-                .map(annotation -> (Measurements) annotation)
-                .flatMap(measurements -> Stream.of(measurements.measurements()))
-                .map(Reflections::newInstance))
-            .forEach(measurementRegistry::register);
     }
 
     private Object createTest(final Class testClass, final Map<String, String> parameters)
@@ -153,25 +143,26 @@ public class ReflectiveInvoker implements Invoker
 
     private void runThunderbolts(final Class testClass, final Object testInstance)
     {
-        getThunderboltsMethods(testClass)
+        Reflections.getThunderboltMethods(testClass)
             .forEach(method -> {
-                measurementRegistry.getMeasurements().forEach(Measurement::start);
+                final ExecutionContext executionContext = new ExecutionContext(testClass, method);
                 try {
                     Reflections.invokeMethod(testInstance, method);
+                    executionContext.close();
                 } catch (InvocationTargetException e) {
                     final Throwable cause = e.getCause();
                     if (!isThrowableSuppressed(method, cause)) {
                         throw new TestFailedException(e.getCause());
+                    } else {
+                        executionContext.close(cause);
                     }
                 }
-                measurementRegistry.getMeasurements().forEach(Measurement::stop);
+                Reflections.getMeasureAnnotations(method)
+                    .forEach(measure -> {
+                        final Measurement measurement = measurementRegistry.get(method, measure.name());
+                        Reflections.newInstance(measure.ticker()).tick(measurement, executionContext);
+                    });
             });
-    }
-
-    private Stream<Method> getThunderboltsMethods(final Class testClass)
-    {
-        return Stream.of(testClass.getDeclaredMethods())
-            .filter(Reflections::isThunderboltMethod);
     }
 
     private boolean isThrowableSuppressed(final Method method, final Throwable throwable)

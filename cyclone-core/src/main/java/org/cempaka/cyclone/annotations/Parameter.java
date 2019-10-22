@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.annotation;
+package org.cempaka.cyclone.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

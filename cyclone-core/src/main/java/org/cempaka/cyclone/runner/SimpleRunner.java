@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.cempaka.cyclone.invoker.Invoker;
 import org.cempaka.cyclone.invoker.ReflectiveInvoker;
-import org.cempaka.cyclone.metrics.MeasurementRegistry;
+import org.cempaka.cyclone.measurements.MeasurementRegistry;
 
 public class SimpleRunner implements Runner
 {
