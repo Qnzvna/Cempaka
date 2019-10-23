@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 import org.cempaka.cyclone.annotations.Parameter;
 import org.cempaka.cyclone.annotations.Thunderbolt;
+import org.cempaka.cyclone.measurements.Measure;
 import org.cempaka.cyclone.measurements.Measured;
 
 public final class Reflections
@@ -16,11 +17,20 @@ public final class Reflections
     public static boolean containsAnnotation(final Method method, final Class<? extends Annotation> annotationClass)
     {
         return Stream.of(method.getDeclaredAnnotations())
-            .anyMatch(annotation -> annotation.annotationType() == annotationClass);
+            .anyMatch(annotation -> annotation.annotationType().equals(annotationClass));
     }
 
-    public static void invokeMethod(final Object test, final Method method)
+    public static void invokeMethod(final Object test, final Method method, final Object[] args)
         throws InvocationTargetException
+    {
+        try {
+            method.invoke(test, args);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void invokeMethod(final Object test, final Method method) throws InvocationTargetException
     {
         try {
             method.invoke(test);
@@ -31,25 +41,33 @@ public final class Reflections
 
     public static Stream<Method> getThunderboltMethods(final Class testClass)
     {
-        return Stream.of(testClass.getDeclaredMethods())
-            .filter(Reflections::isThunderboltMethod);
+        return Stream.of(testClass.getDeclaredMethods()).filter(Reflections::isThunderboltMethod);
     }
 
     public static boolean isThunderboltMethod(final Method method)
     {
-        return Stream.of(method.getDeclaredAnnotations())
-            .anyMatch(Reflections::isThunderboltAnnotation);
+        return Stream.of(method.getDeclaredAnnotations()).anyMatch(Reflections::isThunderboltAnnotation);
     }
 
     public static boolean isThunderboltAnnotation(final Annotation annotation)
     {
-        return annotation.annotationType() == Thunderbolt.class;
+        return annotation.annotationType().equals(Thunderbolt.class);
     }
 
     public static boolean isFieldParameter(final Field field)
     {
         return Stream.of(field.getDeclaredAnnotations())
-            .anyMatch(annotation -> annotation.annotationType() == Parameter.class);
+            .anyMatch(annotation -> annotation.annotationType().equals(Parameter.class));
+    }
+
+    public static void setFieldValue(final Field field, final Object object, final Object value)
+    {
+        field.setAccessible(true);
+        try {
+            field.set(object, value);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static <T> T newInstance(final Class<T> clazz)
@@ -95,7 +113,7 @@ public final class Reflections
         }
     }
 
-    public static Stream<Measured> getMeasureAnnotations(final Method method)
+    public static Stream<Measured> getMeasuredAnnotations(final Method method)
     {
         return Stream.of(method.getAnnotations())
             .flatMap(annotation -> {
@@ -106,5 +124,15 @@ public final class Reflections
                     return Arrays.stream(annotationType.getDeclaredAnnotationsByType(Measured.class));
                 }
             });
+    }
+
+    public static Stream<java.lang.reflect.Parameter> getMeasureAnnotatedParameters(final Method method)
+    {
+        return Stream.of(method.getParameters()).filter(parameter -> parameter.isAnnotationPresent(Measure.class));
+    }
+
+    public static Stream<Field> getMeasureAnnotatedFields(final Class testClass)
+    {
+        return Stream.of(testClass.getDeclaredFields()).filter(field -> field.isAnnotationPresent(Measure.class));
     }
 }

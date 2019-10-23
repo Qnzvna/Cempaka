@@ -20,6 +20,7 @@ import org.cempaka.cyclone.annotations.BeforeStorm;
 import org.cempaka.cyclone.annotations.Parameter;
 import org.cempaka.cyclone.annotations.Thunderbolt;
 import org.cempaka.cyclone.exceptions.TestFailedException;
+import org.cempaka.cyclone.measurements.Measure;
 import org.cempaka.cyclone.measurements.Measurement;
 import org.cempaka.cyclone.measurements.MeasurementRegistry;
 import org.cempaka.cyclone.utils.Memoizer;
@@ -81,17 +82,21 @@ public class ReflectiveInvoker implements Invoker
             if (!parameters.isEmpty()) {
                 Stream.of(testClass.getDeclaredFields())
                     .filter(Reflections::isFieldParameter)
-                    .forEach(field -> setField(parameters, testObject, field));
+                    .forEach(field -> setParameterField(parameters, testObject, field));
             }
+            Reflections.getMeasureAnnotatedFields(testClass)
+                .forEach(field -> Reflections.setFieldValue(field,
+                    testObject,
+                    measurementRegistry.get(field.getAnnotation(Measure.class).value())));
             return testObject;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void setField(final Map<String, String> parameters,
-                          final Object testObject,
-                          final Field field)
+    private void setParameterField(final Map<String, String> parameters,
+                                   final Object testObject,
+                                   final Field field)
     {
         final String name = field.getAnnotation(Parameter.class).name();
         final String value = parameters.get(name);
@@ -147,7 +152,12 @@ public class ReflectiveInvoker implements Invoker
             .forEach(method -> {
                 final ExecutionContext executionContext = new ExecutionContext(testClass, method);
                 try {
-                    Reflections.invokeMethod(testInstance, method);
+                    final Measurement[] measurements = Reflections.getMeasureAnnotatedParameters(method)
+                        .map(parameter ->
+                            measurementRegistry.get(method, parameter.getAnnotation(Measure.class).value()))
+                        .collect(Collectors.toList())
+                        .toArray(new Measurement[]{});
+                    Reflections.invokeMethod(testInstance, method, measurements);
                     executionContext.close();
                 } catch (InvocationTargetException e) {
                     final Throwable cause = e.getCause();
@@ -157,7 +167,7 @@ public class ReflectiveInvoker implements Invoker
                         executionContext.close(cause);
                     }
                 }
-                Reflections.getMeasureAnnotations(method)
+                Reflections.getMeasuredAnnotations(method)
                     .forEach(measure -> {
                         final Measurement measurement = measurementRegistry.get(method, measure.name());
                         Reflections.newInstance(measure.ticker()).tick(measurement, executionContext);

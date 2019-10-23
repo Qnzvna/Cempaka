@@ -41,4 +41,16 @@ public class MeasurementRegistrarTest
         verify(measurementRegistry, times(1))
             .register(eq(MeasurementsExample.class.getMethod("customCount")), any(CounterMeasurement.class));
     }
+
+    @Test
+    public void shouldRegisterMeasureScopedOnMethod() throws NoSuchMethodException
+    {
+        //given
+        //when
+        measurementRegistrar.registerAll(MeasurementsExample.class, measurementRegistry);
+        //then
+        verify(measurementRegistry, times(1))
+            .register(eq(MeasurementsExample.class.getMethod("measureScope", CounterMeasurement.class)),
+                any(CounterMeasurement.class));
+    }
 }

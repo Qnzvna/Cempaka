@@ -2,6 +2,8 @@ package org.cempaka.cyclone.invoker;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
+import static org.cempaka.cyclone.invoker.MeasurementsExample.CUSTOM_COUNTER_NAME;
+import static org.cempaka.cyclone.invoker.MeasurementsExample.GLOBAL_COUNTER_NAME;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -9,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.cempaka.cyclone.exceptions.TestFailedException;
 import org.cempaka.cyclone.measurements.CounterMeasurement;
+import org.cempaka.cyclone.measurements.Measurement;
 import org.cempaka.cyclone.measurements.MeasurementRegistry;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,19 +114,22 @@ public class ReflectiveInvokerSmallTest
     }
 
     @Test
-    public void shouldRegisterMeasurements() throws NoSuchMethodException
+    public void shouldRegisterMeasures() throws NoSuchMethodException
     {
         //given
-        final Method customCount = MeasurementsExample.class.getMethod("customCount");
+        final Method method = MeasurementsExample.class.getMethod("customCount");
         //when
-        ReflectiveInvoker.forTestClass(MeasurementsExample.class, EMPTY_PARAMETERS, MEASUREMENT_REGISTRY);
+        final Invoker invoker =
+            ReflectiveInvoker.forTestClass(MeasurementsExample.class, EMPTY_PARAMETERS, MEASUREMENT_REGISTRY);
+        final Measurement measurement = MEASUREMENT_REGISTRY.get(method, CUSTOM_COUNTER_NAME);
+        invoker.invoke();
         //then
-        assertThat(MEASUREMENT_REGISTRY.get(customCount, "custom_counter"))
-            .isInstanceOf(CounterMeasurement.class);
+        assertThat(measurement).isInstanceOf(CounterMeasurement.class);
+        assertThat(measurement.getSnapshot()).containsEntry("count", 0D);
     }
 
     @Test
-    public void shouldCountInvocations()
+    public void shouldCountInvocationsUsingTicks()
     {
         //given
         final Invoker reflectiveInvoker = ReflectiveInvoker.forTestClass(MeasurementsExample.class,
@@ -137,5 +143,34 @@ public class ReflectiveInvokerSmallTest
         assertThat(MEASUREMENT_REGISTRY.getSnapshots())
             .containsEntry("counted:success:count", 1D)
             .containsEntry("counted:failure:count", 1D);
+    }
+
+    @Test
+    public void shouldRegisterMeasureOnParameter() throws NoSuchMethodException
+    {
+        //given
+        final Method method = MeasurementsExample.class.getMethod("measureScope", CounterMeasurement.class);
+        //when
+        final Invoker invoker =
+            ReflectiveInvoker.forTestClass(MeasurementsExample.class, EMPTY_PARAMETERS, MEASUREMENT_REGISTRY);
+        final Measurement measurement = MEASUREMENT_REGISTRY.get(method, "");
+        invoker.invoke();
+        //then
+        assertThat(measurement).isInstanceOf(CounterMeasurement.class);
+        assertThat(measurement.getSnapshot()).containsEntry("count", 2D);
+    }
+
+    @Test
+    public void shouldRegisterMeasureOnClass()
+    {
+        //given
+        //when
+        final Invoker invoker =
+            ReflectiveInvoker.forTestClass(MeasurementsExample.class, EMPTY_PARAMETERS, MEASUREMENT_REGISTRY);
+        final Measurement measurement = MEASUREMENT_REGISTRY.get(GLOBAL_COUNTER_NAME);
+        invoker.invoke();
+        //then
+        assertThat(measurement).isInstanceOf(CounterMeasurement.class);
+        assertThat(measurement.getSnapshot()).containsEntry("count", 3D);
     }
 }

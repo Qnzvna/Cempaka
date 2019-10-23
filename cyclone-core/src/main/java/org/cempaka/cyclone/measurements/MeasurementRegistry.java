@@ -104,7 +104,9 @@ public class MeasurementRegistry
         @Override
         public String toString()
         {
-            return method.getName() + DELIMITER + name;
+            return method == null ?
+                DELIMITER + name :
+                method.getName() + DELIMITER + name;
         }
     }
 
