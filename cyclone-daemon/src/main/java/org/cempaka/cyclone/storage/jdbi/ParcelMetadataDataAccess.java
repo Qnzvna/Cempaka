@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.storage.data;
+package org.cempaka.cyclone.storage.jdbi;
 
 import org.cempaka.cyclone.beans.ParcelMetadata;
 import org.jdbi.v3.json.Json;

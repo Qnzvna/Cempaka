@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.storage.data;
+package org.cempaka.cyclone.storage.jdbi;
 
 import java.util.Set;
 import org.cempaka.cyclone.beans.TestRunConfiguration;

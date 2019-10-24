@@ -21,7 +21,7 @@ workers:
 
 auth:
   # Type of the authentication mechanism. Allowed values are: NONE, BASIC, HEADER.
-  type: BASIC
+  type: NONE
 #  properties: {}
 
 # JDBI configuration see: https://www.dropwizard.io/en/stable/manual/jdbi.html#configuration

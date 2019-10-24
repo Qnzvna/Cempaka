@@ -45,18 +45,6 @@ class PayloadEncoder
                 outputStream.writeUTF(entry.getKey());
                 outputStream.writeDouble(entry.getValue());
             }
-            final Map<String, Long> failedExecutions = payload.getFailedExecutions();
-            outputStream.writeInt(failedExecutions.size());
-            for (final Map.Entry<String, Long> entry : failedExecutions.entrySet()) {
-                outputStream.writeUTF(entry.getKey());
-                outputStream.writeLong(entry.getValue());
-            }
-            final Map<String, Long> successExecutions = payload.getSuccessExecutions();
-            outputStream.writeInt(successExecutions.size());
-            for (final Map.Entry<String, Long> entry : successExecutions.entrySet()) {
-                outputStream.writeUTF(entry.getKey());
-                outputStream.writeLong(entry.getValue());
-            }
             outputStream.flush();
             final byte[] data = byteStream.toByteArray();
             return ByteBuffer.wrap(data);
@@ -101,26 +89,12 @@ class PayloadEncoder
     {
         final InputStream inputStream = new ByteArrayInputStream(data);
         final Map<String, Double> measurements = new HashMap<>();
-        final Map<String, Long> failedExecutions = new HashMap<>();
-        final Map<String, Long> successExecutions = new HashMap<>();
         try (final ObjectInputStream stream = new ObjectInputStream(inputStream)) {
             final int measurementsSize = stream.readInt();
             for (int i = 0; i < measurementsSize; i++) {
                 final String name = stream.readUTF();
                 final double value = stream.readDouble();
                 measurements.put(name, value);
-            }
-            final int failedSize = stream.readInt();
-            for (int i = 0; i < failedSize; i++) {
-                final String name = stream.readUTF();
-                final long value = stream.readLong();
-                failedExecutions.put(name, value);
-            }
-            final int successSize = stream.readInt();
-            for (int i = 0; i < successSize; i++) {
-                final String name = stream.readUTF();
-                final long value = stream.readLong();
-                successExecutions.put(name, value);
             }
             return new RunningPayload(testId, measurements);
         } catch (IOException e) {

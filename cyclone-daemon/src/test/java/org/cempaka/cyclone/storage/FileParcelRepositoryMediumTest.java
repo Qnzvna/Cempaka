@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.cempaka.cyclone.beans.Parcel;
-import org.cempaka.cyclone.storage.repository.FileParcelRepository;
+import org.cempaka.cyclone.storage.repositories.FileParcelRepository;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;

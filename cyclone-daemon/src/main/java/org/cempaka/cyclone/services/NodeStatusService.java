@@ -13,7 +13,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.NodeState;
 import org.cempaka.cyclone.beans.NodeStatus;
-import org.cempaka.cyclone.storage.data.NodeStateDataAccess;
+import org.cempaka.cyclone.storage.jdbi.NodeStateDataAccess;
 
 @Singleton
 public class NodeStatusService

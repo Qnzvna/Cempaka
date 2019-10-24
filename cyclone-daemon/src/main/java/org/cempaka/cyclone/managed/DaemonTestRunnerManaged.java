@@ -16,7 +16,7 @@ import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
 import org.cempaka.cyclone.beans.exceptions.WorkerNotAvailableException;
 import org.cempaka.cyclone.configuration.TestRunnerConfiguration;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
-import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
+import org.cempaka.cyclone.storage.jdbi.TestRunStatusDataAccess;
 import org.cempaka.cyclone.worker.WorkerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -9,7 +9,7 @@ import org.cempaka.cyclone.beans.TestState;
 import org.cempaka.cyclone.protocol.payloads.Payload;
 import org.cempaka.cyclone.protocol.payloads.PayloadType;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
-import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
+import org.cempaka.cyclone.storage.jdbi.TestRunStatusDataAccess;
 
 @Singleton
 public class StartedPayloadListener implements BiConsumer<String, Payload>

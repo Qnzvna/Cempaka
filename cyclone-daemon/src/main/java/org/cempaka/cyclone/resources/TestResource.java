@@ -2,7 +2,6 @@ package org.cempaka.cyclone.resources;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -20,15 +19,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import org.cempaka.cyclone.TestRunMetric;
 import org.cempaka.cyclone.beans.ParcelMetadata;
 import org.cempaka.cyclone.beans.TestMetadata;
 import org.cempaka.cyclone.beans.TestRunConfiguration;
 import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
 import org.cempaka.cyclone.services.TestRunnerService;
-import org.cempaka.cyclone.storage.data.TestRunMetricDataAccess;
-import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
-import org.cempaka.cyclone.storage.repository.ParcelMetadataRepository;
+import org.cempaka.cyclone.storage.jdbi.TestRunStatusDataAccess;
+import org.cempaka.cyclone.storage.repositories.ParcelMetadataRepository;
 
 @Singleton
 @Produces(MediaType.APPLICATION_JSON)
@@ -38,18 +35,15 @@ public class TestResource
 {
     private final ParcelMetadataRepository parcelMetadataRepository;
     private final TestRunnerService testRunnerService;
-    private final TestRunMetricDataAccess testRunMetricDataAccess;
     private final TestRunStatusDataAccess testRunStatusDataAccess;
 
     @Inject
     public TestResource(final ParcelMetadataRepository parcelMetadataRepository,
                         final TestRunnerService testRunnerService,
-                        final TestRunMetricDataAccess testRunMetricDataAccess,
                         final TestRunStatusDataAccess testRunStatusDataAccess)
     {
         this.parcelMetadataRepository = checkNotNull(parcelMetadataRepository);
         this.testRunnerService = checkNotNull(testRunnerService);
-        this.testRunMetricDataAccess = checkNotNull(testRunMetricDataAccess);
         this.testRunStatusDataAccess = checkNotNull(testRunStatusDataAccess);
     }
 
@@ -109,14 +103,6 @@ public class TestResource
     {
         final String state = testRunStatusDataAccess.getState(testId, nodeIdentifier);
         return Response.ok().entity(state).build();
-    }
-
-    @GET
-    @Path("/{id}/metrics")
-    public Response getMetrics(@PathParam("id") final String testId)
-    {
-        final List<TestRunMetric> events = testRunMetricDataAccess.getMetricsById(testId);
-        return Response.ok().entity(events).build();
     }
 
     @GET

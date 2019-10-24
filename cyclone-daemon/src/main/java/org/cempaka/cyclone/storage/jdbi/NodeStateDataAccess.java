@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.storage.data;
+package org.cempaka.cyclone.storage.jdbi;
 
 import java.sql.Timestamp;
 import java.util.Set;

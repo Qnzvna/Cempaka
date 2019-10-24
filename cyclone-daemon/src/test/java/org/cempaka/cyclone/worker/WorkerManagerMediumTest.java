@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import org.cempaka.cyclone.beans.Parcel;
 import org.cempaka.cyclone.beans.TestRunConfiguration;
 import org.cempaka.cyclone.beans.exceptions.ProcessFailureException;
-import org.cempaka.cyclone.storage.repository.ParcelRepository;
+import org.cempaka.cyclone.storage.repositories.ParcelRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +31,7 @@ public class WorkerManagerMediumTest
     private static final int WORKER_NUMBER = 2;
     private static final String EXAMPLE_TEST = "org.cempaka.cyclone.examples.ExampleTest";
     private static final String FAILING_TEST = "org.cempaka.cyclone.examples.FailingTest";
-    private static final String SUPPRESSED_FAILING_TEST = "org.cempaka.cyclone.examples.SupressedFailingTest";
+    private static final String SUPPRESSED_FAILING_TEST = "org.cempaka.cyclone.examples.SuppressedFailingTest";
     private static final Set<String> LOCAL = ImmutableSet.of("127.0.0.1");
     private static final String JVM_OPTIONS = "";
 

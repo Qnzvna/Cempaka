@@ -13,7 +13,7 @@ import org.cempaka.cyclone.beans.TestRunConfiguration;
 import org.cempaka.cyclone.beans.TestState;
 import org.cempaka.cyclone.configuration.TestRunnerConfiguration;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
-import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
+import org.cempaka.cyclone.storage.jdbi.TestRunStatusDataAccess;
 import org.cempaka.cyclone.worker.WorkerManager;
 import org.junit.Before;
 import org.junit.Test;

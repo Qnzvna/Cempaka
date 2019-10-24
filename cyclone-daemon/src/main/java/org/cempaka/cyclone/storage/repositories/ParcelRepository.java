@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.storage.repository;
+package org.cempaka.cyclone.storage.repositories;
 
 import java.util.UUID;
 import java.util.stream.Stream;

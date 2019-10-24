@@ -1,17 +1,17 @@
-package org.cempaka.cyclone;
+package org.cempaka.cyclone.beans;
 
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Objects;
 
-public class TestRunMetric
+public class MetricDataPoint
 {
     private final long timestamp;
     private final String name;
     private final double value;
 
-    public TestRunMetric(final long timestamp, final String name, final double value)
+    public MetricDataPoint(final long timestamp, final String name, final double value)
     {
         this.timestamp = timestamp;
         this.name = checkNotNull(name);
@@ -39,7 +39,7 @@ public class TestRunMetric
 
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
-        final TestRunMetric that = (TestRunMetric) o;
+        final MetricDataPoint that = (MetricDataPoint) o;
         return timestamp == that.timestamp &&
             Double.compare(that.value, value) == 0 &&
             Objects.equals(name, that.name);

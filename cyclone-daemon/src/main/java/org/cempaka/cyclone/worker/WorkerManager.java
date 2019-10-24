@@ -8,7 +8,7 @@ import org.cempaka.cyclone.beans.Parcel;
 import org.cempaka.cyclone.beans.TestRunConfiguration;
 import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
 import org.cempaka.cyclone.beans.exceptions.WorkerNotAvailableException;
-import org.cempaka.cyclone.storage.repository.ParcelRepository;
+import org.cempaka.cyclone.storage.repositories.ParcelRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

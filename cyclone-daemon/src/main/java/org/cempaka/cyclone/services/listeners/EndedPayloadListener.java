@@ -10,8 +10,8 @@ import org.cempaka.cyclone.protocol.payloads.EndedPayload;
 import org.cempaka.cyclone.protocol.payloads.Payload;
 import org.cempaka.cyclone.protocol.payloads.PayloadType;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
-import org.cempaka.cyclone.storage.data.TestRunStackTraceDataAccess;
-import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
+import org.cempaka.cyclone.storage.jdbi.TestRunStackTraceDataAccess;
+import org.cempaka.cyclone.storage.jdbi.TestRunStatusDataAccess;
 
 @Singleton
 public class EndedPayloadListener implements BiConsumer<String, Payload>
@@ -21,10 +21,9 @@ public class EndedPayloadListener implements BiConsumer<String, Payload>
     private final TestRunStackTraceDataAccess testRunStackTraceDataAccess;
 
     @Inject
-    public EndedPayloadListener(
-        final NodeIdentifierProvider nodeIdentifierProvider,
-        final TestRunStatusDataAccess testRunStatusDataAccess,
-        final TestRunStackTraceDataAccess testRunStackTraceDataAccess)
+    public EndedPayloadListener(final NodeIdentifierProvider nodeIdentifierProvider,
+                                final TestRunStatusDataAccess testRunStatusDataAccess,
+                                final TestRunStackTraceDataAccess testRunStackTraceDataAccess)
     {
         this.nodeIdentifierProvider = checkNotNull(nodeIdentifierProvider);
         this.testRunStatusDataAccess = checkNotNull(testRunStatusDataAccess);

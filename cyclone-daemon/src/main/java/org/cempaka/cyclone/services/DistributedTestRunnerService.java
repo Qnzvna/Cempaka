@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.TestRunConfiguration;
 import org.cempaka.cyclone.beans.TestState;
-import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
+import org.cempaka.cyclone.storage.jdbi.TestRunStatusDataAccess;
 
 @Singleton
 public class DistributedTestRunnerService implements TestRunnerService

@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.storage.repository;
+package org.cempaka.cyclone.storage.repositories;
 
 import org.cempaka.cyclone.beans.ParcelMetadata;
 

@@ -4,15 +4,17 @@ import com.google.inject.Exposed;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 import javax.inject.Singleton;
-import org.cempaka.cyclone.storage.data.NodeStateDataAccess;
-import org.cempaka.cyclone.storage.data.ParcelMetadataDataAccess;
-import org.cempaka.cyclone.storage.data.TestRunMetricDataAccess;
-import org.cempaka.cyclone.storage.data.TestRunStackTraceDataAccess;
-import org.cempaka.cyclone.storage.data.TestRunStatusDataAccess;
-import org.cempaka.cyclone.storage.repository.FileParcelRepository;
-import org.cempaka.cyclone.storage.repository.JdbiParcelMetadataRepository;
-import org.cempaka.cyclone.storage.repository.ParcelMetadataRepository;
-import org.cempaka.cyclone.storage.repository.ParcelRepository;
+import org.cempaka.cyclone.storage.jdbi.NodeStateDataAccess;
+import org.cempaka.cyclone.storage.jdbi.ParcelMetadataDataAccess;
+import org.cempaka.cyclone.storage.jdbi.TestMetricsDataAccess;
+import org.cempaka.cyclone.storage.jdbi.TestRunStackTraceDataAccess;
+import org.cempaka.cyclone.storage.jdbi.TestRunStatusDataAccess;
+import org.cempaka.cyclone.storage.repositories.FileParcelRepository;
+import org.cempaka.cyclone.storage.repositories.JdbiMeasurementRepository;
+import org.cempaka.cyclone.storage.repositories.JdbiParcelMetadataRepository;
+import org.cempaka.cyclone.storage.repositories.MeasurementsRepository;
+import org.cempaka.cyclone.storage.repositories.ParcelMetadataRepository;
+import org.cempaka.cyclone.storage.repositories.ParcelRepository;
 import org.jdbi.v3.core.Jdbi;
 
 public class StorageModule extends PrivateModule
@@ -22,16 +24,10 @@ public class StorageModule extends PrivateModule
     {
         bind(ParcelRepository.class).to(FileParcelRepository.class);
         bind(ParcelMetadataRepository.class).to(JdbiParcelMetadataRepository.class);
+        bind(MeasurementsRepository.class).to(JdbiMeasurementRepository.class);
         expose(ParcelRepository.class);
         expose(ParcelMetadataRepository.class);
-    }
-
-    @Exposed
-    @Provides
-    @Singleton
-    TestRunMetricDataAccess testRunMetricsRepository(final Jdbi jdbi)
-    {
-        return jdbi.onDemand(TestRunMetricDataAccess.class);
+        expose(MeasurementsRepository.class);
     }
 
     @Exposed
@@ -63,5 +59,12 @@ public class StorageModule extends PrivateModule
     ParcelMetadataDataAccess parcelMetadataDataAccess(final Jdbi jdbi)
     {
         return jdbi.onDemand(ParcelMetadataDataAccess.class);
+    }
+
+    @Provides
+    @Singleton
+    TestMetricsDataAccess testMetricsDataAccess(final Jdbi jdbi)
+    {
+        return jdbi.onDemand(TestMetricsDataAccess.class);
     }
 }

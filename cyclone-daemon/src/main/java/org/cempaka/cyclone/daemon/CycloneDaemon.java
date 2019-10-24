@@ -22,8 +22,8 @@ import org.cempaka.cyclone.resources.StatusResource;
 import org.cempaka.cyclone.resources.TestResource;
 import org.cempaka.cyclone.storage.MigrationRunner;
 import org.cempaka.cyclone.storage.ParcelIndexer;
-import org.cempaka.cyclone.storage.repository.ParcelMetadataRepository;
-import org.cempaka.cyclone.storage.repository.ParcelRepository;
+import org.cempaka.cyclone.storage.repositories.ParcelMetadataRepository;
+import org.cempaka.cyclone.storage.repositories.ParcelRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

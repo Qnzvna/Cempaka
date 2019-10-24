@@ -1,7 +1,7 @@
-package org.cempaka.cyclone.storage.repository;
+package org.cempaka.cyclone.storage.repositories;
 
 import org.cempaka.cyclone.beans.ParcelMetadata;
-import org.cempaka.cyclone.storage.data.ParcelMetadataDataAccess;
+import org.cempaka.cyclone.storage.jdbi.ParcelMetadataDataAccess;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;

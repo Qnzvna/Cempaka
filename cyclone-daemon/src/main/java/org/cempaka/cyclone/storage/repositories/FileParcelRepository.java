@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.storage.repository;
+package org.cempaka.cyclone.storage.repositories;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
