@@ -14,10 +14,10 @@ public interface TestMetricsDataAccess
     void insert(String testRunId, Timestamp timestamp, String name, double value);
 
     @RegisterRowMapper(MetricDataPointRowMapper.class)
-    @SqlQuery("SELECT timestamp, name, value FROM test_metrics WHERE test_run_id = ? AND from >= ? AND to <= ORDER BY timestamp DESC")
-    List<MetricDataPoint> get(String testRunId, long from, long to);
+    @SqlQuery("SELECT timestamp, name, value FROM test_metrics WHERE test_run_id = ? AND timestamp >= ? AND timestamp <= ? ORDER BY timestamp DESC")
+    List<MetricDataPoint> get(String testRunId, Timestamp from, Timestamp to);
 
     @RegisterRowMapper(MetricDataPointRowMapper.class)
-    @SqlQuery("SELECT timestamp, name, value FROM test_metrics WHERE test_run_id = ? AND name = ? AND timestamp >= ? AND timestamp <= to ORDER BY timestamp DESC")
-    List<MetricDataPoint> get(String testRunId, String name, long from, long to);
+    @SqlQuery("SELECT timestamp, name, value FROM test_metrics WHERE test_run_id = ? AND name = ? AND timestamp >= ? AND timestamp <= ? ORDER BY timestamp DESC")
+    List<MetricDataPoint> get(String testRunId, String name, Timestamp from, Timestamp to);
 }

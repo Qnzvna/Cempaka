@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Range;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -26,9 +27,7 @@ public class JdbiMeasurementRepository implements MeasurementsRepository
     {
         checkNotNull(testRunId);
         checkNotNull(timeRange);
-        final long from = timeRange.hasLowerBound() ? timeRange.lowerEndpoint() : 0;
-        final long to = timeRange.hasUpperBound() ? timeRange.upperEndpoint() : Long.MAX_VALUE;
-        return testMetricsDataAccess.get(testRunId, from, to);
+        return testMetricsDataAccess.get(testRunId, getFromTimestamp(timeRange), getToTimestamp(timeRange));
     }
 
     @Override
@@ -37,9 +36,17 @@ public class JdbiMeasurementRepository implements MeasurementsRepository
         checkNotNull(testRunId);
         checkNotNull(name);
         checkNotNull(timeRange);
-        final long from = timeRange.hasLowerBound() ? timeRange.lowerEndpoint() : 0;
-        final long to = timeRange.hasUpperBound() ? timeRange.upperEndpoint() : Long.MAX_VALUE;
-        return testMetricsDataAccess.get(testRunId, name, from, to);
+        return testMetricsDataAccess.get(testRunId, name, getFromTimestamp(timeRange), getToTimestamp(timeRange));
+    }
+
+    private Timestamp getFromTimestamp(final Range<Long> timeRange)
+    {
+        return timeRange.hasLowerBound() ? new Timestamp(timeRange.lowerEndpoint()) : new Timestamp(0);
+    }
+
+    private Timestamp getToTimestamp(final Range<Long> timeRange)
+    {
+        return timeRange.hasUpperBound() ? new Timestamp(timeRange.upperEndpoint()) : Timestamp.from(Instant.now());
     }
 
     @Override
