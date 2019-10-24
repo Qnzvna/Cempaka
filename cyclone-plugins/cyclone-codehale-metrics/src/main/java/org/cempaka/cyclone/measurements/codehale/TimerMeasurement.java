@@ -5,6 +5,8 @@ import com.codahale.metrics.Timer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import org.cempaka.cyclone.measurements.Measurement;
 
 public class TimerMeasurement extends Measurement
@@ -15,6 +17,21 @@ public class TimerMeasurement extends Measurement
     {
         super(name);
         this.timer = new Timer();
+    }
+
+    public void update(final long duration, TimeUnit timeUnit)
+    {
+        timer.update(duration, timeUnit);
+    }
+
+    public Timer.Context time()
+    {
+        return timer.time();
+    }
+
+    public <T> T time(final Callable<T> callable) throws Exception
+    {
+        return timer.time(callable);
     }
 
     @Override
