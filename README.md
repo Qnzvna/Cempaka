@@ -32,7 +32,7 @@ cyclone-cli dependency
 <dependency>
     <groupId>org.cempaka.cyclone</groupId>
     <artifactId>cyclone-cli</artifactId>
-    <version>0.1</version>
+    <version>0.2-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -81,19 +81,6 @@ main class.
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.3</version>
-                <configuration>
-                    <createDependencyReducedPom>true</createDependencyReducedPom>
-                    <filters>
-                        <filter>
-                            <artifact>*:*</artifact>
-                            <excludes>
-                                <exclude>META-INF/*.SF</exclude>
-                                <exclude>META-INF/*.DSA</exclude>
-                                <exclude>META-INF/*.RSA</exclude>
-                            </excludes>
-                        </filter>
-                    </filters>
-                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -133,6 +120,26 @@ server command on the produced fat jar.
 
 You can access the Daemon UI in your browser by typing
 `http://localhost:8080/`
+
+#### Docker
+
+You can also run cyclone inside a docker. Simply build an image using maven. 
+
+```
+mvn clean package -P docker
+``` 
+
+Docker image will  be named as `cempaka/cyclone:0.2-SNAPSHOT`. You can also use prepared docker-compose files to run 
+the cyclone and postgres.
+
+```
+cd docker/ && docker-compose up -d
+```
+
+To scale number of cyclones use the `scale` command.
+```
+docker-compose scale cyclone=3
+```
 
 #### Configuration
 
