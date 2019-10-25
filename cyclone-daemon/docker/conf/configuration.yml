@@ -1,0 +1,37 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: 8000
+
+cluster:
+  nodeId: localhost # TODO
+
+storage:
+  storagePath: /opt/cyclone/parcels/
+
+workers:
+  workersNumber: 4
+  guavaPath: /opt/cyclone/guava.jar
+  logsPath: /var/log/cyclone/
+
+auth:
+  type: NONE
+
+database:
+  driverClass: org.postgresql.Driver
+  user: cyclone
+  password: cyclone
+  url: jdbc:postgresql://postgres/postgres
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 1s
+  validationQuery: "/* MyService Health Check */ SELECT 1"
+  validationQueryTimeout: 3s
+  minSize: 8
+  maxSize: 32
+  checkConnectionWhileIdle: false
+  evictionInterval: 10s
+  minIdleTime: 1 minute
+
+logging:
+  level: INFO

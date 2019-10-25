@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.cempaka.cyclone</groupId>
@@ -128,9 +129,35 @@
                         <phase>pre-integration-test</phase>
                         <configuration>
                             <target name="copy examples to test resources">
-                                <copy file="${project.basedir}/../cyclone-examples/target/cyclone-examples-${project.version}.jar" tofile="${project.basedir}/target/test-classes/67548d96-076d-4f69-bd1d-3b9316b2ba15" />
+                                <copy
+                                    file="${project.basedir}/../cyclone-examples/target/cyclone-examples-${project.version}.jar"
+                                    tofile="${project.basedir}/target/test-classes/67548d96-076d-4f69-bd1d-3b9316b2ba15"/>
                             </target>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>com.google.guava</groupId>
+                            <artifactId>guava</artifactId>
+                            <version>${guava.version}</version>
+                            <type>jar</type>
+                            <overWrite>false</overWrite>
+                            <destFileName>guava.jar</destFileName>
+                        </artifactItem>
+                    </artifactItems>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <phase>package</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -143,9 +170,13 @@
                         </goals>
                         <phase>package</phase>
                         <configuration>
-                            <outputFile>../out/cyclone-daemon.jar</outputFile>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                            <outputFile>target/cyclone-daemon.jar</outputFile>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer
+                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>org.cempaka.cyclone.daemon.CycloneDaemon</mainClass>
                                 </transformer>
                             </transformers>
@@ -165,4 +196,18 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.spotify</groupId>
+                        <artifactId>dockerfile-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
