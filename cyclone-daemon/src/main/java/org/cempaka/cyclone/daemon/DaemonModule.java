@@ -8,10 +8,12 @@ import com.google.common.collect.Multimap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Environment;
 import java.time.Clock;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import javax.inject.Inject;
 import org.cempaka.cyclone.configuration.AuthenticationConfiguration;
@@ -81,10 +83,11 @@ public class DaemonModule extends AbstractModule
             .toInstance(channelConfiguration.getUdpServerPort());
         bind(Long.class).annotatedWith(Names.named("heartbeat.interval"))
             .toInstance(clusterConfiguration.getHeartbeatInterval());
-        bind(String.class).annotatedWith(Names.named("node.id"))
-            .toInstance(clusterConfiguration.getNodeId());
+        bind(new TypeLiteral<Map<String, String>>(){})
+            .annotatedWith(Names.named("node.provider.properties"))
+            .toInstance(clusterConfiguration.getNodeProviderProperties());
 
-        bind(NodeIdentifierProvider.class).to(StaticNodeIdentifierProvider.class);
+        bind(NodeIdentifierProvider.class).to(clusterConfiguration.getNodeIdentifierProvider());
         bind(Clock.class).toInstance(Clock.systemUTC());
 
         install(new StorageModule());

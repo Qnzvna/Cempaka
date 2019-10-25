@@ -1,5 +1,6 @@
 package org.cempaka.cyclone.services;
 
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -12,9 +13,9 @@ public class StaticNodeIdentifierProvider implements NodeIdentifierProvider
     private final String nodeId;
 
     @Inject
-    public StaticNodeIdentifierProvider(@Named("node.id") final String nodeId)
+    public StaticNodeIdentifierProvider(@Named("node.provider.properties") final Map<String, String> properties)
     {
-        this.nodeId = checkNotNull(nodeId);
+        this.nodeId = checkNotNull(properties.get("nodeId"));
     }
 
     @Override

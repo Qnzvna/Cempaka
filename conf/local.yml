@@ -7,7 +7,8 @@ server:
 
 cluster:
   # Node id's should be unique across all nodes in cluster.
-  nodeId: localhost
+  nodeProviderProperties:
+    nodeId: localhost
   # Controls when node will be marked as dead. Values are in seconds.
 #  heartbeatInterval: 10
 #  heartbeatManagedAwaitInterval: 60

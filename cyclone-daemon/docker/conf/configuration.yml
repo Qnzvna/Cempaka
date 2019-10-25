@@ -4,7 +4,7 @@ server:
       port: 8000
 
 cluster:
-  nodeId: localhost # TODO
+  nodeIdentifierProvider: org.cempaka.cyclone.services.LocalHostNodeIdentifierProvider
 
 storage:
   storagePath: /opt/cyclone/parcels/
