@@ -43,20 +43,17 @@ public class CycloneCli
         description = "test names to run", required = true,
         split = ",")
     private String[] testNames;
-    @Option(names = {LOOP_COUNT,
-        "--loopCount"}, description = "number of loops to run", defaultValue = "1")
+    @Option(names = {LOOP_COUNT, "--loopCount"}, description = "number of loops to run", defaultValue = "1")
     private long loopCount;
-    @Option(names = {THREADS,
-        "--threads"}, description = "number of threads to run", defaultValue = "1")
+    @Option(names = {THREADS, "--threads"}, description = "number of threads to run", defaultValue = "1")
     private int threads;
-    @Option(names = {PARAMETERS,
-        "--parameters"}, description = "passed parameters to tests", split = ",")
+    @Option(names = {PARAMETERS, "--parameters"}, description = "passed parameters to tests", split = ",")
     private Map<String, String> parameters = new HashMap<>();
-    @Option(names = {DAEMON_PORT}, description = "daemon port to send updates")
+    @Option(names = DAEMON_PORT, description = "daemon port to send updates")
     private int daemonPort;
-    @Option(names = {TEST_ID}, description = "test id to receive updates")
+    @Option(names = TEST_ID, description = "test id to receive updates")
     private String testId = "unknown";
-    @Option(names = {"--measurement-period"},
+    @Option(names = "--measurement-period",
         description = "measurements period in seconds", defaultValue = "5")
     private int measurementsPeriod;
 

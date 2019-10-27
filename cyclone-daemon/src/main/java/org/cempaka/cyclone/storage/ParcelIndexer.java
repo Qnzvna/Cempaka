@@ -57,9 +57,10 @@ public class ParcelIndexer
         final File temporaryParcelFile = createTemporaryFile(parcel);
         try {
             Files.write(temporaryParcelFile.toPath(), parcel.getData());
+            final String classPath = temporaryParcelFile.getPath() + ":" + guavaPath;
             final Process process = new ProcessBuilder("java",
                 "-cp",
-                temporaryParcelFile.getPath() + ":" + guavaPath,
+                classPath,
                 METADATA_PRINT).start();
             final List<String> response =
                 CharStreams.readLines(new InputStreamReader(process.getInputStream()));

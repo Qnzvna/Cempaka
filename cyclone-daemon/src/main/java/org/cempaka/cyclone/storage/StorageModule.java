@@ -9,9 +9,10 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import java.util.Map;
 import javax.inject.Singleton;
-import org.cempaka.cyclone.configurations.TypedConfiguration;
 import org.cempaka.cyclone.configurations.StorageConfiguration;
+import org.cempaka.cyclone.configurations.TypedConfiguration;
 import org.cempaka.cyclone.storage.jdbi.NodeStateDataAccess;
+import org.cempaka.cyclone.storage.jdbi.ParcelDataAccess;
 import org.cempaka.cyclone.storage.jdbi.ParcelMetadataDataAccess;
 import org.cempaka.cyclone.storage.jdbi.TestMetricsDataAccess;
 import org.cempaka.cyclone.storage.jdbi.TestRunStackTraceDataAccess;
@@ -70,6 +71,13 @@ public class StorageModule extends PrivateModule
     TestRunStatusDataAccess testRunStateDataAccess(final Jdbi jdbi)
     {
         return jdbi.onDemand(TestRunStatusDataAccess.class);
+    }
+
+    @Provides
+    @Singleton
+    ParcelDataAccess parcelDataAccess(final Jdbi jdbi)
+    {
+        return jdbi.onDemand(ParcelDataAccess.class);
     }
 
     @Provides

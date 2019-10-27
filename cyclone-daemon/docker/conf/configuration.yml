@@ -9,9 +9,7 @@ cluster:
 
 storage:
   parcelRepository:
-    type: org.cempaka.cyclone.storage.repositories.FileParcelRepository
-    parameters:
-      storagePath: /opt/cyclone/parcels/
+    type: org.cempaka.cyclone.storage.repositories.JdbiParcelRepository
 
 workers:
   workersNumber: 4

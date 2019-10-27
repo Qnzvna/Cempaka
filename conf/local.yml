@@ -17,10 +17,10 @@ cluster:
 
 storage:
   parcelRepository:
-    type: org.cempaka.cyclone.storage.repositories.FileParcelRepository
-    parameters:
-      # Location where to store uploaded parcels. Filesystem should be shared between all nodes.
-      storagePath: tmp/
+    type: org.cempaka.cyclone.storage.repositories.JdbiParcelRepository
+#    parameters:
+#      # Location where to store uploaded parcels. Filesystem should be shared between all nodes.
+#      storagePath: tmp/
 
 workers:
   # Number of test runners.
