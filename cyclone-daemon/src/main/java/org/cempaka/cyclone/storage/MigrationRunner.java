@@ -27,6 +27,7 @@ public class MigrationRunner implements Runnable
         final Flyway flyway = Flyway.configure().dataSource(dataSourceFactory.getUrl(),
             dataSourceFactory.getUser(),
             dataSourceFactory.getPassword())
+            .connectRetries(3)
             .load();
         final int migrationsApplied = flyway.migrate();
         LOG.info("Database migration completed. {} migrations applied.", migrationsApplied);

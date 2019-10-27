@@ -35,6 +35,7 @@
         <module>cyclone-examples</module>
         <module>cyclone-daemon</module>
         <module>cyclone-plugins</module>
+        <module>cyclone-tests</module>
     </modules>
 
     <scm>
@@ -67,18 +68,20 @@
         <httpclient.version>4.5.7</httpclient.version>
         <postgresql.version>42.2.5</postgresql.version>
         <jdbi3.version>3.10.1</jdbi3.version>
+        <flyway.version>6.0.4</flyway.version>
 
         <junit.version>4.12</junit.version>
         <assertj-core.version>3.11.0</assertj-core.version>
         <mockito-all.version>1.9.5</mockito-all.version>
         <awaitility.version>3.1.6</awaitility.version>
+        <docker-java.version>3.1.5</docker-java.version>
+        <httpmime.version>4.5.3</httpmime.version>
 
         <angularjs.version>1.7.7</angularjs.version>
         <bootstrap.version>4.3.1</bootstrap.version>
         <font-awesome.version>5.7.2</font-awesome.version>
         <ngtoast.version>1.5.6</ngtoast.version>
         <ng-file-upload.version>12.0.4</ng-file-upload.version>
-        <flyway.version>6.0.4</flyway.version>
     </properties>
 
     <dependencyManagement>
@@ -255,6 +258,18 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <version>${awaitility.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java</artifactId>
+            <version>${docker-java.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>${httpmime.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
