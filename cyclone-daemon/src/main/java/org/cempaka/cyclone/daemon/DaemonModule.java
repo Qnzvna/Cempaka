@@ -16,12 +16,12 @@ import java.time.Clock;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import javax.inject.Inject;
-import org.cempaka.cyclone.configuration.AuthenticationConfiguration;
-import org.cempaka.cyclone.configuration.ChannelConfiguration;
-import org.cempaka.cyclone.configuration.ClusterConfiguration;
-import org.cempaka.cyclone.configuration.DaemonConfiguration;
-import org.cempaka.cyclone.configuration.StorageConfiguration;
-import org.cempaka.cyclone.configuration.WorkersConfiguration;
+import org.cempaka.cyclone.configurations.AuthenticationConfiguration;
+import org.cempaka.cyclone.configurations.ChannelConfiguration;
+import org.cempaka.cyclone.configurations.ClusterConfiguration;
+import org.cempaka.cyclone.configurations.DaemonConfiguration;
+import org.cempaka.cyclone.configurations.StorageConfiguration;
+import org.cempaka.cyclone.configurations.WorkersConfiguration;
 import org.cempaka.cyclone.protocol.DaemonChannel;
 import org.cempaka.cyclone.protocol.LogFailureListener;
 import org.cempaka.cyclone.protocol.PayloadListener;
@@ -30,7 +30,6 @@ import org.cempaka.cyclone.protocol.payloads.Payload;
 import org.cempaka.cyclone.protocol.payloads.PayloadType;
 import org.cempaka.cyclone.services.DistributedTestRunnerService;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
-import org.cempaka.cyclone.services.StaticNodeIdentifierProvider;
 import org.cempaka.cyclone.services.TestRunnerService;
 import org.cempaka.cyclone.services.listeners.EndedPayloadListener;
 import org.cempaka.cyclone.services.listeners.RunningPayloadListener;
@@ -71,8 +70,6 @@ public class DaemonModule extends AbstractModule
 
         bind(TestRunnerService.class).to(DistributedTestRunnerService.class);
         bind(ObjectMapper.class).toInstance(environment.getObjectMapper());
-        bind(String.class).annotatedWith(Names.named("storage.path"))
-            .toInstance(storageConfiguration.getStoragePath());
         bind(String.class).annotatedWith(Names.named("guava.path"))
             .toInstance(workersConfiguration.getGuavaPath());
         bind(Integer.class).annotatedWith(Names.named("worker.number"))
@@ -90,7 +87,7 @@ public class DaemonModule extends AbstractModule
         bind(NodeIdentifierProvider.class).to(clusterConfiguration.getNodeIdentifierProvider());
         bind(Clock.class).toInstance(Clock.systemUTC());
 
-        install(new StorageModule());
+        install(new StorageModule(storageConfiguration));
     }
 
     @Inject

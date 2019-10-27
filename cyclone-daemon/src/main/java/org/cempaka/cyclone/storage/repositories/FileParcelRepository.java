@@ -1,13 +1,13 @@
 package org.cempaka.cyclone.storage.repositories;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -22,10 +22,9 @@ public class FileParcelRepository implements ParcelRepository
     private final Path storagePath;
 
     @Inject
-    public FileParcelRepository(@Named("storage.path") final String storagePath)
+    public FileParcelRepository(@Named("parcel.repository.parameters") final Map<String, String> parameters)
     {
-        checkNotNull(storagePath);
-        this.storagePath = Paths.get(storagePath);
+        this.storagePath = Paths.get(parameters.get("storagePath"));
         checkStoragePath();
     }
 

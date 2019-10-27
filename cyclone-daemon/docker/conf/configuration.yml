@@ -4,10 +4,14 @@ server:
       port: 8000
 
 cluster:
-  nodeIdentifierProvider: org.cempaka.cyclone.services.LocalHostNodeIdentifierProvider
+  nodeIdentifierProvider:
+    type: org.cempaka.cyclone.services.LocalHostNodeIdentifierProvider
 
 storage:
-  storagePath: /opt/cyclone/parcels/
+  parcelRepository:
+    type: org.cempaka.cyclone.storage.repositories.FileParcelRepository
+    parameters:
+      storagePath: /opt/cyclone/parcels/
 
 workers:
   workersNumber: 4

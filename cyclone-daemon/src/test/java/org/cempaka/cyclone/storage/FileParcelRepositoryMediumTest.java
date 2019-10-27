@@ -3,6 +3,7 @@ package org.cempaka.cyclone.storage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,7 +37,7 @@ public class FileParcelRepositoryMediumTest
     @Before
     public void setUp()
     {
-        fileParcelRepository = new FileParcelRepository(storagePath.toString());
+        fileParcelRepository = new FileParcelRepository(ImmutableMap.of("storagePath", storagePath.toString()));
     }
 
     @AfterClass

@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.configuration;
+package org.cempaka.cyclone.configurations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;

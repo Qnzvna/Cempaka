@@ -7,7 +7,7 @@ import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.cempaka.cyclone.configuration.AuthenticationConfiguration;
+import org.cempaka.cyclone.configurations.AuthenticationConfiguration;
 
 @Singleton
 public class AuthFilterFactory

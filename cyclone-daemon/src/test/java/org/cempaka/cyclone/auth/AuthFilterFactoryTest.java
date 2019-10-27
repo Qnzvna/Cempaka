@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.dropwizard.auth.AuthFilter;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
-import org.cempaka.cyclone.configuration.AuthenticationConfiguration;
-import org.cempaka.cyclone.configuration.AuthenticationConfiguration.Type;
+import org.cempaka.cyclone.configurations.AuthenticationConfiguration;
+import org.cempaka.cyclone.configurations.AuthenticationConfiguration.Type;
 import org.junit.Test;
 
 public class AuthFilterFactoryTest

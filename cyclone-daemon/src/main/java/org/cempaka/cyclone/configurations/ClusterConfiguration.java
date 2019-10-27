@@ -1,33 +1,36 @@
-package org.cempaka.cyclone.configuration;
+package org.cempaka.cyclone.configurations;
 
-import java.util.HashMap;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
 import org.cempaka.cyclone.services.StaticNodeIdentifierProvider;
-import org.hibernate.validator.constraints.NotEmpty;
 
 public class ClusterConfiguration
 {
-    @NotNull
-    private Class<? extends NodeIdentifierProvider> nodeIdentifierProvider = StaticNodeIdentifierProvider.class;
-    private Map<String, String> nodeProviderProperties = new HashMap<>();
+    @Valid
+    @JsonProperty("nodeIdentifierProvider")
+    private TypedConfiguration<NodeIdentifierProvider> nodeIdentifierProviderConfiguration =
+        new TypedConfiguration<>(StaticNodeIdentifierProvider.class);
     @Min(10)
     @Max(600)
     private long heartbeatInterval = 10;
     @Min(60)
     private long heartbeatManagedAwaitInterval = 60;
 
+    @JsonIgnore
     public Class<? extends NodeIdentifierProvider> getNodeIdentifierProvider()
     {
-        return nodeIdentifierProvider;
+        return nodeIdentifierProviderConfiguration.getType();
     }
 
+    @JsonIgnore
     public Map<String, String> getNodeProviderProperties()
     {
-        return nodeProviderProperties;
+        return nodeIdentifierProviderConfiguration.getParameters();
     }
 
     public long getHeartbeatInterval()

@@ -6,16 +6,21 @@ server:
       port: 8080
 
 cluster:
-  # Node id's should be unique across all nodes in cluster.
-  nodeProviderProperties:
-    nodeId: localhost
+  nodeIdentifierProvider:
+    type: org.cempaka.cyclone.services.StaticNodeIdentifierProvider
+    # Node id's should be unique across all nodes in cluster.
+    parameters:
+      nodeId: localhost
   # Controls when node will be marked as dead. Values are in seconds.
 #  heartbeatInterval: 10
 #  heartbeatManagedAwaitInterval: 60
 
 storage:
-  # Location where to store uploaded parcels. Filesystem should be shared between all nodes.
-  storagePath: tmp/
+  parcelRepository:
+    type: org.cempaka.cyclone.storage.repositories.FileParcelRepository
+    parameters:
+      # Location where to store uploaded parcels. Filesystem should be shared between all nodes.
+      storagePath: tmp/
 
 workers:
   # Number of test runners.

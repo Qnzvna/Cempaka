@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.NodeStatus;
-import org.cempaka.cyclone.configuration.ClusterConfiguration;
+import org.cempaka.cyclone.configurations.ClusterConfiguration;
 import org.cempaka.cyclone.services.NodeStatusService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

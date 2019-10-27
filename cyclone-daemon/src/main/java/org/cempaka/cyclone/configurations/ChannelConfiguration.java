@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.configuration;
+package org.cempaka.cyclone.configurations;
 
 import javax.validation.constraints.Min;
 

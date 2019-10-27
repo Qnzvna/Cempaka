@@ -3,7 +3,7 @@ package org.cempaka.cyclone.storage;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import io.dropwizard.db.DataSourceFactory;
-import org.cempaka.cyclone.configuration.DaemonConfiguration;
+import org.cempaka.cyclone.configurations.DaemonConfiguration;
 import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
