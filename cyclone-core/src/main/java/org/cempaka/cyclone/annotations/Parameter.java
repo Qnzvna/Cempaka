@@ -21,8 +21,7 @@ import java.lang.annotation.Target;
  * }
  * </pre>
  * <p>
- * Cyclone will automatically inject values at the start of the test so thunderbolts methods can use
- * them.
+ * Cyclone will automatically inject values at the start of the test so thunderbolts methods can use them.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})

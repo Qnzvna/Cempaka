@@ -22,12 +22,12 @@ import org.cempaka.cyclone.configurations.ClusterConfiguration;
 import org.cempaka.cyclone.configurations.DaemonConfiguration;
 import org.cempaka.cyclone.configurations.StorageConfiguration;
 import org.cempaka.cyclone.configurations.WorkersConfiguration;
-import org.cempaka.cyclone.protocol.DaemonChannel;
-import org.cempaka.cyclone.protocol.LogFailureListener;
-import org.cempaka.cyclone.protocol.PayloadListener;
-import org.cempaka.cyclone.protocol.UdpDaemonChannel;
-import org.cempaka.cyclone.protocol.payloads.Payload;
-import org.cempaka.cyclone.protocol.payloads.PayloadType;
+import org.cempaka.cyclone.listeners.DaemonChannel;
+import org.cempaka.cyclone.listeners.LogFailureListener;
+import org.cempaka.cyclone.listeners.PayloadListener;
+import org.cempaka.cyclone.listeners.UdpDaemonChannel;
+import org.cempaka.cyclone.listeners.payloads.Payload;
+import org.cempaka.cyclone.listeners.payloads.PayloadType;
 import org.cempaka.cyclone.services.DistributedTestRunnerService;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
 import org.cempaka.cyclone.services.TestRunnerService;
@@ -80,7 +80,7 @@ public class DaemonModule extends AbstractModule
             .toInstance(channelConfiguration.getUdpServerPort());
         bind(Long.class).annotatedWith(Names.named("heartbeat.interval"))
             .toInstance(clusterConfiguration.getHeartbeatInterval());
-        bind(new TypeLiteral<Map<String, String>>(){})
+        bind(new TypeLiteral<Map<String, String>>() {})
             .annotatedWith(Names.named("node.provider.properties"))
             .toInstance(clusterConfiguration.getNodeProviderProperties());
 

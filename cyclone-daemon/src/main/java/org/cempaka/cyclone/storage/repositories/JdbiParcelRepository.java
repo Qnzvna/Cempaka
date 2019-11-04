@@ -1,9 +1,10 @@
 package org.cempaka.cyclone.storage.repositories;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.stream.Collectors.toSet;
 
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -41,8 +42,8 @@ public class JdbiParcelRepository implements ParcelRepository
     }
 
     @Override
-    public Stream<UUID> list()
+    public Set<UUID> keys()
     {
-        return parcelDataAccess.listKeys().stream().map(UUID::fromString);
+        return parcelDataAccess.keys().stream().map(UUID::fromString).collect(toSet());
     }
 }

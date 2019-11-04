@@ -2,7 +2,6 @@ package org.cempaka.cyclone.resources;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
 import java.util.List;
 import javax.inject.Inject;
@@ -16,7 +15,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.cempaka.cyclone.beans.MetricDataPoint;
-import org.cempaka.cyclone.storage.repositories.MeasurementsRepository;
+import org.cempaka.cyclone.storage.repositories.TestMetricRepository;
 
 @Singleton
 @Produces(MediaType.APPLICATION_JSON)
@@ -24,12 +23,12 @@ import org.cempaka.cyclone.storage.repositories.MeasurementsRepository;
 @Path("/tests")
 public class MetricsResource
 {
-    private final MeasurementsRepository measurementsRepository;
+    private final TestMetricRepository testMetricRepository;
 
     @Inject
-    public MetricsResource(final MeasurementsRepository measurementsRepository)
+    public MetricsResource(final TestMetricRepository testMetricRepository)
     {
-        this.measurementsRepository = checkNotNull(measurementsRepository);
+        this.testMetricRepository = checkNotNull(testMetricRepository);
     }
 
     @GET
@@ -38,7 +37,7 @@ public class MetricsResource
                                @QueryParam("from") final Long from,
                                @QueryParam("to") final Long to)
     {
-        final List<MetricDataPoint> events = measurementsRepository.getMetrics(testId, getRange(from, to));
+        final List<MetricDataPoint> events = testMetricRepository.get(testId, getRange(from, to));
         return Response.ok().entity(events).build();
     }
 
@@ -49,7 +48,7 @@ public class MetricsResource
                                @QueryParam("from") final Long from,
                                @QueryParam("to") final Long to)
     {
-        final List<MetricDataPoint> events = measurementsRepository.getMetrics(testId, name, getRange(from, to));
+        final List<MetricDataPoint> events = testMetricRepository.get(testId, name, getRange(from, to));
         return Response.ok().entity(events).build();
     }
 

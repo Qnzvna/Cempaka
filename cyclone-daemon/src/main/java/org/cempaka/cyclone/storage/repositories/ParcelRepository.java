@@ -1,7 +1,7 @@
 package org.cempaka.cyclone.storage.repositories;
 
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.cempaka.cyclone.beans.Parcel;
 
@@ -14,5 +14,5 @@ public interface ParcelRepository
 
     void delete(UUID id);
 
-    Stream<UUID> list();
+    Set<UUID> keys();
 }

@@ -15,7 +15,8 @@
                ng-model="$ctrl.runConfiguration.loopCount">
         <small id="loopCountHelp" class="form-text text-muted">Enter number of loops to run.</small>
     </div>
-    <label for="threadsNumber">Threads <span class="badge badge-light">{{$ctrl.runConfiguration.threadsNumber}}</span></label>
+    <label for="threadsNumber">Threads <span
+        class="badge badge-light">{{$ctrl.runConfiguration.threadsNumber}}</span></label>
     <input type="range" class="custom-range" id="threadsNumber" min="1" max="512"
            ng-model="$ctrl.runConfiguration.threadsNumber">
     <div class="form-group">

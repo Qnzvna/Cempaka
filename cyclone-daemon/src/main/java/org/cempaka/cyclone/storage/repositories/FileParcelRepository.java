@@ -1,6 +1,7 @@
 package org.cempaka.cyclone.storage.repositories;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -8,8 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -74,12 +75,13 @@ public class FileParcelRepository implements ParcelRepository
     }
 
     @Override
-    public Stream<UUID> list()
+    public Set<UUID> keys()
     {
         try {
             return Files.list(storagePath).map(Path::getFileName)
                 .map(Path::toString)
-                .map(UUID::fromString);
+                .map(UUID::fromString)
+                .collect(toSet());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

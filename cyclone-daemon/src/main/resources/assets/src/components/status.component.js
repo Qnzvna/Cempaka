@@ -13,7 +13,7 @@ export const StatusComponent = {
             this.healthy = false;
             this.http({
                 method: 'GET',
-                url: '/api/status'
+                url: '/api/cluster/status'
             }).then(response => {
                 this.nodes = response.data;
             }, error => {

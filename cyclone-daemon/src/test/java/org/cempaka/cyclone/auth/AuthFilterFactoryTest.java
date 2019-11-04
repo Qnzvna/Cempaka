@@ -1,7 +1,6 @@
 package org.cempaka.cyclone.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.dropwizard.auth.AuthFilter;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;

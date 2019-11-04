@@ -1,0 +1,79 @@
+package org.cempaka.cyclone.storage.repositories;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.stream.Collectors.toSet;
+
+import java.util.Set;
+import java.util.UUID;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.cempaka.cyclone.storage.jdbi.TestExecutionDataAccess;
+import org.cempaka.cyclone.tests.TestExecution;
+
+@Singleton
+public class JdbiTestExecutionRepository implements TestExecutionRepository
+{
+    private final TestExecutionDataAccess testExecutionDataAccess;
+
+    @Inject
+    public JdbiTestExecutionRepository(final TestExecutionDataAccess testExecutionDataAccess)
+    {
+        this.testExecutionDataAccess = checkNotNull(testExecutionDataAccess);
+    }
+
+    @Override
+    public void setState(final UUID id, final String node, final String state)
+    {
+        checkNotNull(node);
+        checkNotNull(state);
+        testExecutionDataAccess.setState(id.toString(), node, state);
+    }
+
+    @Override
+    public void setStates(final UUID id, final String state)
+    {
+        checkNotNull(state);
+        testExecutionDataAccess.setStates(id.toString(), state);
+    }
+
+    @Override
+    public void put(final TestExecution testExecution)
+    {
+        testExecutionDataAccess.insert(testExecution.getId().toString(),
+            testExecution.getNode(),
+            testExecution.getState(),
+            testExecution.getProperties());
+    }
+
+    @Override
+    public Set<TestExecution> getAll()
+    {
+        return testExecutionDataAccess.getAll();
+    }
+
+    @Override
+    public Set<TestExecution> get(final String node, final String state)
+    {
+        checkNotNull(node);
+        checkNotNull(state);
+        return testExecutionDataAccess.get(node, state);
+    }
+
+    @Override
+    public Set<TestExecution> get(final UUID id)
+    {
+        return testExecutionDataAccess.get(id.toString());
+    }
+
+    @Override
+    public void delete(final UUID id)
+    {
+        testExecutionDataAccess.delete(id.toString());
+    }
+
+    @Override
+    public Set<UUID> keys()
+    {
+        return testExecutionDataAccess.keys().stream().map(UUID::fromString).collect(toSet());
+    }
+}

@@ -16,11 +16,12 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import org.cempaka.cyclone.beans.ParameterMetadata;
 import org.cempaka.cyclone.beans.Parcel;
-import org.cempaka.cyclone.beans.ParcelMetadata;
-import org.cempaka.cyclone.beans.TestMetadata;
 import org.cempaka.cyclone.beans.exceptions.IndexingParcelException;
+import org.cempaka.cyclone.tests.ImmutableTest;
+import org.cempaka.cyclone.tests.ImmutableTestParameter;
+import org.cempaka.cyclone.tests.Test;
+import org.cempaka.cyclone.tests.TestParameter;
 import org.cempaka.cyclone.utils.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,16 +43,18 @@ public class ParcelIndexer
         this.guavaPath = checkNotNull(guavaPath);
     }
 
-    public ParcelMetadata index(final Parcel parcel)
+    public Set<Test> index(final Parcel parcel)
     {
         checkNotNull(parcel);
         final List<String> processOutput = getProcessOutput(parcel);
-        final Set<TestMetadata> testsMetadata = processOutput.stream()
+        return processOutput.stream()
             .map(this::parseTestMetadata)
+            .map(testBuilder -> testBuilder.parcelId(parcel.getId()))
+            .map(ImmutableTest.Builder::build)
             .collect(Collectors.toSet());
-        return new ParcelMetadata(parcel.getId(), testsMetadata);
     }
 
+    // TODO extract and write tests
     private List<String> getProcessOutput(final Parcel parcel)
     {
         final File temporaryParcelFile = createTemporaryFile(parcel);
@@ -91,22 +94,28 @@ public class ParcelIndexer
         }
     }
 
-    private TestMetadata parseTestMetadata(final String data)
+    private ImmutableTest.Builder parseTestMetadata(final String data)
     {
         final String[] split = data.split(Metadata.SEPARATOR);
         checkArgument(split.length > 0);
         final String testName = split[0];
-        final Set<ParameterMetadata> parameterMetadata = Stream.of(split)
+        final Set<TestParameter> testParameters = Stream.of(split)
             .skip(1)
             .map(this::parseParameterMetadata)
             .collect(Collectors.toSet());
-        return new TestMetadata(testName, parameterMetadata);
+        return ImmutableTest.builder()
+            .name(testName)
+            .addAllParameters(testParameters);
     }
 
-    private ParameterMetadata parseParameterMetadata(final String data)
+    private TestParameter parseParameterMetadata(final String data)
     {
         final String[] split = data.split(Metadata.PARAMETER_SEPARATOR);
         checkArgument(split.length == 3);
-        return new ParameterMetadata(split[0], split[1], split[2]);
+        return ImmutableTestParameter.builder()
+            .name(split[0])
+            .type(split[1])
+            .defaultValue(split[2])
+            .build();
     }
 }

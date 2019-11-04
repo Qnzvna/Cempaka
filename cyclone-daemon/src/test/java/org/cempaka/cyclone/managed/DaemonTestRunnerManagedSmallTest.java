@@ -9,12 +9,13 @@ import static org.mockito.Mockito.verify;
 import com.google.common.collect.ImmutableSet;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import org.cempaka.cyclone.beans.TestRunConfiguration;
 import org.cempaka.cyclone.beans.TestState;
 import org.cempaka.cyclone.configurations.TestRunnerConfiguration;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
-import org.cempaka.cyclone.storage.jdbi.TestRunStatusDataAccess;
-import org.cempaka.cyclone.worker.WorkerManager;
+import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
+import org.cempaka.cyclone.tests.ImmutableTestExecution;
+import org.cempaka.cyclone.tests.TestExecutionProperties;
+import org.cempaka.cyclone.workers.WorkerManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +30,7 @@ public class DaemonTestRunnerManagedSmallTest
     private static final String NODE_IDENTIFIER = "localhost";
 
     @Mock
-    private TestRunStatusDataAccess testRunStatusDataAccess;
+    private TestExecutionRepository testExecutionRepository;
     @Mock
     private NodeIdentifierProvider nodeIdentifierProvider;
     @Mock
@@ -37,7 +38,7 @@ public class DaemonTestRunnerManagedSmallTest
     @Mock
     private TestRunnerConfiguration testRunnerConfiguration;
     @Mock
-    private TestRunConfiguration testRunConfiguration;
+    private TestExecutionProperties testExecutionProperties;
 
     @InjectMocks
     private DaemonTestRunnerManaged daemonTestRunnerManaged;
@@ -47,23 +48,27 @@ public class DaemonTestRunnerManagedSmallTest
     {
         given(testRunnerConfiguration.getPeriodInterval()).willReturn(1);
         given(nodeIdentifierProvider.get()).willReturn(NODE_IDENTIFIER);
-        given(testRunStatusDataAccess.getConfiguration(TEST_ID.toString())).willReturn(testRunConfiguration);
     }
 
     @Test
     public void shouldStartTest()
     {
         //given
-        given(testRunStatusDataAccess.getTests(NODE_IDENTIFIER, TestState.INITIALIZED))
-            .willReturn(ImmutableSet.of(TEST_ID.toString()));
+        given(testExecutionRepository.get(NODE_IDENTIFIER, TestState.INITIALIZED))
+            .willReturn(ImmutableSet.of(ImmutableTestExecution.builder()
+                .id(TEST_ID)
+                .node(NODE_IDENTIFIER)
+                .state(TestState.INITIALIZED)
+                .properties(testExecutionProperties)
+                .build()));
         //when
         daemonTestRunnerManaged.start();
         //then
         await().atMost(2, TimeUnit.SECONDS)
             .untilAsserted(() -> {
                 verify(workerManager, times(1)).startTest(any(), any());
-                verify(testRunStatusDataAccess, times(1))
-                    .updateState(TestState.STARTED, TEST_ID.toString(), NODE_IDENTIFIER);
+                verify(testExecutionRepository, times(1))
+                    .setState(TEST_ID, NODE_IDENTIFIER, TestState.STARTED);
             });
     }
 }

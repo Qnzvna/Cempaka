@@ -1,8 +1,7 @@
 package org.cempaka.cyclone.configurations;
 
-import org.hibernate.validator.constraints.NotEmpty;
-
 import javax.validation.constraints.Min;
+import org.hibernate.validator.constraints.NotEmpty;
 
 public class WorkersConfiguration
 {

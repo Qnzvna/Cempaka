@@ -10,14 +10,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.cempaka.cyclone.beans.TestRunConfiguration;
 import org.cempaka.cyclone.beans.TestState;
 import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
 import org.cempaka.cyclone.beans.exceptions.WorkerNotAvailableException;
 import org.cempaka.cyclone.configurations.TestRunnerConfiguration;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
-import org.cempaka.cyclone.storage.jdbi.TestRunStatusDataAccess;
-import org.cempaka.cyclone.worker.WorkerManager;
+import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
+import org.cempaka.cyclone.tests.TestExecution;
+import org.cempaka.cyclone.workers.WorkerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,19 +26,19 @@ public class DaemonTestRunnerManaged implements Managed
 {
     private static final Logger LOG = LoggerFactory.getLogger(DaemonTestRunnerManaged.class);
 
-    private final TestRunStatusDataAccess testRunStatusDataAccess;
+    private final TestExecutionRepository testExecutionRepository;
     private final NodeIdentifierProvider nodeIdentifierProvider;
     private final WorkerManager workerManager;
     private final TestRunnerConfiguration testRunnerConfiguration;
     private final ScheduledExecutorService executorService;
 
     @Inject
-    public DaemonTestRunnerManaged(final TestRunStatusDataAccess testRunStatusDataAccess,
+    public DaemonTestRunnerManaged(final TestExecutionRepository testExecutionRepository,
                                    final NodeIdentifierProvider nodeIdentifierProvider,
                                    final WorkerManager workerManager,
                                    final TestRunnerConfiguration testRunnerConfiguration)
     {
-        this.testRunStatusDataAccess = checkNotNull(testRunStatusDataAccess);
+        this.testExecutionRepository = checkNotNull(testExecutionRepository);
         this.nodeIdentifierProvider = checkNotNull(nodeIdentifierProvider);
         this.workerManager = checkNotNull(workerManager);
         this.testRunnerConfiguration = checkNotNull(testRunnerConfiguration);
@@ -53,30 +53,24 @@ public class DaemonTestRunnerManaged implements Managed
         final int periodInterval = testRunnerConfiguration.getPeriodInterval();
         executorService.scheduleAtFixedRate(() -> {
             try {
-                startTests();
+                testExecutionRepository.get(nodeIdentifierProvider.get(), TestState.INITIALIZED)
+                    .forEach(this::startTest);
             } catch (Exception e) {
                 LOG.error("Test initialization failure.", e);
             }
         }, 0, periodInterval, TimeUnit.SECONDS);
     }
 
-    private void startTests()
+    private void startTest(final TestExecution testExecution)
     {
-        final String nodeIdentifier = nodeIdentifierProvider.get();
-        testRunStatusDataAccess.getTests(nodeIdentifier, TestState.INITIALIZED)
-            .forEach(testId -> startTest(nodeIdentifier, testId));
-    }
 
-    private void startTest(final String nodeIdentifier, final String testId)
-    {
-        final TestRunConfiguration testRunConfiguration = testRunStatusDataAccess.getConfiguration(testId);
-        final UUID testUuid = UUID.fromString(testId);
+        final UUID testId = testExecution.getId();
         try {
-            workerManager.startTest(testUuid, testRunConfiguration);
-            testRunStatusDataAccess.updateState(TestState.STARTED, testId, nodeIdentifier);
+            workerManager.startTest(testId, testExecution.getProperties());
+            testExecutionRepository.setState(testId, testExecution.getNode(), TestState.STARTED);
         } catch (ParcelNotFoundException e) {
             LOG.warn("Parcel for test {} could'nt be found.", testId);
-            testRunStatusDataAccess.updateState(TestState.ERROR, testId, nodeIdentifier);
+            testExecutionRepository.setState(testId, testExecution.getNode(), TestState.ERROR);
         } catch (WorkerNotAvailableException e) {
             LOG.warn("Worker is not available right now.");
         }
@@ -87,7 +81,6 @@ public class DaemonTestRunnerManaged implements Managed
     public void stop() throws InterruptedException
     {
         executorService.shutdown();
-        executorService.awaitTermination(testRunnerConfiguration.getAwaitInterval(),
-            TimeUnit.SECONDS);
+        executorService.awaitTermination(testRunnerConfiguration.getAwaitInterval(), TimeUnit.SECONDS);
     }
 }

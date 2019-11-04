@@ -8,22 +8,22 @@ import java.util.function.BiConsumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.MetricDataPoint;
-import org.cempaka.cyclone.protocol.payloads.Payload;
-import org.cempaka.cyclone.protocol.payloads.PayloadType;
-import org.cempaka.cyclone.protocol.payloads.RunningPayload;
-import org.cempaka.cyclone.storage.repositories.MeasurementsRepository;
+import org.cempaka.cyclone.listeners.payloads.Payload;
+import org.cempaka.cyclone.listeners.payloads.PayloadType;
+import org.cempaka.cyclone.listeners.payloads.RunningPayload;
+import org.cempaka.cyclone.storage.repositories.TestMetricRepository;
 
 @Singleton
 public class RunningPayloadListener implements BiConsumer<String, Payload>
 {
-    private final MeasurementsRepository measurementsRepository;
+    private final TestMetricRepository testMetricRepository;
     private final Clock clock;
 
     @Inject
-    public RunningPayloadListener(final MeasurementsRepository measurementsRepository,
+    public RunningPayloadListener(final TestMetricRepository testMetricRepository,
                                   final Clock clock)
     {
-        this.measurementsRepository = checkNotNull(measurementsRepository);
+        this.testMetricRepository = checkNotNull(testMetricRepository);
         this.clock = checkNotNull(clock);
     }
 
@@ -34,7 +34,7 @@ public class RunningPayloadListener implements BiConsumer<String, Payload>
             final RunningPayload runningPayload = (RunningPayload) payload;
             final long now = Instant.now(clock).getEpochSecond();
             runningPayload.getMeasurements().forEach((name, value) ->
-                measurementsRepository.put(testRunId, new MetricDataPoint(now, name, value)));
+                testMetricRepository.put(testRunId, new MetricDataPoint(now, name, value)));
         }
     }
 }

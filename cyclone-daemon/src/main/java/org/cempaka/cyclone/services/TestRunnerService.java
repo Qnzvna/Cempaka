@@ -1,12 +1,11 @@
 package org.cempaka.cyclone.services;
 
-import org.cempaka.cyclone.beans.TestRunConfiguration;
-
 import java.util.UUID;
+import org.cempaka.cyclone.tests.TestExecutionProperties;
 
 public interface TestRunnerService
 {
-    UUID startTest(final TestRunConfiguration testRunConfiguration);
+    UUID startTest(final TestExecutionProperties testExecutionProperties);
 
     void abortTest(final UUID testId);
 }

@@ -11,17 +11,16 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import org.cempaka.cyclone.beans.Parcel;
-import org.cempaka.cyclone.beans.ParcelMetadata;
 import org.cempaka.cyclone.storage.ParcelIndexer;
-import org.cempaka.cyclone.storage.repositories.ParcelMetadataRepository;
 import org.cempaka.cyclone.storage.repositories.ParcelRepository;
+import org.cempaka.cyclone.storage.repositories.TestRepository;
+import org.cempaka.cyclone.tests.Test;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,22 +35,16 @@ public class ParcelResource
 
     private final ParcelRepository parcelRepository;
     private final ParcelIndexer parcelIndexer;
-    private final ParcelMetadataRepository parcelMetadataRepository;
+    private final TestRepository testRepository;
 
     @Inject
     public ParcelResource(final ParcelRepository parcelRepository,
                           final ParcelIndexer parcelIndexer,
-                          final ParcelMetadataRepository parcelMetadataRepository)
+                          final TestRepository testRepository)
     {
         this.parcelRepository = checkNotNull(parcelRepository);
         this.parcelIndexer = checkNotNull(parcelIndexer);
-        this.parcelMetadataRepository = checkNotNull(parcelMetadataRepository);
-    }
-
-    @GET
-    public Set<ParcelMetadata> getParcels()
-    {
-        return parcelMetadataRepository.getAll();
+        this.testRepository = checkNotNull(testRepository);
     }
 
     @POST
@@ -61,11 +54,11 @@ public class ParcelResource
         final UUID parcelId = UUID.randomUUID();
         LOG.debug("Adding parcel for {} uuid.", parcelId);
         final Parcel parcel = Parcel.of(parcelId, ByteStreams.toByteArray(data));
-        final ParcelMetadata parcelMetadata = parcelIndexer.index(parcel);
+        final Set<Test> tests = parcelIndexer.index(parcel);
         parcelRepository.put(parcel);
-        parcelMetadataRepository.put(parcelMetadata);
+        testRepository.putAll(tests);
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Parcel {} saved.", parcelMetadata);
+            LOG.debug("Parcel {} saved.", tests);
         }
         return parcelId;
     }
@@ -74,7 +67,7 @@ public class ParcelResource
     @Path("/{id}")
     public void deleteParcel(@PathParam("id") final String parcelId)
     {
-        parcelMetadataRepository.delete(parcelId);
+        testRepository.delete(parcelId);
         parcelRepository.delete(UUID.fromString(parcelId));
     }
 }

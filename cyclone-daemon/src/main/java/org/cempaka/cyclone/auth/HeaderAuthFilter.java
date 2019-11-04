@@ -3,7 +3,6 @@ package org.cempaka.cyclone.auth;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import io.dropwizard.auth.AuthFilter;
-import io.dropwizard.auth.Authenticator;
 import java.util.Optional;
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;

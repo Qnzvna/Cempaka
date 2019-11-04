@@ -8,9 +8,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.cempaka.cyclone.beans.Parcel;
 import org.cempaka.cyclone.storage.repositories.FileParcelRepository;
 import org.junit.AfterClass;
@@ -128,7 +127,7 @@ public class FileParcelRepositoryMediumTest
         //given
         Files.write(parcelPath, PARCEL_DATA);
         //when
-        final List<UUID> parcels = fileParcelRepository.list().collect(Collectors.toList());
+        final Set<UUID> parcels = fileParcelRepository.keys();
         //then
         assertThat(parcels).containsOnly(PARCEL_ID);
     }

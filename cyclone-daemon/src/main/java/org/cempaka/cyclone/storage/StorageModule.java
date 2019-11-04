@@ -13,15 +13,15 @@ import org.cempaka.cyclone.configurations.StorageConfiguration;
 import org.cempaka.cyclone.configurations.TypedConfiguration;
 import org.cempaka.cyclone.storage.jdbi.NodeStateDataAccess;
 import org.cempaka.cyclone.storage.jdbi.ParcelDataAccess;
-import org.cempaka.cyclone.storage.jdbi.ParcelMetadataDataAccess;
-import org.cempaka.cyclone.storage.jdbi.TestMetricsDataAccess;
-import org.cempaka.cyclone.storage.jdbi.TestRunStackTraceDataAccess;
-import org.cempaka.cyclone.storage.jdbi.TestRunStatusDataAccess;
-import org.cempaka.cyclone.storage.repositories.JdbiMeasurementRepository;
-import org.cempaka.cyclone.storage.repositories.JdbiParcelMetadataRepository;
-import org.cempaka.cyclone.storage.repositories.MeasurementsRepository;
-import org.cempaka.cyclone.storage.repositories.ParcelMetadataRepository;
+import org.cempaka.cyclone.storage.jdbi.TestDataAccess;
+import org.cempaka.cyclone.storage.jdbi.TestExecutionDataAccess;
+import org.cempaka.cyclone.storage.jdbi.TestMetricDataAccess;
+import org.cempaka.cyclone.storage.repositories.JdbiTestMetricRepository;
+import org.cempaka.cyclone.storage.repositories.JdbiTestRepository;
 import org.cempaka.cyclone.storage.repositories.ParcelRepository;
+import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
+import org.cempaka.cyclone.storage.repositories.TestMetricRepository;
+import org.cempaka.cyclone.storage.repositories.TestRepository;
 import org.jdbi.v3.core.Jdbi;
 
 public class StorageModule extends PrivateModule
@@ -36,25 +36,21 @@ public class StorageModule extends PrivateModule
     @Override
     protected void configure()
     {
-        bind(ParcelMetadataRepository.class).to(JdbiParcelMetadataRepository.class);
-        bind(MeasurementsRepository.class).to(JdbiMeasurementRepository.class);
-        expose(ParcelRepository.class);
-        expose(ParcelMetadataRepository.class);
-        expose(MeasurementsRepository.class);
+        bind(TestRepository.class).to(JdbiTestRepository.class);
+        bind(TestMetricRepository.class).to(JdbiTestMetricRepository.class);
 
         final TypedConfiguration<ParcelRepository> parcelRepositoryConfiguration =
             storageConfiguration.getParcelRepositoryConfiguration();
         bind(ParcelRepository.class).to(parcelRepositoryConfiguration.getType());
         bind(new TypeLiteral<Map<String, String>>() {}).annotatedWith(Names.named("parcel.repository.parameters"))
             .toInstance(parcelRepositoryConfiguration.getParameters());
-    }
+        bind(TestExecutionRepository.class)
+            .to(storageConfiguration.getTestExecutionRepositoryConfiguration().getType());
 
-    @Exposed
-    @Provides
-    @Singleton
-    TestRunStackTraceDataAccess testRunStackTracesRepository(final Jdbi jdbi)
-    {
-        return jdbi.onDemand(TestRunStackTraceDataAccess.class);
+        expose(ParcelRepository.class);
+        expose(TestRepository.class);
+        expose(TestMetricRepository.class);
+        expose(TestExecutionRepository.class);
     }
 
     @Exposed
@@ -65,12 +61,11 @@ public class StorageModule extends PrivateModule
         return jdbi.onDemand(NodeStateDataAccess.class);
     }
 
-    @Exposed
     @Provides
     @Singleton
-    TestRunStatusDataAccess testRunStateDataAccess(final Jdbi jdbi)
+    TestExecutionDataAccess testExecutionDataAccess(final Jdbi jdbi)
     {
-        return jdbi.onDemand(TestRunStatusDataAccess.class);
+        return jdbi.onDemand(TestExecutionDataAccess.class);
     }
 
     @Provides
@@ -82,15 +77,15 @@ public class StorageModule extends PrivateModule
 
     @Provides
     @Singleton
-    ParcelMetadataDataAccess parcelMetadataDataAccess(final Jdbi jdbi)
+    TestDataAccess parcelMetadataDataAccess(final Jdbi jdbi)
     {
-        return jdbi.onDemand(ParcelMetadataDataAccess.class);
+        return jdbi.onDemand(TestDataAccess.class);
     }
 
     @Provides
     @Singleton
-    TestMetricsDataAccess testMetricsDataAccess(final Jdbi jdbi)
+    TestMetricDataAccess testMetricsDataAccess(final Jdbi jdbi)
     {
-        return jdbi.onDemand(TestMetricsDataAccess.class);
+        return jdbi.onDemand(TestMetricDataAccess.class);
     }
 }

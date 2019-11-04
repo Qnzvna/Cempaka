@@ -1,46 +1,53 @@
 package org.cempaka.cyclone;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.cempaka.cyclone.beans.TestRunConfiguration;
-import org.cempaka.cyclone.beans.TestState;
+import org.cempaka.cyclone.tests.Test;
+import org.cempaka.cyclone.tests.TestExecution;
+import org.cempaka.cyclone.tests.TestExecutionProperties;
 
 public class CycloneTestClient
 {
-    private static final String API_URL = "http://127.0.0.1:50000/api";
-
+    private final String apiUrl;
     private final HttpClient httpClient = HttpClients.createDefault();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new GuavaModule());
 
-    public Map<String, Boolean> getStatus()
+    public CycloneTestClient(final String apiUrl)
     {
-        final HttpGet httpGet = new HttpGet(API_URL + "/status");
-        try {
-            final HttpResponse httpResponse = httpClient.execute(httpGet);
-            final String stringResponse = EntityUtils.toString(httpResponse.getEntity());
-            return objectMapper.readValue(stringResponse, new TypeReference<Map<String, Boolean>>() {});
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        this.apiUrl = checkNotNull(apiUrl);
+    }
+
+    public List<Test> getTests()
+    {
+        final HttpGet httpGet = new HttpGet(apiUrl + "/tests");
+        return runRequest(httpGet, new TypeReference<List<Test>>() {});
     }
 
     public UUID uploadParcel(final File parcel)
     {
-        final HttpPost httpPost = new HttpPost(API_URL + "/parcels");
+        final HttpPost httpPost = new HttpPost(apiUrl + "/parcels");
         httpPost.setEntity(MultipartEntityBuilder.create()
             .addBinaryBody("file", parcel)
             .build());
@@ -53,26 +60,89 @@ public class CycloneTestClient
         }
     }
 
-    public UUID runTest(final TestRunConfiguration testRunConfiguration)
+    public void deleteParcel(final UUID id)
     {
-        final HttpPost httpPost = new HttpPost(API_URL + "/tests/run");
+        final HttpDelete httpDelete = new HttpDelete(apiUrl + String.format("/parcels/%s", id));
+        runRequest(httpDelete, new TypeReference<Void>() {});
+    }
+
+    public UUID runTest(final TestExecutionProperties testExecutionProperties)
+    {
+        final HttpPost httpPost = new HttpPost(apiUrl + "/tests/start");
+        return runRequest(testExecutionProperties, UUID.class, httpPost);
+    }
+
+    public void stopTest(final UUID testId)
+    {
+        final HttpPost httpPost = new HttpPost(apiUrl + String.format("/tests/%s/stop", testId));
+        runRequest(null, Void.class, httpPost);
+    }
+
+    public Set<TestExecution> getTestExecutions()
+    {
+        final HttpGet httpGet = new HttpGet(apiUrl + "/tests/executions");
+        return runRequest(httpGet, new TypeReference<Set<TestExecution>>() {});
+    }
+
+    public Set<TestExecution> getTestExecutions(final UUID id)
+    {
+        final HttpGet httpGet = new HttpGet(apiUrl + "/tests/executions/" + id);
+        return runRequest(httpGet, new TypeReference<Set<TestExecution>>() {});
+    }
+
+    public Set<UUID> getTestExecutionKeys()
+    {
+        final HttpGet httpGet = new HttpGet(apiUrl + "/tests/executions/keys");
+        return runRequest(httpGet, new TypeReference<Set<UUID>>() {});
+    }
+
+    public void deleteTestExecution(final UUID id)
+    {
+        final HttpDelete httpDelete = new HttpDelete(apiUrl + "/tests/executions/" + id);
+        runRequest(httpDelete, new TypeReference<Void>() {});
+    }
+
+    public Map<String, Boolean> getStatus()
+    {
+        final HttpGet httpGet = new HttpGet(apiUrl + "/cluster/status");
+        return runRequest(httpGet, new TypeReference<Map<String, Boolean>>() {});
+    }
+
+    private <I, O> O runRequest(final I input,
+                                final Class<O> clazz,
+                                final HttpPost httpPost)
+    {
         try {
-            final String requestString = objectMapper.writeValueAsString(testRunConfiguration);
-            httpPost.setEntity(new StringEntity(requestString, ContentType.APPLICATION_JSON));
+            if (input != null) {
+                final String requestString = objectMapper.writeValueAsString(input);
+                httpPost.setEntity(new StringEntity(requestString, ContentType.APPLICATION_JSON));
+            } else {
+                httpPost.setEntity(new StringEntity("", ContentType.APPLICATION_JSON));
+            }
             final HttpResponse httpResponse = httpClient.execute(httpPost);
-            final String stringResponse = EntityUtils.toString(httpResponse.getEntity());
-            return objectMapper.readValue(stringResponse, UUID.class);
+            final HttpEntity entity = httpResponse.getEntity();
+            if (entity != null) {
+                final String stringResponse = EntityUtils.toString(entity);
+                return objectMapper.readValue(stringResponse, clazz);
+            } else {
+                return null;
+            }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    public String getTestState(final UUID testId, final String nodeId)
+    private <T> T runRequest(final HttpUriRequest request, final TypeReference<T> reference)
     {
-        final HttpGet httpGet = new HttpGet(API_URL + String.format("/tests/%s/nodes/%s/state", testId, nodeId));
         try {
-            final HttpResponse httpResponse = httpClient.execute(httpGet);
-            return EntityUtils.toString(httpResponse.getEntity());
+            final HttpResponse httpResponse = httpClient.execute(request);
+            final HttpEntity entity = httpResponse.getEntity();
+            if (entity != null) {
+                final String stringResponse = EntityUtils.toString(entity);
+                return objectMapper.readValue(stringResponse, reference);
+            } else {
+                return null;
+            }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

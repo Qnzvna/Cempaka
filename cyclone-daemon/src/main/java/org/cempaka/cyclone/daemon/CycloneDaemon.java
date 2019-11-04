@@ -11,20 +11,17 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Objects;
 import org.cempaka.cyclone.auth.AuthFilterFactory;
 import org.cempaka.cyclone.configurations.DaemonConfiguration;
+import org.cempaka.cyclone.listeners.DaemonChannel;
 import org.cempaka.cyclone.managed.DaemonTestRunnerManaged;
 import org.cempaka.cyclone.managed.HeartbeatManaged;
-import org.cempaka.cyclone.protocol.DaemonChannel;
+import org.cempaka.cyclone.resources.ClusterResource;
 import org.cempaka.cyclone.resources.MetricsResource;
 import org.cempaka.cyclone.resources.ParcelResource;
-import org.cempaka.cyclone.resources.StatusResource;
+import org.cempaka.cyclone.resources.TestExecutionResource;
 import org.cempaka.cyclone.resources.TestResource;
 import org.cempaka.cyclone.storage.MigrationRunner;
-import org.cempaka.cyclone.storage.ParcelIndexer;
-import org.cempaka.cyclone.storage.repositories.ParcelMetadataRepository;
-import org.cempaka.cyclone.storage.repositories.ParcelRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +54,6 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
         registerManaged(environment, injector);
         registerFilters(environment, injector);
 
-        indexParcels(injector);
-
         final DaemonChannel daemonChannel = injector.getInstance(DaemonChannel.class);
         daemonChannel.connect(daemonConfiguration.getChannelConfiguration().getUdpServerPort());
 
@@ -77,8 +72,9 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
         jersey.setUrlPattern("/api/*");
         jersey.register(injector.getInstance(ParcelResource.class));
         jersey.register(injector.getInstance(TestResource.class));
-        jersey.register(injector.getInstance(StatusResource.class));
+        jersey.register(injector.getInstance(ClusterResource.class));
         jersey.register(injector.getInstance(MetricsResource.class));
+        jersey.register(injector.getInstance(TestExecutionResource.class));
         LOG.info("Resources registered.");
     }
 
@@ -86,18 +82,5 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
     {
         environment.lifecycle().manage(injector.getInstance(HeartbeatManaged.class));
         environment.lifecycle().manage(injector.getInstance(DaemonTestRunnerManaged.class));
-    }
-
-    private void indexParcels(final Injector injector)
-    {
-        final ParcelRepository parcelRepository = injector.getInstance(ParcelRepository.class);
-        final ParcelIndexer parcelIndexer = injector.getInstance(ParcelIndexer.class);
-        final ParcelMetadataRepository parcelMetadataRepository =
-            injector.getInstance(ParcelMetadataRepository.class);
-        parcelRepository.list()
-            .map(parcelRepository::get)
-            .filter(Objects::nonNull)
-            .map(parcelIndexer::index)
-            .forEach(parcelMetadataRepository::put);
     }
 }

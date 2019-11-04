@@ -14,7 +14,7 @@ export const ParcelsComponent = {
         loadParcels() {
             this.http({
                 'method': 'GET',
-                'url': '/api/parcels'
+                'url': '/api/tests'
             }).then((response) => {
                 this.parcels = response.data;
             }, (error) => {
