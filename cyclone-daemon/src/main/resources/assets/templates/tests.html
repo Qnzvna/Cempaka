@@ -1,0 +1,25 @@
+<h5 class="mb-3 mt-4">Tests</h5>
+
+<upload-parcel on-uploaded="$ctrl.loadTests()"></upload-parcel>
+
+<div class="text-center">
+    <div ng-if="$ctrl.tests === undefined" class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<div ng-if="$ctrl.tests.length == 0" class="alert-warning">
+    No parcels.
+</div>
+
+<ul class="list-group">
+    <li class="list-group-item" ng-repeat="(parcelId, tests) in $ctrl.tests">
+        <button type="button" class="btn btn-danger float-right" ng-click="$ctrl.deleteParcel(parcelId)">
+            <i class="fas fa-trash"></i>
+        </button>
+        <h5 class="mb-3">{{parcelId}}</h5>
+        <ul class="list-inline">
+            <li ng-repeat="test in tests track by test.name">{{test.name}}</li>
+        </ul>
+    </li>
+</ul>

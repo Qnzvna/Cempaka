@@ -57,7 +57,7 @@ public class TestResource
     @Path("/{id}/stop")
     public Response stopTest(@PathParam("id") final String testId)
     {
-        testRunnerService.abortTest(UUID.fromString(testId));
+        testRunnerService.stopTest(UUID.fromString(testId));
         return Response.noContent().build();
     }
 }

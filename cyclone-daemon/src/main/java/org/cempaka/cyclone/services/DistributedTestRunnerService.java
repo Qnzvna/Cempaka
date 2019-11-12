@@ -43,7 +43,7 @@ public class DistributedTestRunnerService implements TestRunnerService
     }
 
     @Override
-    public void abortTest(final UUID testId)
+    public void stopTest(final UUID testId)
     {
         testExecutionRepository.setStates(testId, TestState.ABORTED);
     }

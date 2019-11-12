@@ -1,0 +1,43 @@
+<h5 class="mb-3 mt-4">Test executions</h5>
+
+<div class="text-center">
+    <div ng-if="$ctrl.executions === undefined" class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<div ng-if="$ctrl.areExecutionsEmpty()" class="alert alert-warning">
+    No executions. <a href="/#!/tests/start">Start test</a> to see executions here.
+</div>
+
+<ul class="list-group">
+    <li class="list-group-item" ng-repeat="(id, execution) in $ctrl.executions">
+        <div class="btn-group float-right" role="group">
+            <button type="button" class="btn btn-primary" ng-click="$ctrl.showExecution(id)">
+                <i class="fas fa-eye"></i>
+            </button>
+            <button type="button" class="btn btn-danger"
+                    ng-click="$ctrl.deleteExecution(id)"
+                    ng-if="!$ctrl.isTestRunning(id)"
+                    uib-tooltip="Delete">
+                <i class="fas fa-trash"></i>
+            </button>
+            <button type="button" class="btn btn-danger"
+                    ng-click="$ctrl.stopExecution(id)"
+                    ng-if="$ctrl.isTestRunning(id)"
+                    uib-tooltip="Stop">
+                <i class="fas fa-ban"></i>
+            </button>
+        </div>
+        <h5>
+            <i class="fa fa-running animate-flicker" ng-if="$ctrl.isTestRunning(id)"></i>
+            <i class="fa fa-check-circle text-success" ng-if="!$ctrl.isTestRunning(id)"></i>
+            {{id | limitTo:8 }}
+        </h5>
+        <h6 ng-repeat="name in execution.names" class="mb-3">{{name}}</h6>
+        <h5 ng-repeat="(node, state) in execution.states">
+            <span class="default-cursor badge badge-pill badge-{{$ctrl.executionService.getStateBadgeType(state)}}"
+                  uib-tooltip="{{state}}">{{node}}</span>
+        </h5>
+    </li>
+</ul>

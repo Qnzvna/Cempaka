@@ -1,0 +1,67 @@
+<div class="card mt-4 mb-1">
+    <h5 class="card-header">
+        <i class="fa fa-running animate-flicker" ng-if="$ctrl.isTestRunning()"></i>
+        <i class="fa fa-check-circle text-success" ng-if="!$ctrl.isTestRunning()"></i>
+        Test execution status
+    </h5>
+    <div class="card-body d-flex justify-content-center">
+        <div class="spinner-border text-primary" role="status" ng-if="$ctrl.states === undefined">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <h4 ng-repeat="(node, state) in $ctrl.states">
+            <span class="default-cursor badge badge-pill m-1 badge-{{$ctrl.executionService.getStateBadgeType(state)}}"
+                  uib-tooltip="{{state}}">{{node}}</span>
+        </h4>
+    </div>
+</div>
+<div class="card mb-1" ng-repeat="execution in $ctrl.executions track by $index">
+    <h5 class="card-header">
+        <i class="fas fa-file-code"></i> Execution properties on {{execution.node}}
+    </h5>
+    <div class="card-body">
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="(name, value) in $ctrl.filterProperties(execution.properties)">
+                <td>{{name}}</td>
+                <td>{{value}}</td>
+            </tr>
+            <tr ng-repeat="(name, value) in execution.properties.parameters">
+                <td>{{name}}</td>
+                <td>{{value}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="card mb-1">
+    <h5 class="card-header">
+        <i class="fas fa-file-contract"></i> Latest execution metrics
+    </h5>
+    <div class="card-body">
+        <div class="spinner-border" role="status" ng-if="$ctrl.metrics === undefined">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <table class="table table-hover" ng-if="$ctrl.metrics !== undefined">
+            <thead>
+            <tr>
+                <th scope="col">Timestamp</th>
+                <th scope="col">Name</th>
+                <th scope="col">Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="metric in $ctrl.metrics">
+                <td>{{$ctrl.formatTimestamp(metric.timestamp)}}</td>
+                <td>{{metric.name}}</td>
+                <td>{{metric.value}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

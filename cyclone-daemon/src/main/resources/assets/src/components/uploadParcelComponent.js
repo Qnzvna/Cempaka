@@ -1,6 +1,9 @@
-export const ParcelComponent = {
-    templateUrl: 'templates/parcel.html',
-    controller: class ParcelController
+export const UploadParcelComponent = {
+    templateUrl: 'templates/uploadParcel.html',
+    bindings: {
+        onUploaded: '&'
+    },
+    controller: class UploadParcelController
     {
         constructor(Upload, ngToast)
         {
@@ -27,6 +30,7 @@ export const ParcelComponent = {
                 this.ngToast.success('Parcel uploaded successfully');
                 this.uploading = false;
                 this.uploaded = 0;
+                this.onUploaded();
             }, error => {
                 this.ngToast.danger(`Parcel failed to upload. ${error.data.message}`);
                 this.uploading = false;

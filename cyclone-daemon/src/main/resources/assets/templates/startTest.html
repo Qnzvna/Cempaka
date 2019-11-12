@@ -1,0 +1,63 @@
+<h5 class="mb-3 mt-4">Start test</h5>
+
+<div class="text-center">
+    <div ng-if="$ctrl.tests === undefined" class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<div ng-if="$ctrl.tests.length == 0" class="alert alert-warning">
+    Upload your first parcel to start the test.
+</div>
+
+<div ng-if="$ctrl.tests.length != 0" class="form-group">
+    <select class="form-control"
+            id="startTestSelect"
+            ng-model="$ctrl.test"
+            ng-change="$ctrl.changeParameters()"
+            ng-options="option.name for option in $ctrl.tests">
+    </select>
+</div>
+
+<form ng-if="$ctrl.tests.length != 0">
+    <div ng-if="$ctrl.test.parcelId" class="form-group">
+        <label for="id">Parcel id</label>
+        <input type="text" class="form-control" id="id" ng-value="$ctrl.test.parcelId" readonly>
+    </div>
+    <div class="form-group">
+        <label for="runOnNodes">Select nodes to run</label>
+        <select ng-model="$ctrl.properties.nodes" class="custom-select" id="runOnNodes" multiple>
+            <option ng-repeat="node in $ctrl.aliveNodes" ng-selected="$ctrl.isNodeSelected(node)">{{node}}</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="loopCount">Loop count</label>
+        <input type="number" class="form-control" id="loopCount" aria-describedby="loopCountHelp"
+               ng-model="$ctrl.properties.loopCount">
+        <small id="loopCountHelp" class="form-text text-muted">Enter number of loops to run.</small>
+    </div>
+    <div class="form-group">
+        <label for="threadsNumber">Threads</label>
+        <span class="badge badge-light float-right">{{$ctrl.properties.threadsNumber}}</span>
+        <input type="range" class="custom-range" id="threadsNumber" min="1" max="512"
+               ng-model="$ctrl.properties.threadsNumber">
+        <small id="threadsNumberHelp" class="form-text text-muted">Select number of threads.</small>
+    </div>
+    <div class="form-group">
+        <label for="jvmOptions">Jvm options</label>
+        <input type="text" class="form-control" id="jvmOptions" aria-describedby="jvmOptions"
+               ng-model="$ctrl.properties.jvmOptions">
+        <small id="jvmOptionsHelp" class="form-text text-muted">Enter custom jvm options for test run.</small>
+    </div>
+    <label ng-if="$ctrl.test.parameters.length > 0">Test custom parameters</label>
+    <div class="form-group row" ng-repeat="(name, value) in $ctrl.properties.parameters">
+        <label class="col-sm-2 col-form-label">{{name}}</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" ng-model="$ctrl.properties.parameters[name]">
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary float-right" ng-click="$ctrl.startTest()">
+        <i class="fas fa-play"></i> Start test
+    </button>
+    <div class="clearfix"></div>
+</form>

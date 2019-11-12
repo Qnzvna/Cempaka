@@ -1,4 +1,4 @@
-<h5>Live nodes</h5>
+<h5 class="mb-3 mt-4">Live nodes</h5>
 
 <table class="table">
     <thead>
@@ -13,8 +13,10 @@
         <th scope="row">{{$index + 1}}</th>
         <td>{{key}}</td>
         <td>
-            <span class="badge badge-success" ng-if="value">Healthy</span>
-            <span class="badge badge-danger" ng-if="!value">Failure</span>
+            <h5>
+                <span class="badge badge-success" ng-if="value">Up <i class="fas fa-thumbs-up"></i></span>
+                <span class="badge badge-danger" ng-if="!value">Down <i class="fas fa-thumbs-down"></i></span>
+            </h5>
         </td>
     </tr>
     </tbody>

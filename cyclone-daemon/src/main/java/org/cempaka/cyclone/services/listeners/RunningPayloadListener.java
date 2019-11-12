@@ -32,7 +32,7 @@ public class RunningPayloadListener implements BiConsumer<String, Payload>
     {
         if (payload.getType() == PayloadType.RUNNING) {
             final RunningPayload runningPayload = (RunningPayload) payload;
-            final long now = Instant.now(clock).getEpochSecond();
+            final long now = Instant.now(clock).toEpochMilli();
             runningPayload.getMeasurements().forEach((name, value) ->
                 testMetricRepository.put(testRunId, new MetricDataPoint(now, name, value)));
         }

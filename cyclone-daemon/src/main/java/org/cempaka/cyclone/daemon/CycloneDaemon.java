@@ -12,6 +12,7 @@ import io.dropwizard.setup.Environment;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import org.cempaka.cyclone.auth.AuthFilterFactory;
+import org.cempaka.cyclone.bundles.UrlRewriteBundle;
 import org.cempaka.cyclone.configurations.DaemonConfiguration;
 import org.cempaka.cyclone.listeners.DaemonChannel;
 import org.cempaka.cyclone.managed.DaemonTestRunnerManaged;
@@ -33,8 +34,9 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
     public void initialize(final Bootstrap<DaemonConfiguration> bootstrap)
     {
         bootstrap.addBundle(new MultiPartBundle());
+//        bootstrap.addBundle(new UrlRewriteBundle());
         bootstrap.addBundle(new AssetsBundle("/assets", "/", "index.html"));
-        bootstrap.addBundle(new WebJarBundle("org.webjars.npm", "org.webjars.bower"));
+        bootstrap.addBundle(new WebJarBundle("org.webjars", "org.webjars.npm", "org.webjars.bower"));
     }
 
     public static void main(final String[] args) throws Exception

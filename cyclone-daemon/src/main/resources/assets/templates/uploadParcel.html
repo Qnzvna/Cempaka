@@ -1,12 +1,11 @@
-<h5>Upload parcel</h5>
-
 <form>
     <div ng-if="parcel.id" class="form-group">
         <label for="id">Parcel id</label>
         <input type="text" class="form-control" id="id" ng-value="$ctrl.parcel.id" readonly>
     </div>
 </form>
-<div class="progress" ng-if="$ctrl.uploading">
+
+<div class="progress mb-3" ng-if="$ctrl.uploading">
     <div class="progress-bar"
          role="progressbar"
          ng-style="{width: $ctrl.uploaded + '%'}"
@@ -16,9 +15,10 @@
         {{$ctrl.uploaded}}%
     </div>
 </div>
+
 <div class="input-group mb-3" ng-if="$ctrl.parcel.id === undefined && !$ctrl.uploading">
     <div class="custom-file">
         <input type="file" ngf-select="$ctrl.uploadParcel($file)" class="custom-file-input" id="parcelFileInput">
-        <label class="custom-file-label" for="parcelFileInput">Choose Parcel</label>
+        <label class="custom-file-label" for="parcelFileInput">Choose parcel to upload</label>
     </div>
 </div>

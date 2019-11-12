@@ -72,6 +72,7 @@
         <postgresql.version>42.2.5</postgresql.version>
         <jdbi3.version>3.10.1</jdbi3.version>
         <flyway.version>6.0.4</flyway.version>
+        <urlrewritefilter.version>4.0.3</urlrewritefilter.version>
 
         <junit.version>4.12</junit.version>
         <assertj-core.version>3.11.0</assertj-core.version>
@@ -85,6 +86,10 @@
         <font-awesome.version>5.7.2</font-awesome.version>
         <ngtoast.version>1.5.6</ngtoast.version>
         <ng-file-upload.version>12.0.4</ng-file-upload.version>
+        <lodash.version>4.17.15</lodash.version>
+        <jquery.version>3.4.1</jquery.version>
+        <ui-bootstrap4.version>3.0.6</ui-bootstrap4.version>
+        <momentjs.version>2.24.0</momentjs.version>
     </properties>
 
     <dependencyManagement>
@@ -210,6 +215,11 @@
                 <artifactId>flyway-core</artifactId>
                 <version>${flyway.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.tuckey</groupId>
+                <artifactId>urlrewritefilter</artifactId>
+                <version>${urlrewritefilter.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.webjars</groupId>
@@ -249,6 +259,26 @@
                         <artifactId>angular-sanitize</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>lodash</artifactId>
+                <version>${lodash.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>jquery</artifactId>
+                <version>${jquery.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.webjars.npm</groupId>
+                <artifactId>ui-bootstrap4</artifactId>
+                <version>${ui-bootstrap4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.webjars</groupId>
+                <artifactId>momentjs</artifactId>
+                <version>${momentjs.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

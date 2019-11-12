@@ -7,5 +7,5 @@ public interface TestRunnerService
 {
     UUID startTest(final TestExecutionProperties testExecutionProperties);
 
-    void abortTest(final UUID testId);
+    void stopTest(final UUID testId);
 }

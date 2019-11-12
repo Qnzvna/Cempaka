@@ -20,7 +20,7 @@ import org.cempaka.cyclone.storage.repositories.TestMetricRepository;
 @Singleton
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@Path("/tests")
+@Path("/tests/executions")
 public class MetricsResource
 {
     private final TestMetricRepository testMetricRepository;
