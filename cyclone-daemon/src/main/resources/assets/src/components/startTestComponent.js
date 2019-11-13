@@ -22,7 +22,9 @@ export const StartTestComponent = {
                 .then(tests => {
                     this.tests = tests;
                     this.test = tests[0] || undefined;
-                    this.changeParameters();
+                    if (!_.isUndefined(this.tests)) {
+                        this.reduceParameters(this.tests.parameters);
+                    }
                 });
             this.clusterService.getStatus().then(nodes => {
                 this.aliveNodes = _.invertBy(nodes)[true];
@@ -43,9 +45,9 @@ export const StartTestComponent = {
             });
         }
 
-        changeParameters()
+        reduceParameters(parameters)
         {
-            this.properties.parameters = this.test.parameters.reduce((map, parameter) => {
+            this.properties.parameters = parameters.reduce((map, parameter) => {
                 map[parameter.name] = parameter.defaultValue;
                 return map;
             }, {});

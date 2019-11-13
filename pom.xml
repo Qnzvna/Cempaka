@@ -36,7 +36,6 @@
         <module>cyclone-examples</module>
         <module>cyclone-daemon</module>
         <module>cyclone-plugins</module>
-        <module>cyclone-tests</module>
     </modules>
 
     <scm>
@@ -72,13 +71,11 @@
         <postgresql.version>42.2.5</postgresql.version>
         <jdbi3.version>3.10.1</jdbi3.version>
         <flyway.version>6.0.4</flyway.version>
-        <urlrewritefilter.version>4.0.3</urlrewritefilter.version>
 
         <junit.version>4.12</junit.version>
         <assertj-core.version>3.11.0</assertj-core.version>
         <mockito-all.version>1.9.5</mockito-all.version>
         <awaitility.version>3.1.6</awaitility.version>
-        <docker-java.version>3.1.5</docker-java.version>
         <httpmime.version>4.5.3</httpmime.version>
 
         <angularjs.version>1.7.7</angularjs.version>
@@ -215,11 +212,6 @@
                 <artifactId>flyway-core</artifactId>
                 <version>${flyway.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.tuckey</groupId>
-                <artifactId>urlrewritefilter</artifactId>
-                <version>${urlrewritefilter.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.webjars</groupId>
@@ -309,21 +301,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.docker-java</groupId>
-            <artifactId>docker-java</artifactId>
-            <version>${docker-java.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
             <version>${httpmime.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard</groupId>
-            <artifactId>dropwizard-testing</artifactId>
-            <version>${dropwizard.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -353,6 +333,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>3.1.1</version>
+                    <configuration>
+                        <skipIfEmpty>true</skipIfEmpty>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>com.github.ekryd.sortpom</groupId>
@@ -422,7 +405,6 @@
                             <include>**/*Test*</include>
                         </includes>
                         <excludes>
-                            <exclude>**/*MediumTest*</exclude>
                             <exclude>**/*BigTest*</exclude>
                         </excludes>
                     </configuration>
@@ -437,12 +419,63 @@
                     </executions>
                 </plugin>
                 <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>0.31.0</version>
+                    <configuration>
+                        <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
+                        <images>
+                            <image>
+                                <alias>postgres</alias>
+                                <name>postgres:9.5.16-alpine</name>
+                                <run>
+                                    <env>
+                                        <POSTGRES_USER>cyclone</POSTGRES_USER>
+                                        <POSTGRES_PASSWORD>cyclone</POSTGRES_PASSWORD>
+                                    </env>
+                                    <wait>
+                                        <log>database system is ready to accept connections</log>
+                                        <time>20000</time>
+                                    </wait>
+                                    <network>
+                                        <mode>custom</mode>
+                                        <name>cyclone-it</name>
+                                        <alias>postgres</alias>
+                                    </network>
+                                </run>
+                            </image>
+                            <image>
+                                <alias>cyclone</alias>
+                                <name>cempaka/cyclone:${project.version}</name>
+                                <run>
+                                    <hostname>cyclone</hostname>
+                                    <ports>
+                                        <port>127.0.0.1:8080:8000</port>
+                                    </ports>
+                                    <wait>
+                                        <http>
+                                            <url>http://127.0.0.1:8080/api/cluster/status</url>
+                                            <method>GET</method>
+                                            <status>200</status>
+                                        </http>
+                                    </wait>
+                                    <network>
+                                        <mode>custom</mode>
+                                        <name>cyclone-it</name>
+                                        <alias>cyclone</alias>
+                                    </network>
+                                </run>
+                            </image>
+                        </images>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>3.0.0-M3</version>
                     <executions>
                         <execution>
-                            <id>medium-big-tests</id>
+                            <id>big-tests</id>
                             <goals>
                                 <goal>integration-test</goal>
                                 <goal>verify</goal>
@@ -450,7 +483,7 @@
                             <phase>integration-test</phase>
                             <configuration>
                                 <includes>
-                                    <include>**/*MediumTest*</include>
+                                    <include>**/*BigTest*</include>
                                 </includes>
                             </configuration>
                         </execution>

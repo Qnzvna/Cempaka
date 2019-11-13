@@ -7,7 +7,9 @@ import org.cempaka.cyclone.tests.TestExecutionProperties;
 
 final class Tests
 {
-    static final String PATH = "conf/local.yml";
+    static final String API = "http://localhost:8080/api";
+    static final String NODE = "cyclone";
+    static final String EXAMPLES = "target/examples.jar";
 
     static TestExecutionProperties getExampleTest(final UUID parcelId, final Set<String> nodes)
     {

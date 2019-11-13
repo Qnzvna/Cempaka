@@ -91,10 +91,6 @@
             <groupId>org.immutables</groupId>
             <artifactId>value</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.tuckey</groupId>
-            <artifactId>urlrewritefilter</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.webjars</groupId>
@@ -146,16 +142,19 @@
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>examples-copy</id>
+                        <id>copy-examples</id>
                         <goals>
                             <goal>run</goal>
                         </goals>
-                        <phase>pre-integration-test</phase>
+                        <phase>generate-test-resources</phase>
                         <configuration>
-                            <target name="copy examples to test resources">
+                            <target name="copy examples">
                                 <copy
                                     file="${project.basedir}/../cyclone-examples/target/cyclone-examples-${project.version}.jar"
                                     tofile="${project.basedir}/target/test-classes/67548d96-076d-4f69-bd1d-3b9316b2ba15"/>
+                                <copy
+                                    file="${project.basedir}/../cyclone-examples/target/cyclone-examples-${project.version}.jar"
+                                    tofile="${project.basedir}/target/examples.jar"/>
                             </target>
                         </configuration>
                     </execution>
@@ -229,6 +228,26 @@
                     <plugin>
                         <groupId>com.spotify</groupId>
                         <artifactId>dockerfile-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>start</id>
+                                <goals>
+                                    <goal>start</goal>
+                                </goals>
+                                <phase>pre-integration-test</phase>
+                            </execution>
+                            <execution>
+                                <id>stop</id>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                                <phase>post-integration-test</phase>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

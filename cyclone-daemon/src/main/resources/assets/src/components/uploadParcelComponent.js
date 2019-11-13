@@ -30,7 +30,6 @@ export const UploadParcelComponent = {
                 this.ngToast.success('Parcel uploaded successfully');
                 this.uploading = false;
                 this.uploaded = 0;
-                this.onUploaded();
             }, error => {
                 this.ngToast.danger(`Parcel failed to upload. ${error.data.message}`);
                 this.uploading = false;

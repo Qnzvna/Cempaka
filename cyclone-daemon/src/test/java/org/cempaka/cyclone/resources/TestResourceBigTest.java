@@ -3,35 +3,26 @@ package org.cempaka.cyclone.resources;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import java.io.File;
 import java.util.List;
 import java.util.UUID;
 import org.cempaka.cyclone.CycloneTestClient;
 import org.cempaka.cyclone.beans.TestState;
-import org.cempaka.cyclone.configurations.DaemonConfiguration;
-import org.cempaka.cyclone.daemon.CycloneDaemon;
 import org.cempaka.cyclone.tests.TestExecution;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
 
 public class TestResourceBigTest
 {
-    @ClassRule
-    public static final DropwizardAppRule<DaemonConfiguration> APP_RULE =
-        new DropwizardAppRule<>(CycloneDaemon.class, Tests.PATH);
-
-    private static final CycloneTestClient TEST_CLIENT = new CycloneTestClient("http://localhost:8080/api");
-    private static final String NODE = "localhost";
+    private static final CycloneTestClient TEST_CLIENT = new CycloneTestClient(Tests.API);
 
     private static UUID PARCEL_ID;
 
     @BeforeClass
     public static void setUpClass()
     {
-        PARCEL_ID = TEST_CLIENT.uploadParcel(new File("cyclone-tests/target/examples.jar"));
+        PARCEL_ID = TEST_CLIENT.uploadParcel(new File(Tests.EXAMPLES));
     }
 
     @AfterClass
@@ -55,7 +46,7 @@ public class TestResourceBigTest
     {
         //given
         //when
-        TEST_CLIENT.runTest(Tests.getExampleTest(PARCEL_ID, ImmutableSet.of("localhost")));
+        TEST_CLIENT.runTest(Tests.getExampleTest(PARCEL_ID, ImmutableSet.of(Tests.NODE)));
         //then
         // no exceptions
     }
@@ -64,7 +55,7 @@ public class TestResourceBigTest
     public void shouldStopTest()
     {
         //given
-        final UUID testId = TEST_CLIENT.runTest(Tests.getExampleTest(PARCEL_ID, ImmutableSet.of(NODE)));
+        final UUID testId = TEST_CLIENT.runTest(Tests.getExampleTest(PARCEL_ID, ImmutableSet.of(Tests.NODE)));
         //when
         TEST_CLIENT.stopTest(testId);
         final String state = TEST_CLIENT.getTestExecutions(testId).stream()

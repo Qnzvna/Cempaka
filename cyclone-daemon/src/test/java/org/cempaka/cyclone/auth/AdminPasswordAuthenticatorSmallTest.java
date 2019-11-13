@@ -6,7 +6,7 @@ import io.dropwizard.auth.basic.BasicCredentials;
 import java.util.Optional;
 import org.junit.Test;
 
-public class AdminPasswordAuthenticatorTest
+public class AdminPasswordAuthenticatorSmallTest
 {
     private static final String PASSWORD = "password";
 

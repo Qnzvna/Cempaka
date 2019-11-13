@@ -8,7 +8,7 @@ import org.cempaka.cyclone.configurations.AuthenticationConfiguration;
 import org.cempaka.cyclone.configurations.AuthenticationConfiguration.Type;
 import org.junit.Test;
 
-public class AuthFilterFactoryTest
+public class AuthFilterFactorySmallTest
 {
     private AuthFilterFactory authFilterFactory;
 

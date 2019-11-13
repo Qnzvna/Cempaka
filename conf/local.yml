@@ -10,7 +10,7 @@ cluster:
     type: org.cempaka.cyclone.services.StaticNodeIdentifierProvider
     # Node id's should be unique across all nodes in cluster.
     parameters:
-      nodeId: localhost
+      nodeId: cyclone
   # Controls when node will be marked as dead. Values are in seconds.
 #  heartbeatInterval: 10
 #  heartbeatManagedAwaitInterval: 60

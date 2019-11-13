@@ -14,7 +14,7 @@
     <select class="form-control"
             id="startTestSelect"
             ng-model="$ctrl.test"
-            ng-change="$ctrl.changeParameters()"
+            ng-change="$ctrl.reduceParameters()"
             ng-options="option.name for option in $ctrl.tests">
     </select>
 </div>

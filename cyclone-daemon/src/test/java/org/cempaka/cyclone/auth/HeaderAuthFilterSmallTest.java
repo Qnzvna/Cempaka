@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class HeaderAuthFilterTest
+public class HeaderAuthFilterSmallTest
 {
     private static final String HEADER_NAME = "X-Auth";
     private static final String USERNAME = "username";

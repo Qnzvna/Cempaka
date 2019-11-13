@@ -12,7 +12,6 @@ import io.dropwizard.setup.Environment;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import org.cempaka.cyclone.auth.AuthFilterFactory;
-import org.cempaka.cyclone.bundles.UrlRewriteBundle;
 import org.cempaka.cyclone.configurations.DaemonConfiguration;
 import org.cempaka.cyclone.listeners.DaemonChannel;
 import org.cempaka.cyclone.managed.DaemonTestRunnerManaged;

@@ -3,6 +3,8 @@ package org.cempaka.cyclone.beans;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 public class MetricDataPoint
@@ -11,7 +13,10 @@ public class MetricDataPoint
     private final String name;
     private final double value;
 
-    public MetricDataPoint(final long timestamp, final String name, final double value)
+    @JsonCreator
+    public MetricDataPoint(@JsonProperty("timestamp") final long timestamp,
+                           @JsonProperty("name") final String name,
+                           @JsonProperty("value") final double value)
     {
         this.timestamp = timestamp;
         this.name = checkNotNull(name);
