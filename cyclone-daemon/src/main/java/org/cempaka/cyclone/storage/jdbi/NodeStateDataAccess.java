@@ -18,5 +18,5 @@ public interface NodeStateDataAccess
 
     @RegisterRowMapper(NodeStateRowMapper.class)
     @SqlQuery("SELECT identifier, status, timestamp FROM nodes")
-    Set<NodeState> getNodes();
+    Set<NodeState> getAll();
 }

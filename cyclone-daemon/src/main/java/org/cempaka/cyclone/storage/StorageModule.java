@@ -18,6 +18,7 @@ import org.cempaka.cyclone.storage.jdbi.TestExecutionDataAccess;
 import org.cempaka.cyclone.storage.jdbi.TestMetricDataAccess;
 import org.cempaka.cyclone.storage.repositories.JdbiTestMetricRepository;
 import org.cempaka.cyclone.storage.repositories.JdbiTestRepository;
+import org.cempaka.cyclone.storage.repositories.NodeStateDataRepository;
 import org.cempaka.cyclone.storage.repositories.ParcelRepository;
 import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
 import org.cempaka.cyclone.storage.repositories.TestMetricRepository;
@@ -46,14 +47,16 @@ public class StorageModule extends PrivateModule
             .toInstance(parcelRepositoryConfiguration.getParameters());
         bind(TestExecutionRepository.class)
             .to(storageConfiguration.getTestExecutionRepositoryConfiguration().getType());
+        bind(NodeStateDataRepository.class)
+            .to(storageConfiguration.getNodeStateRepositoryConfiguration().getType());
 
         expose(ParcelRepository.class);
         expose(TestRepository.class);
         expose(TestMetricRepository.class);
         expose(TestExecutionRepository.class);
+        expose(NodeStateDataRepository.class);
     }
 
-    @Exposed
     @Provides
     @Singleton
     NodeStateDataAccess nodeStateDataAccess(final Jdbi jdbi)

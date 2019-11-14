@@ -14,40 +14,40 @@ import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.NodeState;
 import org.cempaka.cyclone.beans.NodeStatus;
 import org.cempaka.cyclone.storage.jdbi.NodeStateDataAccess;
+import org.cempaka.cyclone.storage.repositories.NodeStateDataRepository;
 
 @Singleton
 public class NodeStatusService
 {
     private static final int HEARTBEAT_RATIO = 2;
 
-    private final NodeStateDataAccess nodeStateDataAccess;
+    private final NodeStateDataRepository nodeStateDataRepository;
     private final NodeIdentifierProvider nodeIdentifierProvider;
     private final long heartbeatInterval;
     private final Clock clock;
 
     @Inject
-    public NodeStatusService(final NodeStateDataAccess nodeStateDataAccess,
+    public NodeStatusService(final NodeStateDataRepository nodeStateDataRepository,
                              final NodeIdentifierProvider nodeIdentifierProvider,
                              @Named("heartbeat.interval") final long heartbeatInterval,
                              final Clock clock)
     {
-        this.nodeStateDataAccess = checkNotNull(nodeStateDataAccess);
+        this.nodeStateDataRepository = checkNotNull(nodeStateDataRepository);
         this.nodeIdentifierProvider = checkNotNull(nodeIdentifierProvider);
         this.heartbeatInterval = heartbeatInterval;
         this.clock = checkNotNull(clock);
     }
 
-    public void updateStatus(final NodeStatus state)
+    public void updateStatus(final NodeStatus status)
     {
         final String identifier = nodeIdentifierProvider.get();
-        final Timestamp now = Timestamp.from(Instant.now(clock));
-        nodeStateDataAccess.upsert(identifier, state.toString(), now);
+        nodeStateDataRepository.put(new NodeState(identifier, status, Instant.now(clock).getEpochSecond()));
     }
 
     public Set<String> getLiveNodes()
     {
         final long now = Instant.now(clock).getEpochSecond();
-        return nodeStateDataAccess.getNodes().stream()
+        return nodeStateDataRepository.getAll().stream()
             .filter(NodeState::isUp)
             .filter(nodeState -> isAlive(now, nodeState))
             .map(NodeState::getIdentifier)
@@ -57,7 +57,7 @@ public class NodeStatusService
     public Map<String, Boolean> getNodesStatus()
     {
         final long now = Instant.now(clock).getEpochSecond();
-        return nodeStateDataAccess.getNodes().stream()
+        return nodeStateDataRepository.getAll().stream()
             .collect(Collectors.toMap(NodeState::getIdentifier,
                 nodeState -> nodeState.isUp() && isAlive(now, nodeState)));
     }
