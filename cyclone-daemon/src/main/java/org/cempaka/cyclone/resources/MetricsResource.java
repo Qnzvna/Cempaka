@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Range;
 import java.util.List;
+import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
@@ -37,7 +38,7 @@ public class MetricsResource
                                @QueryParam("from") final Long from,
                                @QueryParam("to") final Long to)
     {
-        final List<MetricDataPoint> events = testMetricRepository.get(testId, getRange(from, to));
+        final List<MetricDataPoint> events = testMetricRepository.get(UUID.fromString(testId), getRange(from, to));
         return Response.ok().entity(events).build();
     }
 
@@ -48,7 +49,8 @@ public class MetricsResource
                                @QueryParam("from") final Long from,
                                @QueryParam("to") final Long to)
     {
-        final List<MetricDataPoint> events = testMetricRepository.get(testId, name, getRange(from, to));
+        final List<MetricDataPoint> events = testMetricRepository
+            .get(UUID.fromString(testId), name, getRange(from, to));
         return Response.ok().entity(events).build();
     }
 

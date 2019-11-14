@@ -22,14 +22,18 @@ public class MigrationRunner implements Runnable
     @Override
     public void run()
     {
-        LOG.info("Starting to run migration...");
         final DataSourceFactory dataSourceFactory = daemonConfiguration.getDataSourceFactory();
-        final Flyway flyway = Flyway.configure().dataSource(dataSourceFactory.getUrl(),
-            dataSourceFactory.getUser(),
-            dataSourceFactory.getPassword())
-            .connectRetries(3)
-            .load();
-        final int migrationsApplied = flyway.migrate();
-        LOG.info("Database migration completed. {} migrations applied.", migrationsApplied);
+        if (dataSourceFactory != null) {
+            LOG.info("Starting to run migration...");
+            final Flyway flyway = Flyway.configure().dataSource(dataSourceFactory.getUrl(),
+                dataSourceFactory.getUser(),
+                dataSourceFactory.getPassword())
+                .connectRetries(3)
+                .load();
+            final int migrationsApplied = flyway.migrate();
+            LOG.info("Database migration completed. {} migrations applied.", migrationsApplied);
+        } else {
+            LOG.info("Not running database migrations, data source is not configured.");
+        }
     }
 }

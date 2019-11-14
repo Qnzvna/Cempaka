@@ -105,18 +105,21 @@ main class.
 Please read the [javadoc](https://cempaka.org/javadoc) for full API
 overview.
 
-### Installing the daemon
+### Running daemon
 
 To install the daemon you're gonna need the working postgresql cluster.
-The quickest way to set it up locally will be to use docker compose file
-located in `tools/docker.yml`
+You can run the daemon using single node setup (and memory only storage)
+or with postgresql cluster.
+The quickest way to set up postgres locally is to use docker compose file located in `tools/docker.yml`
 
 The second is the cyclone daemon process. You can either run it locally
 on your machine using `java` or through docker compose file. To simply
 build the fat jar run `mvn clean package`. When the build is done run
 server command on the produced fat jar. 
 
-```java -jar out/cyclone-daemon.jar server conf/local.yml```
+```java -jar out/cyclone-daemon.jar server conf/local.yml``` - with postgres
+
+```java -jar out/cyclone-daemon.jar server conf/memory.yml``` - without postgres
 
 You can access the Daemon UI in your browser by typing
 `http://localhost:8080/`

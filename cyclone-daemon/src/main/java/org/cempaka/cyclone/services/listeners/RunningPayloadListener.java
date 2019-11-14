@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,7 +35,7 @@ public class RunningPayloadListener implements BiConsumer<String, Payload>
             final RunningPayload runningPayload = (RunningPayload) payload;
             final long now = Instant.now(clock).toEpochMilli();
             runningPayload.getMeasurements().forEach((name, value) ->
-                testMetricRepository.put(testRunId, new MetricDataPoint(now, name, value)));
+                testMetricRepository.put(UUID.fromString(testRunId), new MetricDataPoint(now, name, value)));
         }
     }
 }

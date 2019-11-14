@@ -5,9 +5,13 @@ import javax.validation.Valid;
 import org.cempaka.cyclone.storage.repositories.JdbiNodeStateRepository;
 import org.cempaka.cyclone.storage.repositories.JdbiParcelRepository;
 import org.cempaka.cyclone.storage.repositories.JdbiTestExecutionRepository;
+import org.cempaka.cyclone.storage.repositories.JdbiTestMetricRepository;
+import org.cempaka.cyclone.storage.repositories.JdbiTestRepository;
 import org.cempaka.cyclone.storage.repositories.NodeStateDataRepository;
 import org.cempaka.cyclone.storage.repositories.ParcelRepository;
 import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
+import org.cempaka.cyclone.storage.repositories.TestMetricRepository;
+import org.cempaka.cyclone.storage.repositories.TestRepository;
 
 public class StorageConfiguration
 {
@@ -23,6 +27,14 @@ public class StorageConfiguration
     @JsonProperty("nodeStateRepository")
     private TypedConfiguration<NodeStateDataRepository> nodeStateRepositoryConfiguration =
         new TypedConfiguration<>(JdbiNodeStateRepository.class);
+    @Valid
+    @JsonProperty("testRepository")
+    private TypedConfiguration<TestRepository> testRepositoryConfiguration =
+        new TypedConfiguration<>(JdbiTestRepository.class);
+    @Valid
+    @JsonProperty("metricsRepository")
+    private TypedConfiguration<TestMetricRepository> metricsRepository =
+        new TypedConfiguration<>(JdbiTestMetricRepository.class);
 
     public TypedConfiguration<ParcelRepository> getParcelRepositoryConfiguration()
     {
@@ -37,5 +49,15 @@ public class StorageConfiguration
     public TypedConfiguration<NodeStateDataRepository> getNodeStateRepositoryConfiguration()
     {
         return nodeStateRepositoryConfiguration;
+    }
+
+    public TypedConfiguration<TestRepository> getTestRepositoryConfiguration()
+    {
+        return testRepositoryConfiguration;
+    }
+
+    public TypedConfiguration<TestMetricRepository> getMetricsRepository()
+    {
+        return metricsRepository;
     }
 }

@@ -67,7 +67,7 @@ public class ParcelResource
     @Path("/{id}")
     public void deleteParcel(@PathParam("id") final String parcelId)
     {
-        testRepository.delete(parcelId);
+        testRepository.delete(UUID.fromString(parcelId));
         parcelRepository.delete(UUID.fromString(parcelId));
     }
 }

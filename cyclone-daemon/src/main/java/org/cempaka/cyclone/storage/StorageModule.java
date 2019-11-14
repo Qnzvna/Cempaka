@@ -37,9 +37,6 @@ public class StorageModule extends PrivateModule
     @Override
     protected void configure()
     {
-        bind(TestRepository.class).to(JdbiTestRepository.class);
-        bind(TestMetricRepository.class).to(JdbiTestMetricRepository.class);
-
         final TypedConfiguration<ParcelRepository> parcelRepositoryConfiguration =
             storageConfiguration.getParcelRepositoryConfiguration();
         bind(ParcelRepository.class).to(parcelRepositoryConfiguration.getType());
@@ -49,6 +46,10 @@ public class StorageModule extends PrivateModule
             .to(storageConfiguration.getTestExecutionRepositoryConfiguration().getType());
         bind(NodeStateDataRepository.class)
             .to(storageConfiguration.getNodeStateRepositoryConfiguration().getType());
+        bind(TestRepository.class)
+            .to(storageConfiguration.getTestRepositoryConfiguration().getType());
+        bind(TestMetricRepository.class)
+            .to(storageConfiguration.getMetricsRepository().getType());
 
         expose(ParcelRepository.class);
         expose(TestRepository.class);

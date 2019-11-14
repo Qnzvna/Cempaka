@@ -1,0 +1,51 @@
+# Cyclone configuration file
+
+server:
+  applicationConnectors:
+    - type: http
+      port: 8080
+
+cluster:
+  nodeIdentifierProvider:
+    type: org.cempaka.cyclone.services.StaticNodeIdentifierProvider
+    # Node id's should be unique across all nodes in cluster.
+    parameters:
+      nodeId: cyclone
+  # Controls when node will be marked as dead. Values are in seconds.
+#  heartbeatInterval: 10
+#  heartbeatManagedAwaitInterval: 60
+
+storage:
+  parcelRepository:
+    type: org.cempaka.cyclone.storage.repositories.FileParcelRepository
+    parameters:
+      storagePath: tmp/
+  executionRepository:
+    type: org.cempaka.cyclone.storage.repositories.MemoryTestExecutionRepository
+  nodeStateRepository:
+    type: org.cempaka.cyclone.storage.repositories.MemoryNodeStateRepository
+  testRepository:
+    type: org.cempaka.cyclone.storage.repositories.MemoryTestRepository
+  metricsRepository:
+    type: org.cempaka.cyclone.storage.repositories.MemoryTestMetricRepository
+
+workers:
+  # Number of test runners.
+  workersNumber: 1
+  # Path to the guava jar. Used for gathering parcels metadata.
+  guavaPath: cyclone-daemon/target/dependency/guava.jar
+  # Path to store logs from load tests.
+  logsPath: logs/
+
+auth:
+  # Type of the authentication mechanism. Allowed values are: NONE, BASIC, HEADER.
+  type: NONE
+#  properties: {}
+
+database: null
+
+# Dropwizard logging configuration
+logging:
+  level: INFO
+  loggers:
+    org.cempaka: DEBUG

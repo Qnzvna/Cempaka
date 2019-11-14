@@ -33,7 +33,6 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
     public void initialize(final Bootstrap<DaemonConfiguration> bootstrap)
     {
         bootstrap.addBundle(new MultiPartBundle());
-//        bootstrap.addBundle(new UrlRewriteBundle());
         bootstrap.addBundle(new AssetsBundle("/assets", "/", "index.html"));
         bootstrap.addBundle(new WebJarBundle("org.webjars", "org.webjars.npm", "org.webjars.bower"));
     }

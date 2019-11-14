@@ -1,6 +1,7 @@
 package org.cempaka.cyclone.storage.repositories;
 
 import java.util.Set;
+import java.util.UUID;
 import org.cempaka.cyclone.tests.Test;
 
 public interface TestRepository
@@ -11,7 +12,7 @@ public interface TestRepository
 
     void putAll(Set<Test> tests);
 
-    void delete(String id);
+    void delete(UUID id);
 
-    Set<String> keys();
+    Set<UUID> keys();
 }

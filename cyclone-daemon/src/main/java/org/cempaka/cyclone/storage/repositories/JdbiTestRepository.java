@@ -1,8 +1,10 @@
 package org.cempaka.cyclone.storage.repositories;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 import java.util.Set;
+import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.cempaka.cyclone.storage.jdbi.TestDataAccess;
@@ -39,15 +41,15 @@ public class JdbiTestRepository implements TestRepository
     }
 
     @Override
-    public void delete(final String id)
+    public void delete(final UUID id)
     {
         checkNotNull(id);
-        testDataAccess.delete(id);
+        testDataAccess.delete(id.toString());
     }
 
     @Override
-    public Set<String> keys()
+    public Set<UUID> keys()
     {
-        return testDataAccess.keys();
+        return testDataAccess.keys().stream().map(UUID::fromString).collect(toImmutableSet());
     }
 }
