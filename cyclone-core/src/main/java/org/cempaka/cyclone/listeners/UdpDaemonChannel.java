@@ -1,6 +1,7 @@
 package org.cempaka.cyclone.listeners;
 
 import static java.net.InetAddress.getLoopbackAddress;
+import static org.cempaka.cyclone.utils.Preconditions.checkArgument;
 import static org.cempaka.cyclone.utils.Preconditions.checkState;
 
 import java.io.IOException;
@@ -20,6 +21,8 @@ import org.cempaka.cyclone.listeners.payloads.Payload;
 
 public class UdpDaemonChannel implements DaemonChannel
 {
+    static int SIZE = 65507;
+
     private final MessageEncoder messageEncoder;
     private final Lock runningLock;
     private final Queue<Consumer<Payload>> writeListeners;
@@ -81,14 +84,14 @@ public class UdpDaemonChannel implements DaemonChannel
     {
         while (running) {
             try {
-                final byte[] buffer = new byte[MessageEncoder.SIZE];
-                final DatagramPacket datagram = new DatagramPacket(buffer, buffer.length);
-                socket.receive(datagram);
-                final byte[] data = datagram.getData();
+                final byte[] buffer = new byte[SIZE];
+                final DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                socket.receive(packet);
+                final byte[] data = packet.getData();
 
                 final Payload payload = messageEncoder.decode(data);
                 readListeners.forEach(listener ->
-                    listenersService.submit(() -> listener.accept(datagram.getPort(), payload)));
+                    listenersService.submit(() -> listener.accept(packet.getPort(), payload)));
             } catch (Exception e) {
                 failureListeners.forEach(listener -> listener.accept(e));
             }
@@ -99,8 +102,9 @@ public class UdpDaemonChannel implements DaemonChannel
     @Override
     public void write(final Payload payload, final int port)
     {
-        checkState(socket != null, "socket not initialized");
+        checkState(socket != null, "Socket not initialized");
         final byte[] bytes = messageEncoder.encode(payload).array();
+        checkArgument(bytes.length < SIZE, String.format("Payload is too big to transfer [%s]", bytes.length));
         final DatagramPacket datagramPacket = new DatagramPacket(bytes,
             bytes.length,
             getLoopbackAddress(),

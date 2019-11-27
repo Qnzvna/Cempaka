@@ -9,8 +9,6 @@ class MessageEncoder
     private final HeaderEncoder headerEncoder;
     private final PayloadEncoder payloadEncoder;
 
-    static int SIZE = 4096;
-
     MessageEncoder()
     {
         this.headerEncoder = new HeaderEncoder();

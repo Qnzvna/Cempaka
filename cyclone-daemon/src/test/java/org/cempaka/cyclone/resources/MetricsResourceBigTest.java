@@ -36,7 +36,7 @@ public class MetricsResourceBigTest
     public void shouldReturnMetrics()
     {
         //given
-        final UUID executionId = TEST_CLIENT.runTest(Tests.getExampleTest(PARCEL_ID, ImmutableSet.of(Tests.NODE)));
+        final UUID executionId = TEST_CLIENT.startTest(Tests.getExampleTest(PARCEL_ID, ImmutableSet.of(Tests.NODE)));
         //when
         await().pollInterval(5, TimeUnit.SECONDS)
             .atMost(30, TimeUnit.SECONDS)

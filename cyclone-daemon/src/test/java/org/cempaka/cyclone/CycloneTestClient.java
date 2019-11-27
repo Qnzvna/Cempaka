@@ -67,7 +67,7 @@ public class CycloneTestClient
         runRequest(httpDelete, new TypeReference<Void>() {});
     }
 
-    public UUID runTest(final TestExecutionProperties testExecutionProperties)
+    public UUID startTest(final TestExecutionProperties testExecutionProperties)
     {
         final HttpPost httpPost = new HttpPost(apiUrl + "/tests/start");
         return runRequest(testExecutionProperties, UUID.class, httpPost);

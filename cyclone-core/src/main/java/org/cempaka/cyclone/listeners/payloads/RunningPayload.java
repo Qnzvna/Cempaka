@@ -34,6 +34,15 @@ public class RunningPayload implements Payload
     }
 
     @Override
+    public String toString()
+    {
+        return "RunningPayload{" +
+            "testId='" + testId + '\'' +
+            ", measurements=" + measurements +
+            '}';
+    }
+
+    @Override
     public boolean equals(final Object o)
     {
         if (this == o) { return true; }

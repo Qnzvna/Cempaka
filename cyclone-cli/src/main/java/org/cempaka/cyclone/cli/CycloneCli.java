@@ -107,12 +107,10 @@ public class CycloneCli
         try {
             runner.run();
             reportMetrics();
-            return new EndedPayload(testId, 0, null);
+            return new EndedPayload(testId, 0);
         } catch (Exception e) {
             e.printStackTrace();
-            final StringWriter writer = new StringWriter();
-            e.printStackTrace(new PrintWriter(writer));
-            return new EndedPayload(testId, -1, writer.toString());
+            return new EndedPayload(testId, -1);
         } finally {
             threadRunner.awaitTermination(RUNNER_AWAIT_TIME);
         }

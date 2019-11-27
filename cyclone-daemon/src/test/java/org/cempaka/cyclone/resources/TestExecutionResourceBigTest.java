@@ -23,7 +23,7 @@ public class TestExecutionResourceBigTest
     public static void setUpClass()
     {
         PARCEL_ID = TEST_CLIENT.uploadParcel(new File(Tests.EXAMPLES));
-        TEST_EXECUTION_ID = TEST_CLIENT.runTest(Tests.getExampleTest(PARCEL_ID, ImmutableSet.of(Tests.NODE)));
+        TEST_EXECUTION_ID = TEST_CLIENT.startTest(Tests.getExampleTest(PARCEL_ID, ImmutableSet.of(Tests.NODE)));
     }
 
     @AfterClass
@@ -70,7 +70,7 @@ public class TestExecutionResourceBigTest
     public void shouldDeleteTestExecution()
     {
         //given
-        final UUID testExecution = TEST_CLIENT.runTest(Tests.getExampleTest(PARCEL_ID, ImmutableSet.of(Tests.NODE)));
+        final UUID testExecution = TEST_CLIENT.startTest(Tests.getExampleTest(PARCEL_ID, ImmutableSet.of(Tests.NODE)));
         //when
         final boolean before = TEST_CLIENT.getTestExecutionKeys().contains(testExecution);
         TEST_CLIENT.deleteTestExecution(testExecution);

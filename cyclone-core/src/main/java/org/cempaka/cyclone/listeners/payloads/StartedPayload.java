@@ -26,6 +26,14 @@ public class StartedPayload implements Payload
     }
 
     @Override
+    public String toString()
+    {
+        return "StartedPayload{" +
+            "testId='" + testId + '\'' +
+            '}';
+    }
+
+    @Override
     public boolean equals(final Object o)
     {
         if (this == o) { return true; }

@@ -13,9 +13,20 @@ final class Tests
 
     static TestExecutionProperties getExampleTest(final UUID parcelId, final Set<String> nodes)
     {
+        return getTest(parcelId, nodes, "org.cempaka.cyclone.examples.ExampleTest");
+    }
+
+    static TestExecutionProperties getLongCauseTest(final UUID parcelId, final Set<String> nodes)
+    {
+        return getTest(parcelId, nodes, "org.cempaka.cyclone.examples.TooBigPayloadTest");
+    }
+
+    private static TestExecutionProperties getTest(final UUID parcelId, final Set<String> nodes,
+                                                   final String s)
+    {
         return ImmutableTestExecutionProperties.builder()
             .parcelId(parcelId)
-            .testName("org.cempaka.cyclone.examples.ExampleTest")
+            .testName(s)
             .threadsNumber(1)
             .loopCount(1)
             .nodes(nodes)

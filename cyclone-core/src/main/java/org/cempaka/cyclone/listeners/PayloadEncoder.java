@@ -57,11 +57,6 @@ class PayloadEncoder
         final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
         try (final ObjectOutputStream outputStream = new ObjectOutputStream(byteStream)) {
             outputStream.writeInt(payload.getExitCode());
-            final Optional<String> stackTrace = payload.getStackTrace();
-            outputStream.writeBoolean(stackTrace.isPresent());
-            if (stackTrace.isPresent()) {
-                outputStream.writeUTF(stackTrace.get());
-            }
             outputStream.flush();
             final byte[] data = byteStream.toByteArray();
             return ByteBuffer.wrap(data);
@@ -106,14 +101,7 @@ class PayloadEncoder
         final InputStream inputStream = new ByteArrayInputStream(data);
         try (final ObjectInputStream stream = new ObjectInputStream(inputStream)) {
             final int exitCode = stream.readInt();
-            final boolean failed = stream.readBoolean();
-            final String stackTrace;
-            if (failed) {
-                stackTrace = stream.readUTF();
-            } else {
-                stackTrace = null;
-            }
-            return new EndedPayload(testId, exitCode, stackTrace);
+            return new EndedPayload(testId, exitCode);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

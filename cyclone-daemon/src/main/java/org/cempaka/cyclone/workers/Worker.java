@@ -9,10 +9,8 @@ import static org.cempaka.cyclone.utils.CliParametrs.THREADS;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.CharStreams;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.util.List;
@@ -119,22 +117,12 @@ class Worker
                 temporaryParcelFile.delete();
                 final int exitValue = runningProcess.exitValue();
                 if (exitValue != 0) {
-                    throwProcessFailureException(runningProcess, exitValue);
+                    LOG.warn("Worker failed.");
+                    throw new ProcessFailureException(exitValue);
                 }
             } catch (InterruptedException ignore) {
             }
             return runningProcess;
         });
-    }
-
-    private void throwProcessFailureException(final Process process, final int exitValue)
-    {
-        try {
-            final String message = CharStreams.toString(new InputStreamReader(process.getErrorStream()));
-            LOG.warn("Worker failed with: {}", message);
-            throw new ProcessFailureException(exitValue, message);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
     }
 }

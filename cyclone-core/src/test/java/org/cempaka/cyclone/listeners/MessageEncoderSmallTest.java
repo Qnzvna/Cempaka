@@ -41,9 +41,9 @@ public class MessageEncoderSmallTest
             new Object[]{new StartedPayload(testId)},
             new Object[]{new RunningPayload(testId, new HashMap<>())},
             new Object[]{new RunningPayload(testId, measurements)},
-            new Object[]{new EndedPayload(testId, 0, longStackTrace)},
-            new Object[]{new EndedPayload(testId, -1, "failure")},
-            new Object[]{new EndedPayload(testId, 5, "failure")},
+            new Object[]{new EndedPayload(testId, 0)},
+            new Object[]{new EndedPayload(testId, -1)},
+            new Object[]{new EndedPayload(testId, 5)},
         };
     }
 

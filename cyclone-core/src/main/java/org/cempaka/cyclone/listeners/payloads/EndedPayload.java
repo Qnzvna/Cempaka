@@ -9,13 +9,11 @@ public class EndedPayload implements Payload
 {
     private final String testId;
     private final int exitCode;
-    private final Optional<String> stackTrace;
 
-    public EndedPayload(final String testId, final int exitCode, final String stackTrace)
+    public EndedPayload(final String testId, final int exitCode)
     {
         this.testId = checkNotNull(testId);
         this.exitCode = exitCode;
-        this.stackTrace = Optional.ofNullable(stackTrace);
     }
 
     @Override
@@ -35,9 +33,13 @@ public class EndedPayload implements Payload
         return exitCode;
     }
 
-    public Optional<String> getStackTrace()
+    @Override
+    public String toString()
     {
-        return stackTrace;
+        return "EndedPayload{" +
+            "testId='" + testId + '\'' +
+            ", exitCode=" + exitCode +
+            '}';
     }
 
     @Override
@@ -47,13 +49,12 @@ public class EndedPayload implements Payload
         if (o == null || getClass() != o.getClass()) { return false; }
         final EndedPayload that = (EndedPayload) o;
         return exitCode == that.exitCode &&
-            Objects.equals(testId, that.testId) &&
-            Objects.equals(stackTrace, that.stackTrace);
+            Objects.equals(testId, that.testId);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(testId, exitCode, stackTrace);
+        return Objects.hash(testId, exitCode);
     }
 }
