@@ -22,8 +22,8 @@ export const StartTestComponent = {
                 .then(tests => {
                     this.tests = tests;
                     this.test = tests[0] || undefined;
-                    if (!_.isUndefined(this.tests)) {
-                        this.reduceParameters(this.tests.parameters);
+                    if (!_.isUndefined(this.test)) {
+                        this.reduceParameters(this.test.parameters);
                     }
                 });
             this.clusterService.getStatus().then(nodes => {

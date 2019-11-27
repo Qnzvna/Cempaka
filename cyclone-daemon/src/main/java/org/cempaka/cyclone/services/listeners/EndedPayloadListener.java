@@ -1,20 +1,25 @@
 package org.cempaka.cyclone.services.listeners;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.UUID;
-import java.util.function.BiConsumer;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.TestState;
 import org.cempaka.cyclone.listeners.payloads.Payload;
 import org.cempaka.cyclone.listeners.payloads.PayloadType;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
 import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.UUID;
+import java.util.function.BiConsumer;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 public class EndedPayloadListener implements BiConsumer<String, Payload>
 {
+    private static final Logger LOG = LoggerFactory.getLogger(EndedPayloadListener.class);
+
     private final NodeIdentifierProvider nodeIdentifierProvider;
     private final TestExecutionRepository testExecutionRepository;
 
@@ -30,6 +35,7 @@ public class EndedPayloadListener implements BiConsumer<String, Payload>
     public void accept(final String testExecutionId, final Payload payload)
     {
         if (payload.getType() == PayloadType.ENDED) {
+            LOG.debug("Ended payload for {} {}.", testExecutionId, payload);
             testExecutionRepository.setState(UUID.fromString(testExecutionId),
                 nodeIdentifierProvider.get(),
                 TestState.ENDED);

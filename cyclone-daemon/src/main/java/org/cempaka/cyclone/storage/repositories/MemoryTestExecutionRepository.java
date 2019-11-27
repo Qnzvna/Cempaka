@@ -1,18 +1,20 @@
 package org.cempaka.cyclone.storage.repositories;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
-
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import org.cempaka.cyclone.tests.ImmutableTestExecution;
+import org.cempaka.cyclone.tests.TestExecution;
+
+import javax.inject.Singleton;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
-import javax.inject.Singleton;
-import org.cempaka.cyclone.tests.ImmutableTestExecution;
-import org.cempaka.cyclone.tests.TestExecution;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 @Singleton
 public class MemoryTestExecutionRepository implements TestExecutionRepository
@@ -56,7 +58,9 @@ public class MemoryTestExecutionRepository implements TestExecutionRepository
     @Override
     public Set<TestExecution> get(final String node, final String state)
     {
-        return get(key -> key.getNode().equals(node));
+        return get(key -> key.getNode().equals(node)).stream()
+                .filter(testExecution -> testExecution.getState().equals(state))
+                .collect(Collectors.toSet());
     }
 
     @Override
