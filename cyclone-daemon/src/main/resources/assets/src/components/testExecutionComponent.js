@@ -41,7 +41,7 @@ export const TestExecutionComponent = {
             this.testsService.getTestMetrics(this.id).then(metrics => {
                 const size = _.uniq(_.map(metrics, metric => metric.name)).length;
                 this.metrics = _.slice(metrics, 0, size);
-                this.metrics = _.sortBy(metrics, metric => metric.name)
+                this.metrics = _.sortBy(this.metrics, metric => metric.name)
             });
         }
 
