@@ -115,13 +115,19 @@ public final class Reflections
 
     public static Stream<Measured> getMeasuredAnnotations(final Method method)
     {
+        return getAnnotations(method, Measured.class);
+    }
+
+    public static <T extends Annotation> Stream<T> getAnnotations(final Method method, final Class<T> annotationClass)
+    {
         return Stream.of(method.getAnnotations())
             .flatMap(annotation -> {
                 final Class<? extends Annotation> annotationType = annotation.annotationType();
-                if (annotationType.equals(Measured.class)) {
-                    return Stream.of((Measured) annotation);
+                if (annotationType.equals(annotationClass)) {
+                    //noinspection unchecked
+                    return Stream.of((T) annotation);
                 } else {
-                    return Arrays.stream(annotationType.getDeclaredAnnotationsByType(Measured.class));
+                    return Arrays.stream(annotationType.getDeclaredAnnotationsByType(annotationClass));
                 }
             });
     }

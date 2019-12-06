@@ -38,7 +38,7 @@ public class ExecutionContext implements Closeable
         return throwable;
     }
 
-    public long getExecutionTime()
+    public long getMillisExecutionTime()
     {
         return endTime - startTime;
     }

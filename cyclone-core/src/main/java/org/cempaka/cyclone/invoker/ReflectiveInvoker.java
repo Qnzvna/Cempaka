@@ -3,13 +3,21 @@ package org.cempaka.cyclone.invoker;
 import static org.cempaka.cyclone.utils.Preconditions.checkArgument;
 import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
 import static org.cempaka.cyclone.utils.Preconditions.checkState;
+import static org.cempaka.cyclone.utils.Reflections.containsAnnotation;
+import static org.cempaka.cyclone.utils.Reflections.getAnnotations;
+import static org.cempaka.cyclone.utils.Reflections.getMeasureAnnotatedFields;
+import static org.cempaka.cyclone.utils.Reflections.getMeasureAnnotatedParameters;
+import static org.cempaka.cyclone.utils.Reflections.getMeasuredAnnotations;
+import static org.cempaka.cyclone.utils.Reflections.getThunderboltMethods;
+import static org.cempaka.cyclone.utils.Reflections.invokeMethod;
+import static org.cempaka.cyclone.utils.Reflections.newInstance;
+import static org.cempaka.cyclone.utils.Reflections.setFieldValue;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -18,7 +26,8 @@ import java.util.stream.Stream;
 import org.cempaka.cyclone.annotations.AfterStorm;
 import org.cempaka.cyclone.annotations.BeforeStorm;
 import org.cempaka.cyclone.annotations.Parameter;
-import org.cempaka.cyclone.annotations.Thunderbolt;
+import org.cempaka.cyclone.annotations.SuppressThrowables;
+import org.cempaka.cyclone.annotations.Throttle;
 import org.cempaka.cyclone.exceptions.TestFailedException;
 import org.cempaka.cyclone.measurements.Measure;
 import org.cempaka.cyclone.measurements.Measurement;
@@ -84,8 +93,8 @@ public class ReflectiveInvoker implements Invoker
                     .filter(Reflections::isFieldParameter)
                     .forEach(field -> setParameterField(parameters, testObject, field));
             }
-            Reflections.getMeasureAnnotatedFields(testClass)
-                .forEach(field -> Reflections.setFieldValue(field,
+            getMeasureAnnotatedFields(testClass)
+                .forEach(field -> setFieldValue(field,
                     testObject,
                     measurementRegistry.get(field.getAnnotation(Measure.class).value())));
             return testObject;
@@ -130,7 +139,7 @@ public class ReflectiveInvoker implements Invoker
                                        final Class<? extends Annotation> annotationClass)
     {
         final Set<Method> methods = Stream.of(testClass.getDeclaredMethods())
-            .filter(method -> Reflections.containsAnnotation(method, annotationClass))
+            .filter(method -> containsAnnotation(method, annotationClass))
             .collect(Collectors.toSet());
         System.out.println(methods);
         checkState(methods.size() <= 1,
@@ -139,7 +148,7 @@ public class ReflectiveInvoker implements Invoker
         methods.stream().findFirst()
             .ifPresent(method -> {
                 try {
-                    Reflections.invokeMethod(testInstance, method);
+                    invokeMethod(testInstance, method);
                 } catch (InvocationTargetException e) {
                     throw new TestFailedException(e.getCause());
                 }
@@ -148,16 +157,11 @@ public class ReflectiveInvoker implements Invoker
 
     private void runThunderbolts(final Class testClass, final Object testInstance)
     {
-        Reflections.getThunderboltMethods(testClass)
+        getThunderboltMethods(testClass)
             .forEach(method -> {
                 final ExecutionContext executionContext = new ExecutionContext(testClass, method);
                 try {
-                    final Measurement[] measurements = Reflections.getMeasureAnnotatedParameters(method)
-                        .map(parameter ->
-                            measurementRegistry.get(method, parameter.getAnnotation(Measure.class).value()))
-                        .collect(Collectors.toList())
-                        .toArray(new Measurement[]{});
-                    Reflections.invokeMethod(testInstance, method, measurements);
+                    invokeMethod(testInstance, method, getMeasurements(method));
                     executionContext.close();
                 } catch (InvocationTargetException e) {
                     final Throwable cause = e.getCause();
@@ -167,23 +171,42 @@ public class ReflectiveInvoker implements Invoker
                         executionContext.close(cause);
                     }
                 }
-                Reflections.getMeasuredAnnotations(method)
+                throttle(method, executionContext);
+                getMeasuredAnnotations(method)
                     .forEach(measure -> {
                         final Measurement measurement = measurementRegistry.get(method, measure.name());
-                        Reflections.newInstance(measure.ticker()).tick(measurement, executionContext);
+                        newInstance(measure.ticker()).tick(measurement, executionContext);
                     });
             });
     }
 
+    private Measurement[] getMeasurements(final Method method)
+    {
+        return getMeasureAnnotatedParameters(method)
+            .map(parameter ->
+                measurementRegistry.get(method, parameter.getAnnotation(Measure.class).value()))
+            .collect(Collectors.toList())
+            .toArray(new Measurement[]{});
+    }
+
     private boolean isThrowableSuppressed(final Method method, final Throwable throwable)
     {
-        final List<Thunderbolt> annotations = Stream.of(method.getDeclaredAnnotations())
-            .filter(Reflections::isThunderboltAnnotation)
-            .map(annotation -> (Thunderbolt) annotation)
-            .collect(Collectors.toList());
-        return annotations.stream().allMatch(Thunderbolt::suppressAllThrowables) ||
-            annotations.stream()
-                .flatMap(annotation -> Stream.of(annotation.suppressedThrowables()))
-                .anyMatch(clazz -> clazz.isInstance(throwable));
+        return getAnnotations(method, SuppressThrowables.class)
+            .anyMatch(suppressThrowables -> suppressThrowables.value().length == 0 ||
+                Stream.of(suppressThrowables.value()).anyMatch(clazz -> clazz.isAssignableFrom(throwable.getClass())));
+    }
+
+    private void throttle(final Method method, final ExecutionContext executionContext)
+    {
+        final long throttle = getAnnotations(method, Throttle.class).findFirst()
+            .map(Throttle::value)
+            .orElse(0L);
+        if (throttle > 0) {
+            try {
+                final long sleepTime = 1_000 / throttle - executionContext.getMillisExecutionTime();
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException ignored) {
+            }
+        }
     }
 }

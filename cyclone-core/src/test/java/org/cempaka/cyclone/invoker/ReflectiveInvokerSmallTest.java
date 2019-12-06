@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.assertj.core.data.Offset;
 import org.cempaka.cyclone.exceptions.TestFailedException;
 import org.cempaka.cyclone.measurements.CounterMeasurement;
 import org.cempaka.cyclone.measurements.Measurement;
@@ -172,5 +173,21 @@ public class ReflectiveInvokerSmallTest
         //then
         assertThat(measurement).isInstanceOf(CounterMeasurement.class);
         assertThat(measurement.getSnapshot()).containsEntry("count", 3D);
+    }
+
+    @Test
+    public void shouldThrottleExecution()
+    {
+        //given
+        final Invoker invoker =
+            ReflectiveInvoker.forTestClass(ThrottledExample.class, EMPTY_PARAMETERS, MEASUREMENT_REGISTRY);
+        //when
+        final long startTime = System.currentTimeMillis();
+        for (int i = 0; i < 10; i++) {
+            invoker.invoke();
+        }
+        final long executionTime = System.currentTimeMillis() - startTime;
+        //then
+        assertThat(executionTime).isCloseTo(1_000, Offset.offset(100L));
     }
 }

@@ -12,7 +12,7 @@ public class TimerMeasurementTicker implements Ticker
     public void tick(final Measurement measurement, final ExecutionContext executionContext)
     {
         if (measurement instanceof TimerMeasurement) {
-            ((TimerMeasurement) measurement).update(executionContext.getExecutionTime(), TimeUnit.MILLISECONDS);
+            ((TimerMeasurement) measurement).update(executionContext.getMillisExecutionTime(), TimeUnit.MILLISECONDS);
         }
     }
 }

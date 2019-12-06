@@ -1,5 +1,6 @@
 package org.cempaka.cyclone.invoker;
 
+import org.cempaka.cyclone.annotations.SuppressThrowables;
 import org.cempaka.cyclone.annotations.Thunderbolt;
 import org.cempaka.cyclone.measurements.Counted;
 import org.cempaka.cyclone.measurements.CounterMeasurement;
@@ -16,7 +17,8 @@ public class MeasurementsExample extends AbstractTestExample
     private CounterMeasurement globalCounter;
 
     @Counted
-    @Thunderbolt(suppressAllThrowables = true)
+    @SuppressThrowables
+    @Thunderbolt
     public void counted()
     {
         globalCounter.increment();
