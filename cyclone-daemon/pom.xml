@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.cempaka.cyclone</groupId>
         <artifactId>cyclone</artifactId>
-        <version>0.2-SNAPSHOT</version>
+        <version>0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>cyclone-daemon</artifactId>
@@ -149,12 +148,8 @@
                         <phase>generate-test-resources</phase>
                         <configuration>
                             <target name="copy examples">
-                                <copy
-                                    file="${project.basedir}/../cyclone-examples/target/cyclone-examples-${project.version}.jar"
-                                    tofile="${project.basedir}/target/test-classes/67548d96-076d-4f69-bd1d-3b9316b2ba15"/>
-                                <copy
-                                    file="${project.basedir}/../cyclone-examples/target/cyclone-examples-${project.version}.jar"
-                                    tofile="${project.basedir}/target/examples.jar"/>
+                                <copy file="${project.basedir}/../cyclone-examples/target/cyclone-examples-${project.version}.jar" tofile="${project.basedir}/target/test-classes/67548d96-076d-4f69-bd1d-3b9316b2ba15" />
+                                <copy file="${project.basedir}/../cyclone-examples/target/cyclone-examples-${project.version}.jar" tofile="${project.basedir}/target/examples.jar" />
                             </target>
                         </configuration>
                     </execution>
@@ -196,10 +191,8 @@
                             <createDependencyReducedPom>true</createDependencyReducedPom>
                             <outputFile>target/cyclone-daemon.jar</outputFile>
                             <transformers>
-                                <transformer
-                                    implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                                <transformer
-                                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>org.cempaka.cyclone.daemon.CycloneDaemon</mainClass>
                                 </transformer>
                             </transformers>
