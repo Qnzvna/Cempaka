@@ -1,6 +1,8 @@
 # Cyclone
 
 [![Build Status](https://travis-ci.org/Qnzvna/Cempaka.svg?branch=master)](https://travis-ci.org/Qnzvna/Cempaka)
+![Maven Central](https://img.shields.io/maven-central/v/org.cempaka.cyclone/cyclone)
+![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/Qnzvna/Cempaka)
 
 Cempaka Cyclone is a pure java open source application made to load test
 and measure performance of systems.
@@ -32,7 +34,7 @@ cyclone-cli dependency
 <dependency>
     <groupId>org.cempaka.cyclone</groupId>
     <artifactId>cyclone-cli</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.3-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -132,7 +134,7 @@ You can also run cyclone inside a docker. Simply build an image using maven.
 mvn clean package -P docker
 ``` 
 
-Docker image will  be named as `cempaka/cyclone:0.2-SNAPSHOT`. You can also use prepared docker-compose files to run 
+Docker image will  be named as `cempaka/cyclone:0.3-SNAPSHOT`. You can also use prepared docker-compose files to run 
 the cyclone and postgres.
 
 ```
