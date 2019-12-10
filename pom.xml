@@ -4,7 +4,7 @@
 
     <groupId>org.cempaka.cyclone</groupId>
     <artifactId>cyclone</artifactId>
-    <version>0.2</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Cyclone Project</name>
@@ -40,7 +40,7 @@
     <scm>
         <connection>scm:git:git://github.com/Qnzvna/Cempaka.git</connection>
         <developerConnection>scm:git:git@github.com:Qnzvna/Cempaka.git</developerConnection>
-        <tag>0.2</tag>
+        <tag>HEAD</tag>
         <url>https://github.com/Qnzvna/Cempaka.git</url>
     </scm>
 
