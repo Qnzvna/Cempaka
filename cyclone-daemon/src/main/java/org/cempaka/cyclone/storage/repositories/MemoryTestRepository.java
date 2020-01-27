@@ -2,9 +2,13 @@ package org.cempaka.cyclone.storage.repositories;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import javax.inject.Singleton;
@@ -13,12 +17,12 @@ import org.cempaka.cyclone.tests.Test;
 @Singleton
 public class MemoryTestRepository implements TestRepository
 {
-    private final Map<UUID, Test> storage = Maps.newConcurrentMap();
+    private final Map<UUID, List<Test>> storage = Maps.newConcurrentMap();
 
     @Override
     public Set<Test> getAll()
     {
-        return ImmutableSet.copyOf(storage.values());
+        return storage.values().stream().flatMap(List::stream).collect(toImmutableSet());
     }
 
     @Override
@@ -31,7 +35,12 @@ public class MemoryTestRepository implements TestRepository
     @Override
     public synchronized void putAll(final Set<Test> tests)
     {
-        tests.forEach(test -> storage.put(test.getParcelId(), test));
+        tests.forEach(test -> {
+            final UUID parcelId = test.getParcelId();
+            final List<Test> testsList = Optional.ofNullable(storage.get(parcelId)).orElseGet(ArrayList::new);
+            testsList.add(test);
+            storage.put(parcelId, testsList);
+        });
     }
 
     @Override
