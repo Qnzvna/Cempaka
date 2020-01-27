@@ -204,7 +204,9 @@ public class ReflectiveInvoker implements Invoker
         if (throttle > 0) {
             try {
                 final long sleepTime = 1_000 / throttle - executionContext.getMillisExecutionTime();
-                Thread.sleep(sleepTime);
+                if (sleepTime > 0) {
+                    Thread.sleep(sleepTime);
+                }
             } catch (InterruptedException ignored) {
             }
         }
