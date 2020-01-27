@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: cyclone
       POSTGRES_PASSWORD: cyclone
   cyclone:
-    image: cempaka/cyclone:0.2-SNAPSHOT
+    image: cempaka/cyclone:0.3-SNAPSHOT
     depends_on:
       - postgres
     ports:
