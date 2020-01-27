@@ -112,7 +112,7 @@ public class WorkerManager
         LOG.debug("Resources cleaned.");
     }
 
-    void abortTest(final UUID testId)
+    public void abortTest(final UUID testId)
     {
         runningTests.computeIfPresent(testId, (handler, worker) -> {
             worker.abort();

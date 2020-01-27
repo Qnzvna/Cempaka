@@ -56,6 +56,8 @@ public class DaemonTestRunnerManaged implements Managed
             try {
                 testExecutionRepository.get(nodeIdentifierProvider.get(), TestState.INITIALIZED)
                     .forEach(this::startTest);
+                testExecutionRepository.get(nodeIdentifierProvider.get(), TestState.ABORTED)
+                    .forEach(testExecution -> workerManager.abortTest(testExecution.getId()));
             } catch (Exception e) {
                 LOG.error("Test initialization failure.", e);
             }
