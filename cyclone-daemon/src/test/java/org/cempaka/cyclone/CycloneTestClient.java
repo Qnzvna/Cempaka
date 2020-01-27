@@ -25,6 +25,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.cempaka.cyclone.beans.MetricDataPoint;
+import org.cempaka.cyclone.beans.NodeCapacity;
 import org.cempaka.cyclone.tests.Test;
 import org.cempaka.cyclone.tests.TestExecution;
 import org.cempaka.cyclone.tests.TestExecutionProperties;
@@ -107,6 +108,12 @@ public class CycloneTestClient
     {
         final HttpGet httpGet = new HttpGet(apiUrl + "/cluster/status");
         return runRequest(httpGet, new TypeReference<Map<String, Boolean>>() {});
+    }
+
+    public NodeCapacity getNodeCapacity(final String node)
+    {
+        final HttpGet httpGet = new HttpGet(apiUrl + "/cluster/" + node + "/capacity");
+        return runRequest(httpGet, new TypeReference<NodeCapacity>() {});
     }
 
     public List<MetricDataPoint> getMetrics(final UUID id)
