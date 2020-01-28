@@ -26,6 +26,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.cempaka.cyclone.beans.MetricDataPoint;
 import org.cempaka.cyclone.beans.NodeCapacity;
+import org.cempaka.cyclone.beans.ParcelUpload;
 import org.cempaka.cyclone.tests.Test;
 import org.cempaka.cyclone.tests.TestExecution;
 import org.cempaka.cyclone.tests.TestExecutionProperties;
@@ -60,6 +61,12 @@ public class CycloneTestClient
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    public UUID uploadParcel(final ParcelUpload parcelUpload)
+    {
+        final HttpPost httpPost = new HttpPost(apiUrl + "/parcels");
+        return runRequest(parcelUpload, UUID.class, httpPost);
     }
 
     public void deleteParcel(final UUID id)
@@ -123,7 +130,7 @@ public class CycloneTestClient
     }
 
     private <I, O> O runRequest(final I input,
-                                final Class<O> clazz,
+                                final Class<O> outputClass,
                                 final HttpPost httpPost)
     {
         try {
@@ -137,7 +144,7 @@ public class CycloneTestClient
             final HttpEntity entity = httpResponse.getEntity();
             if (entity != null) {
                 final String stringResponse = EntityUtils.toString(entity);
-                return objectMapper.readValue(stringResponse, clazz);
+                return objectMapper.readValue(stringResponse, outputClass);
             } else {
                 return null;
             }
