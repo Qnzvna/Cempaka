@@ -190,4 +190,19 @@ public class ReflectiveInvokerSmallTest
         //then
         assertThat(executionTime).isCloseTo(1_000, Offset.offset(100L));
     }
+
+    @Test
+    public void shouldNotThrottleWhenNotNeeded()
+    {
+        //given
+        final Invoker invoker =
+            ReflectiveInvoker.forTestClass(ThrottledSleepExample.class, EMPTY_PARAMETERS, MEASUREMENT_REGISTRY);
+        //when
+        final long startTime = System.currentTimeMillis();
+        invoker.invoke();
+        invoker.invoke();
+        final long executionTime = System.currentTimeMillis() - startTime;
+        //then
+        assertThat(executionTime).isCloseTo(2_200, Offset.offset(100L));
+    }
 }
