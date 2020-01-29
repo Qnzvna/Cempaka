@@ -1,5 +1,7 @@
 package org.cempaka.cyclone.storage.jdbi;
 
+import java.sql.Timestamp;
+import java.util.Optional;
 import java.util.Set;
 import org.cempaka.cyclone.storage.mappers.TestExecutionRowMapper;
 import org.cempaka.cyclone.tests.TestExecution;
@@ -21,6 +23,11 @@ public interface TestExecutionDataAccess
     @SqlUpdate("UPDATE test_executions SET state = :state WHERE id = :id")
     void setStates(@Bind("id") String id, @Bind("state") String state);
 
+    @SqlUpdate("UPDATE test_executions SET update_timestamp = :update_timestamp WHERE id = :id AND node = :node")
+    void updateTimestamp(@Bind("id") String id,
+                         @Bind("node") String node,
+                         @Bind("update_timestamp") Timestamp timestamp);
+
     @RegisterRowMapper(TestExecutionRowMapper.class)
     @SqlQuery("SELECT id, node, state, properties FROM test_executions")
     Set<TestExecution> getAll();
@@ -32,6 +39,10 @@ public interface TestExecutionDataAccess
     @RegisterRowMapper(TestExecutionRowMapper.class)
     @SqlQuery("SELECT id, node, state, properties FROM test_executions WHERE id = ?")
     Set<TestExecution> get(String id);
+
+    @RegisterRowMapper(TestExecutionRowMapper.class)
+    @SqlQuery("SELECT id, node, state, properties FROM test_executions WHERE update_timestamp < :update_timestamp")
+    Set<TestExecution> getUpdatedLaterThan(@Bind("update_timestamp") Timestamp updatedTimestamp);
 
     @SqlUpdate("DELETE FROM test_executions WHERE id = ?")
     void delete(String id);

@@ -54,6 +54,15 @@ public class NodeStatusService
             .collect(Collectors.toSet());
     }
 
+    public Set<String> getDeadNodes()
+    {
+        final long now = Instant.now(clock).getEpochSecond();
+        return nodeStateDataRepository.getAll().stream()
+            .filter(nodeState -> nodeState.isDown() || !isAlive(now, nodeState))
+            .map(NodeState::getIdentifier)
+            .collect(Collectors.toSet());
+    }
+
     public Map<String, Boolean> getNodesStatus()
     {
         final long now = Instant.now(clock).getEpochSecond();

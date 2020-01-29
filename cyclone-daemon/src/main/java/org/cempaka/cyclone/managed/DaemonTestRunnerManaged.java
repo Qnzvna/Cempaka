@@ -51,17 +51,17 @@ public class DaemonTestRunnerManaged implements Managed
     @Override
     public void start()
     {
-        final int periodInterval = testRunnerConfiguration.getPeriodInterval();
         executorService.scheduleAtFixedRate(() -> {
             try {
                 testExecutionRepository.get(nodeIdentifierProvider.get(), TestState.INITIALIZED)
                     .forEach(this::startTest);
                 testExecutionRepository.get(nodeIdentifierProvider.get(), TestState.ABORTED)
                     .forEach(testExecution -> workerManager.abortTest(testExecution.getId()));
+                LOG.debug("Tests aborted and started.");
             } catch (Exception e) {
                 LOG.error("Test initialization failure.", e);
             }
-        }, 0, periodInterval, TimeUnit.SECONDS);
+        }, 0, testRunnerConfiguration.getPeriodInterval(), TimeUnit.SECONDS);
     }
 
     private void startTest(final TestExecution testExecution)

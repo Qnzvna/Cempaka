@@ -29,6 +29,9 @@ public class DaemonConfiguration extends Configuration
     private TestRunnerConfiguration testRunnerConfiguration = new TestRunnerConfiguration();
     @Valid
     @NotNull
+    private StalledTestCleanerConfiguration stalledTestCleanerConfiguration = new StalledTestCleanerConfiguration();
+    @Valid
+    @NotNull
     private AuthenticationConfiguration authenticationConfiguration = new AuthenticationConfiguration();
 
     @JsonProperty("database")
@@ -71,6 +74,12 @@ public class DaemonConfiguration extends Configuration
     public TestRunnerConfiguration getTestRunnerConfiguration()
     {
         return testRunnerConfiguration;
+    }
+
+    @JsonProperty("testCleaner")
+    public StalledTestCleanerConfiguration getStalledTestCleanerConfiguration()
+    {
+        return stalledTestCleanerConfiguration;
     }
 
     @JsonProperty("auth")
