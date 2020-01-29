@@ -16,6 +16,8 @@ import java.time.Clock;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import javax.inject.Inject;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.cempaka.cyclone.configurations.AuthenticationConfiguration;
 import org.cempaka.cyclone.configurations.ChannelConfiguration;
 import org.cempaka.cyclone.configurations.ClusterConfiguration;
@@ -122,11 +124,20 @@ public class DaemonModule extends AbstractModule
     @Singleton
     public Jdbi dbi(final ObjectMapper objectMapper)
     {
+        checkNotNull(daemonConfiguration.getDataSourceFactory());
         final Jdbi jdbi = new JdbiFactory()
             .build(environment, daemonConfiguration.getDataSourceFactory(), "postgresql");
         jdbi.installPlugin(new Jackson2Plugin());
         jdbi.installPlugin(new PostgresPlugin());
         jdbi.getConfig().get(Jackson2Config.class).setMapper(objectMapper);
         return jdbi;
+    }
+
+    @Inject
+    @Provides
+    @Singleton
+    public CloseableHttpClient httpClient()
+    {
+        return HttpClients.createDefault();
     }
 }
