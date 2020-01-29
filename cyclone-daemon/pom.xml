@@ -171,6 +171,14 @@
                             <overWrite>false</overWrite>
                             <destFileName>guava.jar</destFileName>
                         </artifactItem>
+                        <artifactId>
+                            <groupId>org.jacoco</groupId>
+                            <artifactId>org.jacoco.agent</artifactId>
+                            <classifier>runtime</classifier>
+                            <overWrite>false</overWrite>
+                            <version>${jacoco.version}</version>
+                            <destFileName>jacoco-agent.jar</destFileName>
+                        </artifactId>
                     </artifactItems>
                 </configuration>
                 <executions>
