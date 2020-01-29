@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/Qnzvna/Cempaka.svg?branch=master)](https://travis-ci.org/Qnzvna/Cempaka)
 ![Maven Central](https://img.shields.io/maven-central/v/org.cempaka.cyclone/cyclone)
+[![codecov](https://codecov.io/gh/Qnzvna/Cempaka/branch/master/graph/badge.svg)](https://codecov.io/gh/Qnzvna/Cempaka)
 ![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/Qnzvna/Cempaka)
 
 Cempaka Cyclone is a pure java open source application made to load test

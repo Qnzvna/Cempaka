@@ -76,6 +76,7 @@
         <mockito-all.version>1.9.5</mockito-all.version>
         <awaitility.version>3.1.6</awaitility.version>
         <httpmime.version>4.5.3</httpmime.version>
+        <jacoco.version>0.8.5</jacoco.version>
 
         <angularjs.version>1.7.7</angularjs.version>
         <bootstrap.version>4.3.1</bootstrap.version>
@@ -422,6 +423,7 @@
                     <artifactId>docker-maven-plugin</artifactId>
                     <version>0.31.0</version>
                     <configuration>
+                        <showLogs>true</showLogs>
                         <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
                         <images>
                             <image>
@@ -463,6 +465,23 @@
                                         <name>cyclone-it</name>
                                         <alias>cyclone</alias>
                                     </network>
+                                    <volumes>
+                                        <bind>
+                                            <volume>${project.build.directory}/:/jacoco</volume>
+                                        </bind>
+                                    </volumes>
+                                    <entrypoint>
+                                        <exec>
+                                            <arg>java</arg>
+                                            <arg>
+                                                -javaagent:/jacoco/dependency/jacoco-agent.jar=output=file,append=false,dumponexit=true,destfile=/jacoco/jacoco-it.exec
+                                            </arg>
+                                            <arg>-jar</arg>
+                                            <arg>/opt/cyclone/cyclone-daemon.jar</arg>
+                                            <arg>server</arg>
+                                            <arg>/etc/cyclone/configuration.yml</arg>
+                                        </exec>
+                                    </entrypoint>
                                 </run>
                             </image>
                         </images>
@@ -484,6 +503,34 @@
                                 <includes>
                                     <include>**/*BigTest*</include>
                                 </includes>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <phase>prepare-package</phase>
+                        </execution>
+                        <execution>
+                            <id>report-integration</id>
+                            <goals>
+                                <goal>report-integration</goal>
+                            </goals>
+                            <configuration>
+                                <dataFile>${project.build.directory}/jacoco-it.exec</dataFile>
                             </configuration>
                         </execution>
                     </executions>
@@ -580,6 +627,10 @@
             </plugin>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
