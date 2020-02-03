@@ -1,25 +1,36 @@
 package org.cempaka.cyclone.storage.repositories;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableSet.toImmutableSet;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import org.cempaka.cyclone.tests.ImmutableTestExecution;
-import org.cempaka.cyclone.tests.TestExecution;
-
-import javax.inject.Singleton;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.ImmutableSet.toImmutableSet;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.cempaka.cyclone.tests.ImmutableTestExecution;
+import org.cempaka.cyclone.tests.TestExecution;
 
 @Singleton
 public class MemoryTestExecutionRepository implements TestExecutionRepository
 {
     private final Map<TestExecutionKey, TestExecution> storage = Maps.newConcurrentMap();
+    private final Map<TestExecutionKey, Instant> updateTimestampStorage = Maps.newConcurrentMap();
+    private final Clock clock;
+
+    @Inject
+    public MemoryTestExecutionRepository(final Clock clock)
+    {
+        this.clock = checkNotNull(clock);
+    }
 
     @Override
     public void setState(final UUID id, final String node, final String state)
@@ -27,12 +38,13 @@ public class MemoryTestExecutionRepository implements TestExecutionRepository
         setState(new TestExecutionKey(id, node), state);
     }
 
-    private void setState(final TestExecutionKey testExecutionKey, final String state)
+    private synchronized void setState(final TestExecutionKey testExecutionKey, final String state)
     {
         storage.computeIfPresent(testExecutionKey, (key, testExecution) -> ImmutableTestExecution.builder()
             .from(testExecution)
             .state(state)
             .build());
+        updateTimestampStorage.put(testExecutionKey, Instant.now(clock));
     }
 
     @Override
@@ -41,6 +53,15 @@ public class MemoryTestExecutionRepository implements TestExecutionRepository
         ImmutableSet.copyOf(storage.keySet()).stream()
             .filter(key -> key.getId().equals(id))
             .forEach(key -> setState(key, state));
+    }
+
+    @Override
+    public void updateTimestamp(final UUID id, final String node, final Instant timestamp)
+    {
+        checkNotNull(id);
+        checkNotNull(node);
+        checkNotNull(timestamp);
+        updateTimestampStorage.put(new TestExecutionKey(id, node), timestamp);
     }
 
     @Override
@@ -59,14 +80,24 @@ public class MemoryTestExecutionRepository implements TestExecutionRepository
     public Set<TestExecution> get(final String node, final String state)
     {
         return get(key -> key.getNode().equals(node)).stream()
-                .filter(testExecution -> testExecution.getState().equals(state))
-                .collect(Collectors.toSet());
+            .filter(testExecution -> testExecution.getState().equals(state))
+            .collect(Collectors.toSet());
     }
 
     @Override
     public Set<TestExecution> get(final UUID id)
     {
         return get(key -> key.getId().equals(id));
+    }
+
+    @Override
+    public synchronized Set<TestExecution> getUpdatedLaterThan(final Instant timestamp)
+    {
+        return updateTimestampStorage.entrySet().stream()
+            .filter(entry -> entry.getValue().isBefore(timestamp))
+            .map(Map.Entry::getKey)
+            .map(storage::get)
+            .collect(Collectors.toSet());
     }
 
     @Override

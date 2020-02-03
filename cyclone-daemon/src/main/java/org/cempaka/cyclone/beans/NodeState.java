@@ -37,6 +37,11 @@ public class NodeState
         return getNodeStatus().equals(NodeStatus.UP);
     }
 
+    public boolean isDown()
+    {
+        return getNodeStatus().equals(NodeStatus.DOWN);
+    }
+
     @Override
     public boolean equals(final Object o)
     {

@@ -7,15 +7,18 @@ import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.bundles.webjars.WebJarBundle;
 import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
+import io.dropwizard.lifecycle.setup.LifecycleEnvironment;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import org.cempaka.cyclone.auth.AuthFilterFactory;
 import org.cempaka.cyclone.configurations.DaemonConfiguration;
+import org.cempaka.cyclone.configurations.StalledTestCleanerConfiguration;
 import org.cempaka.cyclone.listeners.DaemonChannel;
 import org.cempaka.cyclone.managed.DaemonTestRunnerManaged;
 import org.cempaka.cyclone.managed.HeartbeatManaged;
+import org.cempaka.cyclone.managed.StalledTestCleanerManaged;
 import org.cempaka.cyclone.resources.ClusterResource;
 import org.cempaka.cyclone.resources.MetricsResource;
 import org.cempaka.cyclone.resources.ParcelResource;
@@ -80,7 +83,9 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
 
     private void registerManaged(final Environment environment, final Injector injector)
     {
-        environment.lifecycle().manage(injector.getInstance(HeartbeatManaged.class));
-        environment.lifecycle().manage(injector.getInstance(DaemonTestRunnerManaged.class));
+        final LifecycleEnvironment lifecycle = environment.lifecycle();
+        lifecycle.manage(injector.getInstance(HeartbeatManaged.class));
+        lifecycle.manage(injector.getInstance(DaemonTestRunnerManaged.class));
+        lifecycle.manage(injector.getInstance(StalledTestCleanerManaged.class));
     }
 }

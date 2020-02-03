@@ -22,7 +22,9 @@ import org.cempaka.cyclone.configurations.AuthenticationConfiguration;
 import org.cempaka.cyclone.configurations.ChannelConfiguration;
 import org.cempaka.cyclone.configurations.ClusterConfiguration;
 import org.cempaka.cyclone.configurations.DaemonConfiguration;
+import org.cempaka.cyclone.configurations.StalledTestCleanerConfiguration;
 import org.cempaka.cyclone.configurations.StorageConfiguration;
+import org.cempaka.cyclone.configurations.TestRunnerConfiguration;
 import org.cempaka.cyclone.configurations.WorkersConfiguration;
 import org.cempaka.cyclone.listeners.DaemonChannel;
 import org.cempaka.cyclone.listeners.LogFailureListener;
@@ -30,6 +32,7 @@ import org.cempaka.cyclone.listeners.PayloadListener;
 import org.cempaka.cyclone.listeners.UdpDaemonChannel;
 import org.cempaka.cyclone.listeners.payloads.Payload;
 import org.cempaka.cyclone.listeners.payloads.PayloadType;
+import org.cempaka.cyclone.managed.StalledTestCleanerManaged;
 import org.cempaka.cyclone.services.DistributedTestRunnerService;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
 import org.cempaka.cyclone.services.TestRunnerService;
@@ -69,6 +72,9 @@ public class DaemonModule extends AbstractModule
         bind(WorkersConfiguration.class).toInstance(workersConfiguration);
         bind(ClusterConfiguration.class).toInstance(clusterConfiguration);
         bind(AuthenticationConfiguration.class).toInstance(authenticationConfiguration);
+        bind(TestRunnerConfiguration.class).toInstance(daemonConfiguration.getTestRunnerConfiguration());
+        bind(StalledTestCleanerConfiguration.class)
+            .toInstance(daemonConfiguration.getStalledTestCleanerConfiguration());
 
         bind(TestRunnerService.class).to(DistributedTestRunnerService.class);
         bind(ObjectMapper.class).toInstance(environment.getObjectMapper());

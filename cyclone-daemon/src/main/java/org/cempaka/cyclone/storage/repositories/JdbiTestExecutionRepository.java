@@ -3,6 +3,8 @@ package org.cempaka.cyclone.storage.repositories;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toSet;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -37,6 +39,15 @@ public class JdbiTestExecutionRepository implements TestExecutionRepository
     }
 
     @Override
+    public void updateTimestamp(final UUID id, final String node, final Instant timestamp)
+    {
+        checkNotNull(id);
+        checkNotNull(node);
+        checkNotNull(timestamp);
+        testExecutionDataAccess.updateTimestamp(id.toString(), node, Timestamp.from(timestamp));
+    }
+
+    @Override
     public void put(final TestExecution testExecution)
     {
         testExecutionDataAccess.insert(testExecution.getId().toString(),
@@ -63,6 +74,14 @@ public class JdbiTestExecutionRepository implements TestExecutionRepository
     public Set<TestExecution> get(final UUID id)
     {
         return testExecutionDataAccess.get(id.toString());
+    }
+
+    @Override
+    public Set<TestExecution> getUpdatedLaterThan(final Instant timestamp)
+    {
+        checkNotNull(timestamp);
+        return testExecutionDataAccess.getUpdatedLaterThan(Timestamp.from(timestamp));
+
     }
 
     @Override
