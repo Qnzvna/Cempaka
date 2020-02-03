@@ -52,11 +52,11 @@ export class TestsService
             error => this.ngToast.danger(`Failed to delete parcel. ${error.data.message}`))
     }
 
-    getTestsExecutions()
+    getTestsExecutions(limit, offset)
     {
         return this.$http({
             method: 'GET',
-            url: '/api/tests/executions'
+            url: `/api/tests/executions?limit=${limit}&offset=${offset}`
         }).then(response => response.data,
             error => {
                 this.ngToast.danger(`Failed to get test executions. ${error.data.message}`);

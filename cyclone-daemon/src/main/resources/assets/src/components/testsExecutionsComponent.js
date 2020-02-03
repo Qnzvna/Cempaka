@@ -2,20 +2,44 @@ export const TestExecutionsComponent = {
     templateUrl: 'templates/testExecutions.html',
     controller: class TestExecutionsController
     {
-        constructor($interval, $location, testService, executionService)
+        constructor($interval, $location, testService, executionService, ngToast)
         {
             this.$interval = $interval;
             this.$location = $location;
             this.testService = testService;
             this.executionService = executionService;
+            this.ngToast = ngToast;
         }
 
         $onInit()
         {
             this.executions = undefined;
-            this.testService.getTestsExecutions()
-                .then(executions => this.executions = this.mapExecutions(executions));
+            this.offset = 0;
+            this.firstPage = true;
+            this.lastPage = true;
+            this.loadExecutions();
             this.startRefreshingRunningTests();
+        }
+
+        loadExecutions()
+        {
+            this.testService.getTestsExecutions(this.getLimit(), this.offset)
+               .then(executions => {
+                   if (executions.length === 0 && !_.isUndefined(this.executions) && _.size(this.executions) > 0) {
+                      this.offset -= this.getLimit();
+                      this.lastPage = true;
+                      this.ngToast.create({
+                          className: 'warning',
+                          content: 'This is last page.'
+                      });
+                   } else {
+                      this.executions = this.mapExecutions(executions);
+                      if (executions.length >= this.getLimit()) {
+                          this.lastPage = false;
+                      }
+                      this.firstPage = this.offset === 0;
+                   }
+               });
         }
 
         startRefreshingRunningTests()
@@ -76,6 +100,25 @@ export const TestExecutionsComponent = {
         areExecutionsEmpty()
         {
             return !_.isUndefined(this.executions) && _.isEmpty(this.executions);
+        }
+
+        nextPage()
+        {
+            this.offset += this.getLimit();
+            this.loadExecutions();
+        }
+
+        previousPage()
+        {
+            if (this.offset >= this.getLimit()) {
+                this.offset -= this.getLimit();
+                this.loadExecutions();
+            }
+        }
+
+        getLimit()
+        {
+            return 50;
         }
     }
 };

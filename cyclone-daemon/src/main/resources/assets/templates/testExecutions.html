@@ -41,3 +41,12 @@
         </h5>
     </li>
 </ul>
+
+<div class="mt-3">
+    <button type="button" class="btn btn-light" ng-click="$ctrl.previousPage()" ng-if="!$ctrl.firstPage">
+        Previous page
+    </button>
+    <button type="button" class="btn btn-light float-right" ng-click="$ctrl.nextPage()" ng-if="!$ctrl.lastPage">
+        Next page
+    </button>
+</div>
