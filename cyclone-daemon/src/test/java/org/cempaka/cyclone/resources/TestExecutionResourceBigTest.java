@@ -44,6 +44,19 @@ public class TestExecutionResourceBigTest
     }
 
     @Test
+    public void shouldOffsetTestExecutions()
+    {
+        //given
+        final int limit = 10;
+        //when
+        final Set<TestExecution> testExecutions = TEST_CLIENT.getTestExecutions(limit, 0);
+        final Set<TestExecution> emptyExecutions = TEST_CLIENT.getTestExecutions(limit, testExecutions.size());
+        //then
+        assertThat(testExecutions.size()).isLessThanOrEqualTo(limit);
+        assertThat(emptyExecutions).isEmpty();
+    }
+
+    @Test
     public void shouldReturnTestExecution()
     {
         //given

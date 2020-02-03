@@ -1,6 +1,7 @@
 package org.cempaka.cyclone.storage.repositories;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.cempaka.cyclone.tests.TestExecution;
@@ -15,7 +16,7 @@ public interface TestExecutionRepository
 
     void put(TestExecution testExecution);
 
-    Set<TestExecution> getAll();
+    List<TestExecution> getAll(int limit, int offset);
 
     Set<TestExecution> get(String node, String state);
 

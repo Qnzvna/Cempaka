@@ -93,6 +93,12 @@ public class CycloneTestClient
         return runRequest(httpGet, new TypeReference<Set<TestExecution>>() {});
     }
 
+    public Set<TestExecution> getTestExecutions(final int limit, final int offset)
+    {
+        final HttpGet httpGet = new HttpGet(apiUrl + "/tests/executions?limit=" + limit + "&offset=" + offset);
+        return runRequest(httpGet, new TypeReference<Set<TestExecution>>() {});
+    }
+
     public Set<TestExecution> getTestExecutions(final UUID id)
     {
         final HttpGet httpGet = new HttpGet(apiUrl + "/tests/executions/" + id);

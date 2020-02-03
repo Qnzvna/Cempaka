@@ -7,10 +7,12 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
@@ -30,9 +32,10 @@ public class TestExecutionResource
     }
 
     @GET
-    public Response getAll()
+    public Response getAll(@DefaultValue("50") @QueryParam("limit") final int limit,
+                           @DefaultValue("0") @QueryParam("offset") final int offset)
     {
-        return Response.ok().entity(testExecutionRepository.getAll()).build();
+        return Response.ok().entity(testExecutionRepository.getAll(limit, offset)).build();
     }
 
     @GET

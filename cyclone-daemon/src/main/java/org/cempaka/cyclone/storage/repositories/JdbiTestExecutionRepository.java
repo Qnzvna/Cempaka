@@ -1,10 +1,12 @@
 package org.cempaka.cyclone.storage.repositories;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toSet;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -57,9 +59,11 @@ public class JdbiTestExecutionRepository implements TestExecutionRepository
     }
 
     @Override
-    public Set<TestExecution> getAll()
+    public List<TestExecution> getAll(final int limit, final int offset)
     {
-        return testExecutionDataAccess.getAll();
+        checkArgument(limit > 0);
+        checkArgument(offset >= 0);
+        return testExecutionDataAccess.getAll(limit, offset);
     }
 
     @Override
