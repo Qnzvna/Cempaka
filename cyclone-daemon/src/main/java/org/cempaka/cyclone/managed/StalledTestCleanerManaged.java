@@ -50,7 +50,6 @@ public class StalledTestCleanerManaged implements Managed
         this.executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
             .setNameFormat("StalledTestCleanerManaged-%d")
             .build());
-        ;
     }
 
     @Override
@@ -66,7 +65,7 @@ public class StalledTestCleanerManaged implements Managed
         }, 0, stalledTestCleanerConfiguration.getPeriodInterval(), TimeUnit.MINUTES);
     }
 
-    private void execute()
+    void execute()
     {
         testExecutionRepository.getUpdatedLaterThan(
             Instant.now(clock).minusSeconds(clusterConfiguration.getHeartbeatInterval()))
