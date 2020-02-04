@@ -1,6 +1,7 @@
 package org.cempaka.cyclone.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 import com.google.common.collect.ImmutableSet;
 import java.io.File;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.cempaka.cyclone.CycloneTestClient;
+import org.cempaka.cyclone.beans.TestState;
 import org.cempaka.cyclone.tests.TestExecution;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -25,6 +27,10 @@ public class TestExecutionResourceBigTest
     {
         PARCEL_ID = TEST_CLIENT.uploadParcel(new File(Tests.EXAMPLES));
         TEST_EXECUTION_ID = TEST_CLIENT.startTest(Tests.getExampleTest(PARCEL_ID, ImmutableSet.of(Tests.NODE)));
+        await().untilAsserted(() ->
+            assertThat(TEST_CLIENT.getTestExecutions(TEST_EXECUTION_ID))
+                .hasOnlyOneElementSatisfying(testExecution ->
+                    assertThat(testExecution.getState()).isEqualTo(TestState.ENDED)));
     }
 
     @AfterClass
@@ -78,6 +84,33 @@ public class TestExecutionResourceBigTest
         final Set<UUID> keys = TEST_CLIENT.getTestExecutionKeys();
         //then
         assertThat(keys).contains(TEST_EXECUTION_ID);
+    }
+
+    @Test
+    public void shouldSearchByStateReturnTests()
+    {
+        //given
+        final String state = TestState.ENDED;
+        //when
+        final List<TestExecution> testExecutions = TEST_CLIENT
+            .searchTestExecutions(ImmutableSet.of(state), ImmutableSet.of());
+        //then
+        assertThat(testExecutions).isNotEmpty()
+            .allSatisfy(testExecution -> assertThat(testExecution.getState()).isEqualTo(state));
+    }
+
+    @Test
+    public void shouldSearchByNameReturnTests()
+    {
+        //given
+        final String name = "TeSt";
+        //when
+        final List<TestExecution> testExecutions = TEST_CLIENT
+            .searchTestExecutions(ImmutableSet.of(), ImmutableSet.of(name));
+        //then
+        assertThat(testExecutions).isNotEmpty()
+            .allSatisfy(testExecution ->
+                assertThat(testExecution.getProperties().getTestName()).containsIgnoringCase(name));
     }
 
     @Test

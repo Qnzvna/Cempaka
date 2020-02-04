@@ -17,6 +17,8 @@ public interface TestExecutionRepository
 
     void put(TestExecution testExecution);
 
+    TestExecutionsPage search(Set<String> states, Set<String> names, int limit, int offset);
+
     TestExecutionsPage getPage(int limit, int offset);
 
     Set<TestExecution> get(String node, String state);

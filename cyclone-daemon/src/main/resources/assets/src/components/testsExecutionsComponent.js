@@ -33,12 +33,7 @@ export const TestExecutionsComponent = {
 
         loadExecutions()
         {
-            this.testService.getTestsExecutions(this.getLimit(), this.offset)
-               .then(executionsPage => {
-                   this.executions = this.mapExecutions(executionsPage.testExecutions);
-                   this.lastPage = !executionsPage.hasNext;
-                   this.firstPage = this.offset === 0;
-               });
+            this.testService.getTestsExecutions(this.getLimit(), this.offset).then(page => this.applyExecutionsPage(page));
         }
 
         startRefreshingRunningTests()
@@ -56,13 +51,20 @@ export const TestExecutionsComponent = {
 
         searchTests()
         {
-            console.log(this.search);
+            this.testService.searchTests(this.search).then(page => this.applyExecutionsPage(page));
         }
 
         reloadTestExecution(id)
         {
             return this.testService.getTestExecution(id)
                 .then(executions => this.executions[id] = this.mapNodesExecutions(executions));
+        }
+
+        applyExecutionsPage(executionsPage)
+        {
+            this.executions = this.mapExecutions(executionsPage.testExecutions);
+            this.lastPage = !executionsPage.hasNext;
+            this.firstPage = this.offset === 0;
         }
 
         mapExecutions(executions)

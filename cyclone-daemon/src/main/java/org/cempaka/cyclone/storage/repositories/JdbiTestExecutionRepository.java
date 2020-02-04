@@ -62,11 +62,31 @@ public class JdbiTestExecutionRepository implements TestExecutionRepository
     }
 
     @Override
+    public TestExecutionsPage search(final Set<String> states,
+                                     final Set<String> names,
+                                     final int limit,
+                                     final int offset)
+    {
+        checkNotNull(states);
+        checkNotNull(names);
+        checkArgument(limit > 0);
+        checkArgument(offset >= 0);
+        final List<TestExecution> executions = testExecutionDataAccess
+            .search(states, String.join("|", names), limit, offset);
+        return getTestExecutionsPage(limit, executions);
+    }
+
+    @Override
     public TestExecutionsPage getPage(final int limit, final int offset)
     {
         checkArgument(limit > 0);
         checkArgument(offset >= 0);
         final List<TestExecution> executions = testExecutionDataAccess.getAll(limit + 1, offset);
+        return getTestExecutionsPage(limit, executions);
+    }
+
+    private TestExecutionsPage getTestExecutionsPage(final int limit, final List<TestExecution> executions)
+    {
         return ImmutableTestExecutionsPage.builder()
             .hasNext(executions.size() > limit)
             .addAllTestExecutions(executions.stream().limit(limit).collect(Collectors.toList()))

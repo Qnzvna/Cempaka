@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -86,6 +88,15 @@ public class CycloneTestClient
     {
         final HttpPost httpPost = new HttpPost(apiUrl + String.format("/tests/%s/stop", testId));
         runRequest(null, Void.class, httpPost);
+    }
+
+    public List<TestExecution> searchTestExecutions(final Set<String> states, final Set<String> names)
+    {
+        final String parameters = Stream.concat(states.stream().map(state -> "state=" + state),
+            names.stream().map(name -> "name=" + name))
+            .collect(Collectors.joining("&"));
+        final HttpGet httpGet = new HttpGet(apiUrl + "/tests/executions/search?" + parameters);
+        return runRequest(httpGet, new TypeReference<TestExecutionsPage>() {}).getTestExecutions();
     }
 
     public List<TestExecution> getTestExecutions()

@@ -2,6 +2,7 @@ package org.cempaka.cyclone.resources;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -15,6 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.cempaka.cyclone.beans.TestState;
 import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
 
 @Singleton
@@ -36,6 +38,19 @@ public class TestExecutionResource
                            @DefaultValue("0") @QueryParam("offset") final int offset)
     {
         return Response.ok().entity(testExecutionRepository.getPage(limit, offset)).build();
+    }
+
+    @GET
+    @Path("/search")
+    public Response search(@QueryParam("state") final Set<String> states,
+                           @QueryParam("name") final Set<String> names,
+                           @DefaultValue("50") @QueryParam("limit") final int limit,
+                           @DefaultValue("0") @QueryParam("offset") final int offset)
+    {
+        return Response.ok().entity(testExecutionRepository.search(states.isEmpty() ? TestState.ALL : states,
+            names,
+            limit,
+            offset)).build();
     }
 
     @GET
