@@ -35,7 +35,7 @@ public class TestExecutionResource
     public Response getAll(@DefaultValue("50") @QueryParam("limit") final int limit,
                            @DefaultValue("0") @QueryParam("offset") final int offset)
     {
-        return Response.ok().entity(testExecutionRepository.getAll(limit, offset)).build();
+        return Response.ok().entity(testExecutionRepository.getPage(limit, offset)).build();
     }
 
     @GET

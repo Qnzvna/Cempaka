@@ -27,6 +27,7 @@ import org.apache.http.util.EntityUtils;
 import org.cempaka.cyclone.beans.MetricDataPoint;
 import org.cempaka.cyclone.beans.NodeCapacity;
 import org.cempaka.cyclone.beans.ParcelUpload;
+import org.cempaka.cyclone.resources.TestExecutionsPage;
 import org.cempaka.cyclone.tests.Test;
 import org.cempaka.cyclone.tests.TestExecution;
 import org.cempaka.cyclone.tests.TestExecutionProperties;
@@ -87,16 +88,16 @@ public class CycloneTestClient
         runRequest(null, Void.class, httpPost);
     }
 
-    public Set<TestExecution> getTestExecutions()
+    public List<TestExecution> getTestExecutions()
     {
         final HttpGet httpGet = new HttpGet(apiUrl + "/tests/executions");
-        return runRequest(httpGet, new TypeReference<Set<TestExecution>>() {});
+        return runRequest(httpGet, new TypeReference<TestExecutionsPage>() {}).getTestExecutions();
     }
 
-    public Set<TestExecution> getTestExecutions(final int limit, final int offset)
+    public List<TestExecution> getTestExecutions(final int limit, final int offset)
     {
         final HttpGet httpGet = new HttpGet(apiUrl + "/tests/executions?limit=" + limit + "&offset=" + offset);
-        return runRequest(httpGet, new TypeReference<Set<TestExecution>>() {});
+        return runRequest(httpGet, new TypeReference<TestExecutionsPage>() {}).getTestExecutions();
     }
 
     public Set<TestExecution> getTestExecutions(final UUID id)

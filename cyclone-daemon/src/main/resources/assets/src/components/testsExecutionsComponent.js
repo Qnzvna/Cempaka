@@ -24,21 +24,10 @@ export const TestExecutionsComponent = {
         loadExecutions()
         {
             this.testService.getTestsExecutions(this.getLimit(), this.offset)
-               .then(executions => {
-                   if (executions.length === 0 && !_.isUndefined(this.executions) && _.size(this.executions) > 0) {
-                      this.offset -= this.getLimit();
-                      this.lastPage = true;
-                      this.ngToast.create({
-                          className: 'warning',
-                          content: 'This is last page.'
-                      });
-                   } else {
-                      this.executions = this.mapExecutions(executions);
-                      if (executions.length >= this.getLimit()) {
-                          this.lastPage = false;
-                      }
-                      this.firstPage = this.offset === 0;
-                   }
+               .then(executionsPage => {
+                   this.executions = this.mapExecutions(executionsPage.testExecutions);
+                   this.lastPage = !executionsPage.hasNext;
+                   this.firstPage = this.offset === 0;
                });
         }
 
@@ -110,10 +99,8 @@ export const TestExecutionsComponent = {
 
         previousPage()
         {
-            if (this.offset >= this.getLimit()) {
-                this.offset -= this.getLimit();
-                this.loadExecutions();
-            }
+            this.offset -= this.getLimit();
+            this.loadExecutions();
         }
 
         getLimit()

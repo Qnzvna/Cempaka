@@ -10,6 +10,16 @@
     No executions. <a href="/#!/tests/start">Start test</a> to see executions here.
 </div>
 
+<div class="d-flex mb-3">
+    <button type="button" class="btn btn-light" ng-click="$ctrl.previousPage()" ng-if="!$ctrl.firstPage">
+        <i class="fas fa-angle-left"></i>
+        Previous page
+    </button>
+    <button type="button" class="btn btn-light ml-auto" ng-click="$ctrl.nextPage()" ng-if="!$ctrl.lastPage">
+        Next page <i class="fas fa-angle-right"></i>
+    </button>
+</div>
+
 <ul class="list-group">
     <li class="list-group-item" ng-repeat="(id, execution) in $ctrl.executions">
         <div class="btn-group float-right" role="group">
@@ -41,12 +51,3 @@
         </h5>
     </li>
 </ul>
-
-<div class="mt-3">
-    <button type="button" class="btn btn-light" ng-click="$ctrl.previousPage()" ng-if="!$ctrl.firstPage">
-        Previous page
-    </button>
-    <button type="button" class="btn btn-light float-right" ng-click="$ctrl.nextPage()" ng-if="!$ctrl.lastPage">
-        Next page
-    </button>
-</div>

@@ -16,8 +16,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.cempaka.cyclone.resources.ImmutableTestExecutionsPage;
+import org.cempaka.cyclone.resources.TestExecutionsPage;
 import org.cempaka.cyclone.tests.ImmutableTestExecution;
 import org.cempaka.cyclone.tests.TestExecution;
 
@@ -73,15 +76,18 @@ public class MemoryTestExecutionRepository implements TestExecutionRepository
     }
 
     @Override
-    public List<TestExecution> getAll(final int limit, final int offset)
+    public TestExecutionsPage getPage(final int limit, final int offset)
     {
         checkArgument(limit > 0);
         checkArgument(offset >= 0);
-        return storage.values().stream()
+        final List<TestExecution> executions = storage.values().stream()
             .sorted(Comparator.comparing(testExecution -> testExecution.getId().toString()))
             .skip(offset)
-            .limit(limit)
             .collect(toImmutableList());
+        return ImmutableTestExecutionsPage.builder()
+            .hasNext(executions.size() > limit)
+            .addAllTestExecutions(executions.stream().limit(limit).collect(Collectors.toList()))
+            .build();
     }
 
     @Override

@@ -9,8 +9,11 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.cempaka.cyclone.resources.ImmutableTestExecutionsPage;
+import org.cempaka.cyclone.resources.TestExecutionsPage;
 import org.cempaka.cyclone.storage.jdbi.TestExecutionDataAccess;
 import org.cempaka.cyclone.tests.TestExecution;
 
@@ -59,11 +62,15 @@ public class JdbiTestExecutionRepository implements TestExecutionRepository
     }
 
     @Override
-    public List<TestExecution> getAll(final int limit, final int offset)
+    public TestExecutionsPage getPage(final int limit, final int offset)
     {
         checkArgument(limit > 0);
         checkArgument(offset >= 0);
-        return testExecutionDataAccess.getAll(limit, offset);
+        final List<TestExecution> executions = testExecutionDataAccess.getAll(limit + 1, offset);
+        return ImmutableTestExecutionsPage.builder()
+            .hasNext(executions.size() > limit)
+            .addAllTestExecutions(executions.stream().limit(limit).collect(Collectors.toList()))
+            .build();
     }
 
     @Override
