@@ -17,18 +17,23 @@ export const TestExecutionsComponent = {
             this.offset = 0;
             this.firstPage = true;
             this.lastPage = true;
+            this.search = {
+                states: {
+                    initialized: true,
+                    started: true,
+                    ended: true,
+                    aborted: true,
+                    error: true,
+                },
+                name: ""
+            };
             this.loadExecutions();
             this.startRefreshingRunningTests();
         }
 
         loadExecutions()
         {
-            this.testService.getTestsExecutions(this.getLimit(), this.offset)
-               .then(executionsPage => {
-                   this.executions = this.mapExecutions(executionsPage.testExecutions);
-                   this.lastPage = !executionsPage.hasNext;
-                   this.firstPage = this.offset === 0;
-               });
+            this.testService.getTestsExecutions(this.getLimit(), this.offset).then(page => this.applyExecutionsPage(page));
         }
 
         startRefreshingRunningTests()
@@ -44,10 +49,22 @@ export const TestExecutionsComponent = {
             }, 5000);
         }
 
+        searchTests()
+        {
+            this.testService.searchTests(this.search).then(page => this.applyExecutionsPage(page));
+        }
+
         reloadTestExecution(id)
         {
             return this.testService.getTestExecution(id)
                 .then(executions => this.executions[id] = this.mapNodesExecutions(executions));
+        }
+
+        applyExecutionsPage(executionsPage)
+        {
+            this.executions = this.mapExecutions(executionsPage.testExecutions);
+            this.lastPage = !executionsPage.hasNext;
+            this.firstPage = this.offset === 0;
         }
 
         mapExecutions(executions)

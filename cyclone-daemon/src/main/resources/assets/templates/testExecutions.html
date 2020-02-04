@@ -10,6 +10,30 @@
     No executions. <a href="/#!/tests/start">Start test</a> to see executions here.
 </div>
 
+<div class="d-flex">
+    <div class="btn-group btn-group-sm">
+        <button class="btn btn-light" ng-model="$ctrl.search.states.initialized" uib-btn-checkbox>Initialized</button>
+        <button class="btn btn-light" ng-model="$ctrl.search.states.started" uib-btn-checkbox>Started</button>
+        <button class="btn btn-light" ng-model="$ctrl.search.states.ended" uib-btn-checkbox>Ended</button>
+        <button class="btn btn-light" ng-model="$ctrl.search.states.aborted" uib-btn-checkbox>Aborted</button>
+        <button class="btn btn-light" ng-model="$ctrl.search.states.error" uib-btn-checkbox>Error</button>
+    </div>
+    <div class="input-group input-group-sm ml-2">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="name-input">Test name</span>
+        </div>
+        <input type="text"
+               class="form-control"
+               aria-label="Name"
+               ng-model="$ctrl.search.name"
+               aria-describedby="name-input">
+    </div>
+    <button type="button" class="btn btn-secondary btn-sm ml-2" ng-click="$ctrl.searchTests()">
+        <i class="fas fa-search"></i>
+    </button>
+</div>
+
+
 <div class="d-flex mb-3">
     <button type="button" class="btn btn-light" ng-click="$ctrl.previousPage()" ng-if="!$ctrl.firstPage">
         <i class="fas fa-angle-left"></i>

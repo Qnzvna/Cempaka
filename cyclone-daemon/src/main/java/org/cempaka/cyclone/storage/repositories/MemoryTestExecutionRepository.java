@@ -3,6 +3,7 @@ package org.cempaka.cyclone.storage.repositories;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableSet.of;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 import com.google.common.collect.ImmutableSet;
@@ -76,6 +77,29 @@ public class MemoryTestExecutionRepository implements TestExecutionRepository
     }
 
     @Override
+    public TestExecutionsPage search(final Set<String> states,
+                                     final Set<String> names,
+                                     final int limit,
+                                     final int offset)
+    {
+        checkNotNull(states);
+        checkNotNull(names);
+        checkArgument(limit > 0);
+        checkArgument(offset >= 0);
+        final List<TestExecution> executions = storage.values().stream()
+            .filter(testExecution -> states.contains(testExecution.getState()))
+            .filter(testExecution -> like(names, testExecution))
+            .skip(offset)
+            .collect(Collectors.toList());
+        return getTestExecutionsPage(limit, executions);
+    }
+
+    private boolean like(final Set<String> names, final TestExecution testExecution)
+    {
+        return names.stream().anyMatch(name -> testExecution.getProperties().getTestName().contains(name));
+    }
+
+    @Override
     public TestExecutionsPage getPage(final int limit, final int offset)
     {
         checkArgument(limit > 0);
@@ -84,6 +108,11 @@ public class MemoryTestExecutionRepository implements TestExecutionRepository
             .sorted(Comparator.comparing(testExecution -> testExecution.getId().toString()))
             .skip(offset)
             .collect(toImmutableList());
+        return getTestExecutionsPage(limit, executions);
+    }
+
+    private TestExecutionsPage getTestExecutionsPage(final int limit, final List<TestExecution> executions)
+    {
         return ImmutableTestExecutionsPage.builder()
             .hasNext(executions.size() > limit)
             .addAllTestExecutions(executions.stream().limit(limit).collect(Collectors.toList()))

@@ -18,6 +18,30 @@ export class TestsService
             });
     }
 
+    searchTests(search)
+    {
+        const states = _.chain(_.keys(search.states))
+            .filter(key => search.states[key])
+            .map(key => key.toUpperCase())
+            .map(key => `state=${key}`)
+            .value()
+            .join('&');
+        const names = _.chain(search.name.split(' '))
+            .filter(name => name.length > 0)
+            .map(name => `name=${name}`)
+            .value()
+            .join('&')
+        const params = _.filter([names, states], value => value.length > 0).join('&');
+        return this.$http({
+            method: 'GET',
+            url: `/api/tests/executions/search?${params}`
+        }).then(response => response.data,
+            error => {
+                this.ngToast.danger(`Failed to get test executions. ${error.data.message}`);
+                throw error;
+            });
+    }
+
     startTest(executionProperties)
     {
         return this.$http({

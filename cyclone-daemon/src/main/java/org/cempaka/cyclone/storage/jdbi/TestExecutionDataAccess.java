@@ -2,7 +2,6 @@ package org.cempaka.cyclone.storage.jdbi;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.cempaka.cyclone.storage.mappers.TestExecutionRowMapper;
 import org.cempaka.cyclone.tests.TestExecution;
@@ -10,6 +9,7 @@ import org.cempaka.cyclone.tests.TestExecutionProperties;
 import org.jdbi.v3.json.Json;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
@@ -28,6 +28,13 @@ public interface TestExecutionDataAccess
     void updateTimestamp(@Bind("id") String id,
                          @Bind("node") String node,
                          @Bind("update_timestamp") Timestamp timestamp);
+
+    @RegisterRowMapper(TestExecutionRowMapper.class)
+    @SqlQuery("SELECT id, node, state, properties FROM test_executions WHERE state IN (<states>) AND properties->>'testName' ~* :name ORDER BY id LIMIT :limit OFFSET :offset")
+    List<TestExecution> search(@BindList("states") Set<String> states,
+                               @Bind("name") String nameLike,
+                               @Bind("limit") int limit,
+                               @Bind("offset") int offset);
 
     @RegisterRowMapper(TestExecutionRowMapper.class)
     @SqlQuery("SELECT id, node, state, properties FROM test_executions ORDER BY id LIMIT :limit OFFSET :offset")
