@@ -17,6 +17,16 @@ export const TestExecutionsComponent = {
             this.offset = 0;
             this.firstPage = true;
             this.lastPage = true;
+            this.search = {
+                states: {
+                    initialized: true,
+                    started: true,
+                    ended: true,
+                    aborted: true,
+                    error: true,
+                },
+                name: ""
+            };
             this.loadExecutions();
             this.startRefreshingRunningTests();
         }
@@ -42,6 +52,11 @@ export const TestExecutionsComponent = {
                             .then(() => _.pull(loadingExecutions, id)));
                 }
             }, 5000);
+        }
+
+        searchTests()
+        {
+            console.log(this.search);
         }
 
         reloadTestExecution(id)
