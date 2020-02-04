@@ -1,14 +1,19 @@
 package org.cempaka.cyclone.storage.repositories;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toSet;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.cempaka.cyclone.resources.ImmutableTestExecutionsPage;
+import org.cempaka.cyclone.resources.TestExecutionsPage;
 import org.cempaka.cyclone.storage.jdbi.TestExecutionDataAccess;
 import org.cempaka.cyclone.tests.TestExecution;
 
@@ -57,9 +62,15 @@ public class JdbiTestExecutionRepository implements TestExecutionRepository
     }
 
     @Override
-    public Set<TestExecution> getAll()
+    public TestExecutionsPage getPage(final int limit, final int offset)
     {
-        return testExecutionDataAccess.getAll();
+        checkArgument(limit > 0);
+        checkArgument(offset >= 0);
+        final List<TestExecution> executions = testExecutionDataAccess.getAll(limit + 1, offset);
+        return ImmutableTestExecutionsPage.builder()
+            .hasNext(executions.size() > limit)
+            .addAllTestExecutions(executions.stream().limit(limit).collect(Collectors.toList()))
+            .build();
     }
 
     @Override

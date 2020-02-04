@@ -1,0 +1,6 @@
+comment:
+  layout: diff
+coverage:
+  status:
+    project: false
+    patch: off

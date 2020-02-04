@@ -1,21 +1,26 @@
 package org.cempaka.cyclone.storage.repositories;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.cempaka.cyclone.resources.ImmutableTestExecutionsPage;
+import org.cempaka.cyclone.resources.TestExecutionsPage;
 import org.cempaka.cyclone.tests.ImmutableTestExecution;
 import org.cempaka.cyclone.tests.TestExecution;
 
@@ -71,9 +76,18 @@ public class MemoryTestExecutionRepository implements TestExecutionRepository
     }
 
     @Override
-    public Set<TestExecution> getAll()
+    public TestExecutionsPage getPage(final int limit, final int offset)
     {
-        return ImmutableSet.copyOf(storage.values());
+        checkArgument(limit > 0);
+        checkArgument(offset >= 0);
+        final List<TestExecution> executions = storage.values().stream()
+            .sorted(Comparator.comparing(testExecution -> testExecution.getId().toString()))
+            .skip(offset)
+            .collect(toImmutableList());
+        return ImmutableTestExecutionsPage.builder()
+            .hasNext(executions.size() > limit)
+            .addAllTestExecutions(executions.stream().limit(limit).collect(Collectors.toList()))
+            .build();
     }
 
     @Override
@@ -81,7 +95,7 @@ public class MemoryTestExecutionRepository implements TestExecutionRepository
     {
         return get(key -> key.getNode().equals(node)).stream()
             .filter(testExecution -> testExecution.getState().equals(state))
-            .collect(Collectors.toSet());
+            .collect(toImmutableSet());
     }
 
     @Override
@@ -97,7 +111,7 @@ public class MemoryTestExecutionRepository implements TestExecutionRepository
             .filter(entry -> entry.getValue().isBefore(timestamp))
             .map(Map.Entry::getKey)
             .map(storage::get)
-            .collect(Collectors.toSet());
+            .collect(toImmutableSet());
     }
 
     @Override
@@ -123,7 +137,7 @@ public class MemoryTestExecutionRepository implements TestExecutionRepository
         return ImmutableSet.copyOf(storage.keySet()).stream().map(TestExecutionKey::getId).collect(toImmutableSet());
     }
 
-    private class TestExecutionKey
+    private static class TestExecutionKey
     {
         private final UUID id;
         private final String node;

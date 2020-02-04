@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.common.collect.ImmutableSet;
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.cempaka.cyclone.CycloneTestClient;
@@ -38,9 +39,22 @@ public class TestExecutionResourceBigTest
     {
         //given
         //when
-        final Set<TestExecution> testExecutions = TEST_CLIENT.getTestExecutions();
+        final List<TestExecution> testExecutions = TEST_CLIENT.getTestExecutions();
         //then
         assertThat(testExecutions).extracting(TestExecution::getId).contains(TEST_EXECUTION_ID);
+    }
+
+    @Test
+    public void shouldOffsetTestExecutions()
+    {
+        //given
+        final int limit = 10;
+        //when
+        final List<TestExecution> testExecutions = TEST_CLIENT.getTestExecutions(limit, 0);
+        final List<TestExecution> emptyExecutions = TEST_CLIENT.getTestExecutions(limit, testExecutions.size());
+        //then
+        assertThat(testExecutions.size()).isLessThanOrEqualTo(limit);
+        assertThat(emptyExecutions).isEmpty();
     }
 
     @Test
