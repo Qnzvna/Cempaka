@@ -1,0 +1,370 @@
+openapi: 3.0.0
+info:
+  title: "Cyclone Cempaka API"
+  version: 1.0.0
+tags:
+  - name: cluster
+  - name: parcels
+  - name: tests
+  - name: metrics
+  - name: executions
+paths:
+  /cluster/status:
+    get:
+      description: Describes cluster status
+      tags:
+        - cluster
+      responses:
+        "200":
+          description: Cluster status returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClusterStatus'
+  /cluster/{node}/capacity:
+    parameters:
+      - name: node
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      description: Describes current node capacity
+      tags:
+        - cluster
+      responses:
+        "200":
+          description: Node capacity returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NodeCapacity'
+  /parcels:
+    post:
+      description: Uploads parcel
+      tags:
+        - parcels
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParcelUpload'
+      responses:
+        "200":
+          description: Parcel uploaded
+          content:
+            application/json:
+              schema:
+                type: string
+                format: uuid
+  /parcels/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    delete:
+      description: Deletes parcel
+      tags:
+        - parcels
+      responses:
+        "200":
+          description: Parcel deleted
+  /tests:
+    get:
+      description: Describes tests
+      tags:
+        - tests
+      responses:
+        "200":
+          description: All tests returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Test'
+  /tests/start:
+    post:
+      description: Starts test
+      tags:
+        - tests
+      responses:
+        "200":
+          description: Test started
+          content:
+            application/json:
+              schema:
+                type: string
+                format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestExecutionProperties'
+  /tests/{id}/stop:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      description: Stops test
+      tags:
+        - tests
+      responses:
+        "200":
+          description: Test stopped
+  /tests/executions/{id}/metrics:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      description: Describes test execution metrics
+      tags:
+        - metrics
+      responses:
+        "200":
+          description: Metrics returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MetricDataPoint'
+  /tests/executions/{id}/metrics/{name}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      description: Describes test execution metrics under name
+      tags:
+        - metrics
+      responses:
+        "200":
+          description: Metrics returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MetricDataPoint'
+  /test/executions:
+    parameters:
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 50
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          default: 0
+    get:
+      description: Describes test executions
+      tags:
+        - executions
+      responses:
+        "200":
+          description: Test executions page returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestExecutionsPage'
+  /test/executions/search:
+    parameters:
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 50
+      - name: offset
+        in: query
+        schema:
+          type: integer
+          default: 0
+      - name: state
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+      - name: name
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+    get:
+      description: Searches test executions
+      tags:
+        - executions
+      responses:
+        "200":
+          description: Test executions page returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestExecutionsPage'
+  /test/executions/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      description: Describes test execution
+      tags:
+        - executions
+      responses:
+        "200":
+          description: Test execution returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestExecution'
+    delete:
+      description: Deletes test execution
+      tags:
+        - executions
+      responses:
+        "204":
+          description: Test execution deleted
+  /test/executions/keys:
+    get:
+      description: Describes test execution keys
+      tags:
+        - executions
+      responses:
+        "200":
+          description: Test execution keys returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+
+components:
+  schemas:
+    ClusterStatus:
+      type: object
+      description: Cluster status
+      additionalProperties:
+        type: boolean
+        description: State of the node
+    NodeCapacity:
+      type: object
+      description: Node capacity
+      properties:
+        idleWorkers:
+          type: integer
+          description: Number of idle workers
+        runningTests:
+          type: integer
+          description: Number of currently running tests on node
+    ParcelUpload:
+      type: object
+      properties:
+        location:
+          type: string
+          format: uri
+          description: Parcel url to download
+    Test:
+      type: object
+      properties:
+        parcelId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/TestParameter'
+    TestParameter:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        defaultValue:
+          type: string
+    TestExecutionProperties:
+      type: object
+      properties:
+        parcelId:
+          type: string
+          format: uuid
+        testName:
+          type: string
+        loopCount:
+          type: integer
+        threadsNumber:
+          type: integer
+        parameters:
+          type: object
+          additionalProperties:
+            type: string
+        nodes:
+          type: array
+          items:
+            type: string
+        jvmOptions:
+          type: string
+    MetricDataPoint:
+      type: object
+      properties:
+        timestamp:
+          type: integer
+        name:
+          type: string
+        value:
+          type: number
+    TestExecution:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        node:
+          type: string
+        state:
+          type: string
+        properties:
+          type: object
+          $ref: '#/components/schemas/TestExecutionProperties'
+    TestExecutionsPage:
+      type: object
+      properties:
+        testExecutions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TestExecution'
+        hasNext:
+          type: boolean
