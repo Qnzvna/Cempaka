@@ -15,6 +15,12 @@
             <artifactId>cyclone-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.cempaka.cyclone</groupId>
+            <artifactId>cyclone-client</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>io.dropwizard</groupId>

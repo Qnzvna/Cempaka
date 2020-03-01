@@ -106,7 +106,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TestExecutionProperties'
+              $ref: '#/components/schemas/TestExecutionParameters'
   /tests/{id}/stop:
     parameters:
       - name: id
@@ -315,7 +315,7 @@ components:
           type: string
         defaultValue:
           type: string
-    TestExecutionProperties:
+    TestExecutionParameters:
       type: object
       properties:
         parcelId:
@@ -356,9 +356,9 @@ components:
           type: string
         state:
           type: string
-        properties:
+        parameters:
           type: object
-          $ref: '#/components/schemas/TestExecutionProperties'
+          $ref: '#/components/schemas/TestExecutionParameters'
     TestExecutionsPage:
       type: object
       properties:

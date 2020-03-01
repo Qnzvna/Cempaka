@@ -5,18 +5,19 @@ import static org.awaitility.Awaitility.await;
 
 import com.google.common.collect.ImmutableSet;
 import java.io.File;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import org.cempaka.cyclone.CycloneTestClient;
-import org.cempaka.cyclone.beans.MetricDataPoint;
+import org.cempaka.cyclone.client.ApacheCycloneClient;
+import org.cempaka.cyclone.client.CycloneClient;
+import org.cempaka.cyclone.client.MetricDataPoint;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class MetricsResourceBigTest
 {
-    private static final CycloneTestClient TEST_CLIENT = new CycloneTestClient(Tests.API);
+    private static final CycloneClient TEST_CLIENT = ApacheCycloneClient.builder().withApiUrl(Tests.API).build();
 
     private static UUID PARCEL_ID;
 
@@ -41,7 +42,7 @@ public class MetricsResourceBigTest
         await().pollInterval(5, TimeUnit.SECONDS)
             .atMost(30, TimeUnit.SECONDS)
             .untilAsserted(() -> {
-                final List<MetricDataPoint> metrics = TEST_CLIENT.getMetrics(executionId);
+                final Set<MetricDataPoint> metrics = TEST_CLIENT.getTestExecutionMetrics(executionId);
                 assertThat(metrics).isNotEmpty().anySatisfy(metricDataPoint -> {
                     assertThat(metricDataPoint.getName()).isEqualTo("test1:success:count");
                     assertThat(metricDataPoint.getValue()).isEqualTo(1);

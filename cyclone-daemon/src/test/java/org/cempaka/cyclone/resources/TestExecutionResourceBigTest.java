@@ -8,16 +8,17 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import org.cempaka.cyclone.CycloneTestClient;
 import org.cempaka.cyclone.beans.TestState;
-import org.cempaka.cyclone.tests.TestExecution;
+import org.cempaka.cyclone.client.ApacheCycloneClient;
+import org.cempaka.cyclone.client.CycloneClient;
+import org.cempaka.cyclone.client.TestExecution;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestExecutionResourceBigTest
 {
-    private static final CycloneTestClient TEST_CLIENT = new CycloneTestClient(Tests.API);
+    private static final CycloneClient TEST_CLIENT = ApacheCycloneClient.builder().withApiUrl(Tests.API).build();
 
     private static UUID PARCEL_ID;
     private static UUID TEST_EXECUTION_ID;
@@ -45,7 +46,7 @@ public class TestExecutionResourceBigTest
     {
         //given
         //when
-        final List<TestExecution> testExecutions = TEST_CLIENT.getTestExecutions();
+        final List<TestExecution> testExecutions = TEST_CLIENT.getTestExecutions().getTestExecutions();
         //then
         assertThat(testExecutions).extracting(TestExecution::getId).contains(TEST_EXECUTION_ID);
     }
@@ -56,8 +57,9 @@ public class TestExecutionResourceBigTest
         //given
         final int limit = 10;
         //when
-        final List<TestExecution> testExecutions = TEST_CLIENT.getTestExecutions(limit, 0);
-        final List<TestExecution> emptyExecutions = TEST_CLIENT.getTestExecutions(limit, testExecutions.size());
+        final List<TestExecution> testExecutions = TEST_CLIENT.getTestExecutionsLimitedBy(limit).getTestExecutions();
+        final List<TestExecution> emptyExecutions = TEST_CLIENT.getTestExecutions(limit, testExecutions.size())
+            .getTestExecutions();
         //then
         assertThat(testExecutions.size()).isLessThanOrEqualTo(limit);
         assertThat(emptyExecutions).isEmpty();
@@ -81,7 +83,7 @@ public class TestExecutionResourceBigTest
     {
         //given
         //when
-        final Set<UUID> keys = TEST_CLIENT.getTestExecutionKeys();
+        final Set<UUID> keys = TEST_CLIENT.getTestExecutionsIds();
         //then
         assertThat(keys).contains(TEST_EXECUTION_ID);
     }
@@ -90,10 +92,10 @@ public class TestExecutionResourceBigTest
     public void shouldSearchByStateReturnTests()
     {
         //given
-        final String state = TestState.ENDED;
+        final String state = "ENDED";
         //when
         final List<TestExecution> testExecutions = TEST_CLIENT
-            .searchTestExecutions(ImmutableSet.of(state), ImmutableSet.of());
+            .searchTestExecutionsByStates(ImmutableSet.of(state)).getTestExecutions();
         //then
         assertThat(testExecutions).isNotEmpty()
             .allSatisfy(testExecution -> assertThat(testExecution.getState()).isEqualTo(state));
@@ -106,7 +108,7 @@ public class TestExecutionResourceBigTest
         final String name = "TeSt";
         //when
         final List<TestExecution> testExecutions = TEST_CLIENT
-            .searchTestExecutions(ImmutableSet.of(), ImmutableSet.of(name));
+            .searchTestExecutionsByNames(ImmutableSet.of(name)).getTestExecutions();
         //then
         assertThat(testExecutions).isNotEmpty()
             .allSatisfy(testExecution ->
@@ -119,9 +121,9 @@ public class TestExecutionResourceBigTest
         //given
         final UUID testExecution = TEST_CLIENT.startTest(Tests.getExampleTest(PARCEL_ID, ImmutableSet.of(Tests.NODE)));
         //when
-        final boolean before = TEST_CLIENT.getTestExecutionKeys().contains(testExecution);
+        final boolean before = TEST_CLIENT.getTestExecutionsIds().contains(testExecution);
         TEST_CLIENT.deleteTestExecution(testExecution);
-        final boolean after = TEST_CLIENT.getTestExecutionKeys().contains(testExecution);
+        final boolean after = TEST_CLIENT.getTestExecutionsIds().contains(testExecution);
         //then
         assertThat(before).isTrue();
         assertThat(after).isFalse();
