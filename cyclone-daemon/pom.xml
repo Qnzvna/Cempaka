@@ -37,20 +37,6 @@
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-jdbi3</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jdbi</groupId>
-                    <artifactId>jdbi3-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jdbi</groupId>
-                    <artifactId>jdbi3-guava</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jdbi</groupId>
-                    <artifactId>jdbi3-sqlobject</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
@@ -95,6 +81,7 @@
         <dependency>
             <groupId>org.immutables</groupId>
             <artifactId>value</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
