@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import org.cempaka.cyclone.tests.ImmutableTestExecutionProperties;
-import org.cempaka.cyclone.tests.TestExecutionProperties;
+import org.cempaka.cyclone.client.ImmutableTestExecutionProperties;
+import org.cempaka.cyclone.client.TestExecutionProperties;
 
 final class Tests
 {

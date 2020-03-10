@@ -2,6 +2,7 @@ package org.cempaka.cyclone.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.times;
@@ -46,16 +47,13 @@ public class HeaderAuthFilterSmallTest
         //when
         authFilter.filter(containerRequestContext);
         //then
-        verify(containerRequestContext, times(1))
-            .setSecurityContext(argThat(new PrincipalSecurityContextMatcher(AdminUser.INSTANCE)));
+        verify(containerRequestContext, times(1)).setSecurityContext(any());
     }
 
     @Test
     public void shouldFailAuthenticationWithoutHeader()
     {
         //given
-        given(securityContext.isSecure()).willReturn(true);
-        given(containerRequestContext.getSecurityContext()).willReturn(securityContext);
         //when
         final Throwable throwable = catchThrowable(() -> authFilter.filter(containerRequestContext));
         //then

@@ -33,6 +33,7 @@ import org.cempaka.cyclone.storage.repositories.TestRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -89,14 +90,8 @@ public class ParcelUploadServiceSmallTest
         final UUID parcelId = parcelUploadService.uploadParcel(parcelUpload);
         //then
         assertThat(parcelId).isNotNull();
-        verify(httpClient, times(1)).execute(argThat(new AssertionMatcher<HttpUriRequest>()
-        {
-            @Override
-            public void assertion(final HttpUriRequest httpUriRequest) throws AssertionError
-            {
-                assertThat(httpUriRequest.getURI().toString()).isEqualTo(location);
-            }
-        }));
+        verify(httpClient, times(1)).execute(argThat(
+            httpUriRequest -> httpUriRequest.getURI().toString().equals(location)));
         verify(parcelIndexer, times(1)).index(any(Parcel.class));
         verify(parcelRepository, times(1)).put(any(Parcel.class));
         verify(testRepository, times(1)).putAll(anySetOf(org.cempaka.cyclone.tests.Test.class));

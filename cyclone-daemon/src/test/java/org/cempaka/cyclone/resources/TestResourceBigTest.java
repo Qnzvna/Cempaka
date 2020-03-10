@@ -6,21 +6,22 @@ import static org.awaitility.Awaitility.await;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.io.File;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
-import org.cempaka.cyclone.CycloneTestClient;
-import org.cempaka.cyclone.beans.NodeCapacity;
 import org.cempaka.cyclone.beans.TestState;
-import org.cempaka.cyclone.tests.TestExecution;
+import org.cempaka.cyclone.client.ApacheCycloneClient;
+import org.cempaka.cyclone.client.CycloneClient;
+import org.cempaka.cyclone.client.NodeCapacity;
+import org.cempaka.cyclone.client.TestExecution;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestResourceBigTest
 {
-    private static final CycloneTestClient TEST_CLIENT = new CycloneTestClient(Tests.API);
+    private static final CycloneClient TEST_CLIENT = ApacheCycloneClient.builder().withApiUrl(Tests.API).build();
 
     private static UUID PARCEL_ID;
 
@@ -44,9 +45,9 @@ public class TestResourceBigTest
     {
         //given
         //when
-        final List<org.cempaka.cyclone.tests.Test> tests = TEST_CLIENT.getTests();
+        final Set<org.cempaka.cyclone.client.Test> tests = TEST_CLIENT.getTests();
         //then
-        assertThat(tests).extracting(org.cempaka.cyclone.tests.Test::getParcelId).contains(PARCEL_ID);
+        assertThat(tests).extracting(org.cempaka.cyclone.client.Test::getParcelId).contains(PARCEL_ID);
     }
 
     @Test

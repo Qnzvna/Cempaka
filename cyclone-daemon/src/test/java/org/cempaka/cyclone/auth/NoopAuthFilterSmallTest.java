@@ -1,19 +1,19 @@
 package org.cempaka.cyclone.auth;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.SecurityContext;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
-public class NoopAuthFilterSmallTest
+@ExtendWith(MockitoExtension.class)
+class NoopAuthFilterSmallTest
 {
     @Mock
     private SecurityContext securityContext;
@@ -23,7 +23,7 @@ public class NoopAuthFilterSmallTest
     private final NoopAuthFilter noopAuthFilter = new NoopAuthFilter();
 
     @Test
-    public void shouldPassAuthentication()
+    void shouldPassAuthentication()
     {
         //given
         given(securityContext.isSecure()).willReturn(true);
@@ -31,8 +31,7 @@ public class NoopAuthFilterSmallTest
         //when
         noopAuthFilter.filter(containerRequestContext);
         //then
-        verify(containerRequestContext, times(1))
-            .setSecurityContext(argThat(new PrincipalSecurityContextMatcher(AdminUser.INSTANCE)));
+        verify(containerRequestContext, times(1)).setSecurityContext(any());
     }
 
 }

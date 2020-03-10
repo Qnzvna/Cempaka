@@ -3,7 +3,6 @@ package org.cempaka.cyclone.storage.repositories;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableSet.of;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
 import com.google.common.collect.ImmutableSet;
@@ -96,7 +95,13 @@ public class MemoryTestExecutionRepository implements TestExecutionRepository
 
     private boolean like(final Set<String> names, final TestExecution testExecution)
     {
-        return names.stream().anyMatch(name -> testExecution.getProperties().getTestName().contains(name));
+        if (names.isEmpty()) {
+            return true;
+        } else {
+            return names.stream()
+                .anyMatch(
+                    name -> testExecution.getProperties().getTestName().toLowerCase().contains(name.toLowerCase()));
+        }
     }
 
     @Override
