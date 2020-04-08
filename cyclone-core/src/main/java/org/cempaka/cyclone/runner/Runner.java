@@ -26,5 +26,5 @@ public interface Runner
 
     void afterInvocation(Invoker invoker);
 
-    List<Class> getTestClasses();
+    List<Class<?>> getTestClasses();
 }

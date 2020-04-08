@@ -27,7 +27,7 @@ public abstract class ForwardingRunner implements Runner
     }
 
     @Override
-    public List<Class> getTestClasses()
+    public List<Class<?>> getTestClasses()
     {
         return getDelegate().getTestClasses();
     }

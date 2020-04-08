@@ -24,8 +24,6 @@ workers:
   workersNumber: 1
   # Path to the guava jar. Used for gathering parcels metadata.
   guavaPath: cyclone-daemon/target/dependency/guava.jar
-  # Path to store logs from load tests.
-  logsPath: logs/
 
 auth:
   # Type of the authentication mechanism. Allowed values are: NONE, BASIC, HEADER.

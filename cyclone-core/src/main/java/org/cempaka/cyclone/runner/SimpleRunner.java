@@ -11,10 +11,10 @@ import org.cempaka.cyclone.measurements.MeasurementRegistry;
 
 public class SimpleRunner implements Runner
 {
-    private final List<Class> testClasses;
+    private final List<Class<?>> testClasses;
     private final List<Invoker> invokers;
 
-    public SimpleRunner(final List<Class> testClasses,
+    public SimpleRunner(final List<Class<?>> testClasses,
                         final Map<String, String> parameters,
                         final MeasurementRegistry measurementRegistry)
     {
@@ -50,7 +50,7 @@ public class SimpleRunner implements Runner
     }
 
     @Override
-    public List<Class> getTestClasses()
+    public List<Class<?>> getTestClasses()
     {
         return testClasses;
     }

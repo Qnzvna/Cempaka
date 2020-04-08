@@ -9,8 +9,6 @@ public class WorkersConfiguration
     private int workersNumber;
     @NotEmpty
     private String guavaPath;
-    @NotEmpty
-    private String logsPath;
 
     public int getWorkersNumber()
     {
@@ -20,10 +18,5 @@ public class WorkersConfiguration
     public String getGuavaPath()
     {
         return guavaPath;
-    }
-
-    public String getLogsPath()
-    {
-        return logsPath;
     }
 }

@@ -47,7 +47,7 @@ public class WorkerManagerMediumTest
         final byte[] parcelData = Resources.toByteArray(resource);
         final Parcel parcel = Parcel.of(EXAMPLE_ID, parcelData);
         given(parcelRepository.get(EXAMPLE_ID)).willReturn(parcel);
-        workerManager = new WorkerManager(parcelRepository, 0, WORKER_NUMBER, "../logs");
+        workerManager = new WorkerManager(parcelRepository, 0, WORKER_NUMBER);
     }
 
     @Test

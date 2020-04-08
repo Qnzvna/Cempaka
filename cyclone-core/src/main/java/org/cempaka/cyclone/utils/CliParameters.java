@@ -1,6 +1,6 @@
 package org.cempaka.cyclone.utils;
 
-public final class CliParametrs
+public final class CliParameters
 {
     public static final String TEST_CLASSES = "-c";
     public static final String LOOP_COUNT = "-n";
