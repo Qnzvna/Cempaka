@@ -1,12 +1,12 @@
-package org.cempaka.cyclone.listeners;
+package org.cempaka.cyclone.channel;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.util.function.BiConsumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.cempaka.cyclone.listeners.payloads.Payload;
-import org.cempaka.cyclone.listeners.payloads.PayloadType;
+import org.cempaka.cyclone.channel.payloads.Payload;
+import org.cempaka.cyclone.channel.payloads.PayloadType;
 
 @Singleton
 public class PayloadListener implements BiConsumer<Integer, Payload>

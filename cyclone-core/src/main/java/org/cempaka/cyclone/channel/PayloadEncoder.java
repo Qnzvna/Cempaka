@@ -1,4 +1,6 @@
-package org.cempaka.cyclone.listeners;
+package org.cempaka.cyclone.channel;
+
+import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -10,17 +12,18 @@ import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import org.cempaka.cyclone.listeners.payloads.EndedPayload;
-import org.cempaka.cyclone.listeners.payloads.Payload;
-import org.cempaka.cyclone.listeners.payloads.PayloadType;
-import org.cempaka.cyclone.listeners.payloads.RunningPayload;
-import org.cempaka.cyclone.listeners.payloads.StartedPayload;
+import org.cempaka.cyclone.channel.payloads.EndedPayload;
+import org.cempaka.cyclone.channel.payloads.LogPayload;
+import org.cempaka.cyclone.channel.payloads.Payload;
+import org.cempaka.cyclone.channel.payloads.PayloadType;
+import org.cempaka.cyclone.channel.payloads.RunningPayload;
+import org.cempaka.cyclone.channel.payloads.StartedPayload;
 
 class PayloadEncoder
 {
     ByteBuffer encode(final Payload payload)
     {
+        checkNotNull(payload);
         final PayloadType type = payload.getType();
         switch (type) {
             case STARTED:
@@ -29,6 +32,8 @@ class PayloadEncoder
                 return encodeRunning((RunningPayload) payload);
             case ENDED:
                 return encodeEnded((EndedPayload) payload);
+            case LOG:
+                return encodeLog((LogPayload) payload);
             default:
                 throw new IllegalArgumentException();
         }
@@ -65,8 +70,23 @@ class PayloadEncoder
         }
     }
 
+    private ByteBuffer encodeLog(final LogPayload payload)
+    {
+        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        try (final ObjectOutputStream outputStream = new ObjectOutputStream(byteStream)) {
+            outputStream.writeUTF(payload.getLogLine());
+            outputStream.flush();
+            final byte[] data = byteStream.toByteArray();
+            return ByteBuffer.wrap(data);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     Payload decode(final PayloadType type, final String testId, final byte[] data)
     {
+        checkNotNull(testId);
+        checkNotNull(data);
         switch (type) {
             case STARTED:
                 return new StartedPayload(testId);
@@ -74,12 +94,14 @@ class PayloadEncoder
                 return decodeRunning(testId, data);
             case ENDED:
                 return decodeEnded(testId, data);
+            case LOG:
+                return decodeLog(testId, data);
             default:
                 throw new IllegalArgumentException();
         }
     }
 
-    private Payload decodeRunning(final String testId, final byte[] data)
+    private RunningPayload decodeRunning(final String testId, final byte[] data)
     {
         final InputStream inputStream = new ByteArrayInputStream(data);
         final Map<String, Double> measurements = new HashMap<>();
@@ -96,12 +118,22 @@ class PayloadEncoder
         }
     }
 
-    private Payload decodeEnded(final String testId, final byte[] data)
+    private EndedPayload decodeEnded(final String testId, final byte[] data)
     {
         final InputStream inputStream = new ByteArrayInputStream(data);
         try (final ObjectInputStream stream = new ObjectInputStream(inputStream)) {
             final int exitCode = stream.readInt();
             return new EndedPayload(testId, exitCode);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private LogPayload decodeLog(final String testId, final byte[] data)
+    {
+        final InputStream inputStream = new ByteArrayInputStream(data);
+        try (final ObjectInputStream stream = new ObjectInputStream(inputStream)) {
+            return new LogPayload(testId, stream.readUTF());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

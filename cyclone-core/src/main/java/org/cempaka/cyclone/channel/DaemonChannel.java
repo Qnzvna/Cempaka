@@ -1,11 +1,11 @@
-package org.cempaka.cyclone.listeners;
+package org.cempaka.cyclone.channel;
 
 import java.io.Closeable;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import org.cempaka.cyclone.listeners.payloads.Payload;
+import org.cempaka.cyclone.channel.payloads.Payload;
 
 public interface DaemonChannel extends Closeable
 {

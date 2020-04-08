@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.listeners.payloads;
+package org.cempaka.cyclone.channel.payloads;
 
 public interface Payload
 {

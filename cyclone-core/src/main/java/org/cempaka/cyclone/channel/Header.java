@@ -1,10 +1,10 @@
-package org.cempaka.cyclone.listeners;
+package org.cempaka.cyclone.channel;
 
 import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
 
 import java.util.Objects;
 import java.util.UUID;
-import org.cempaka.cyclone.listeners.payloads.PayloadType;
+import org.cempaka.cyclone.channel.payloads.PayloadType;
 
 class Header
 {

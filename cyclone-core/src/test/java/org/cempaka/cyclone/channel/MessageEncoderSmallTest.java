@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.listeners;
+package org.cempaka.cyclone.channel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,10 +7,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
-import org.cempaka.cyclone.listeners.payloads.EndedPayload;
-import org.cempaka.cyclone.listeners.payloads.Payload;
-import org.cempaka.cyclone.listeners.payloads.RunningPayload;
-import org.cempaka.cyclone.listeners.payloads.StartedPayload;
+import org.cempaka.cyclone.channel.payloads.EndedPayload;
+import org.cempaka.cyclone.channel.payloads.LogPayload;
+import org.cempaka.cyclone.channel.payloads.Payload;
+import org.cempaka.cyclone.channel.payloads.RunningPayload;
+import org.cempaka.cyclone.channel.payloads.StartedPayload;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -44,6 +45,7 @@ public class MessageEncoderSmallTest
             new Object[]{new EndedPayload(testId, 0)},
             new Object[]{new EndedPayload(testId, -1)},
             new Object[]{new EndedPayload(testId, 5)},
+            new Object[]{new LogPayload(testId, longStackTrace)}
         };
     }
 
@@ -55,6 +57,6 @@ public class MessageEncoderSmallTest
         final ByteBuffer data = messageEncoder.encode(payload);
         final Payload decoded = messageEncoder.decode(data.array());
         //then
-        assertThat(decoded).isEqualToComparingFieldByFieldRecursively(payload);
+        assertThat(decoded).isEqualTo(payload);
     }
 }

@@ -1,19 +1,16 @@
-package org.cempaka.cyclone.listeners.payloads;
+package org.cempaka.cyclone.channel.payloads;
 
 import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
 
 import java.util.Objects;
-import java.util.Optional;
 
-public class EndedPayload implements Payload
+public class StartedPayload implements Payload
 {
     private final String testId;
-    private final int exitCode;
 
-    public EndedPayload(final String testId, final int exitCode)
+    public StartedPayload(final String testId)
     {
         this.testId = checkNotNull(testId);
-        this.exitCode = exitCode;
     }
 
     @Override
@@ -25,20 +22,14 @@ public class EndedPayload implements Payload
     @Override
     public PayloadType getType()
     {
-        return PayloadType.ENDED;
-    }
-
-    public int getExitCode()
-    {
-        return exitCode;
+        return PayloadType.STARTED;
     }
 
     @Override
     public String toString()
     {
-        return "EndedPayload{" +
+        return "StartedPayload{" +
             "testId='" + testId + '\'' +
-            ", exitCode=" + exitCode +
             '}';
     }
 
@@ -47,14 +38,13 @@ public class EndedPayload implements Payload
     {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
-        final EndedPayload that = (EndedPayload) o;
-        return exitCode == that.exitCode &&
-            Objects.equals(testId, that.testId);
+        final StartedPayload that = (StartedPayload) o;
+        return Objects.equals(testId, that.testId);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(testId, exitCode);
+        return Objects.hash(testId);
     }
 }

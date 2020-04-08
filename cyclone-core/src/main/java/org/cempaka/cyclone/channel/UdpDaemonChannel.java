@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.listeners;
+package org.cempaka.cyclone.channel;
 
 import static java.net.InetAddress.getLoopbackAddress;
 import static org.cempaka.cyclone.utils.Preconditions.checkArgument;
@@ -17,7 +17,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import org.cempaka.cyclone.listeners.payloads.Payload;
+import org.cempaka.cyclone.channel.payloads.Payload;
 
 public class UdpDaemonChannel implements DaemonChannel
 {

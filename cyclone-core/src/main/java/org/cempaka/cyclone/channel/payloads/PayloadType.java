@@ -1,10 +1,11 @@
-package org.cempaka.cyclone.listeners.payloads;
+package org.cempaka.cyclone.channel.payloads;
 
 public enum PayloadType
 {
     STARTED(1),
     RUNNING(2),
-    ENDED(3);
+    ENDED(3),
+    LOG(4);
 
     private final int code;
 
@@ -17,6 +18,8 @@ public enum PayloadType
                 return RUNNING;
             case 3:
                 return ENDED;
+            case 4:
+                return LOG;
             default:
                 throw new IllegalArgumentException();
         }

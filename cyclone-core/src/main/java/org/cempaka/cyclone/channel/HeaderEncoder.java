@@ -1,8 +1,8 @@
-package org.cempaka.cyclone.listeners;
+package org.cempaka.cyclone.channel;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;
-import org.cempaka.cyclone.listeners.payloads.PayloadType;
+import org.cempaka.cyclone.channel.payloads.PayloadType;
 
 class HeaderEncoder
 {

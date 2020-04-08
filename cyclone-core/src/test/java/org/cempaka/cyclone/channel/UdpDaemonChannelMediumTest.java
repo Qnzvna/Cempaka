@@ -1,12 +1,12 @@
-package org.cempaka.cyclone.listeners;
+package org.cempaka.cyclone.channel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.SocketException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import org.cempaka.cyclone.listeners.payloads.Payload;
-import org.cempaka.cyclone.listeners.payloads.StartedPayload;
+import org.cempaka.cyclone.channel.payloads.Payload;
+import org.cempaka.cyclone.channel.payloads.StartedPayload;
 import org.junit.Test;
 
 public class UdpDaemonChannelMediumTest
@@ -29,6 +29,6 @@ public class UdpDaemonChannelMediumTest
         client.write(payload, SERVER_PORT);
         Thread.sleep(1_000);
         //then
-        assertThat(payloadReference.get()).isEqualToComparingFieldByFieldRecursively(payload);
+        assertThat(payloadReference.get()).isEqualTo(payload);
     }
 }

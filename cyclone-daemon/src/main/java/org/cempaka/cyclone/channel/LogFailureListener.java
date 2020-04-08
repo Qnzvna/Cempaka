@@ -1,4 +1,4 @@
-package org.cempaka.cyclone.listeners;
+package org.cempaka.cyclone.channel;
 
 import com.google.inject.Singleton;
 import java.util.function.Consumer;

@@ -1,19 +1,20 @@
-package org.cempaka.cyclone.listeners.payloads;
+package org.cempaka.cyclone.channel.payloads;
 
 import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
 
-import java.util.Map;
 import java.util.Objects;
 
-public class RunningPayload implements Payload
+public class LogPayload implements Payload
 {
-    private final String testId;
-    private final Map<String, Double> measurements;
+    private final PayloadType type = PayloadType.LOG;
 
-    public RunningPayload(final String testId, final Map<String, Double> measurements)
+    private final String testId;
+    private final String logLine;
+
+    public LogPayload(final String testId, final String logLine)
     {
         this.testId = checkNotNull(testId);
-        this.measurements = checkNotNull(measurements);
+        this.logLine = checkNotNull(logLine);
     }
 
     @Override
@@ -25,20 +26,21 @@ public class RunningPayload implements Payload
     @Override
     public PayloadType getType()
     {
-        return PayloadType.RUNNING;
+        return type;
     }
 
-    public Map<String, Double> getMeasurements()
+    public String getLogLine()
     {
-        return measurements;
+        return logLine;
     }
 
     @Override
     public String toString()
     {
-        return "RunningPayload{" +
+        return "LogPayload{" +
             "testId='" + testId + '\'' +
-            ", measurements=" + measurements +
+            ", type=" + type +
+            ", logLine='" + logLine + '\'' +
             '}';
     }
 
@@ -47,14 +49,15 @@ public class RunningPayload implements Payload
     {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
-        final RunningPayload that = (RunningPayload) o;
+        final LogPayload that = (LogPayload) o;
         return Objects.equals(testId, that.testId) &&
-            Objects.equals(measurements, that.measurements);
+            type == that.type &&
+            Objects.equals(logLine, that.logLine);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(testId, measurements);
+        return Objects.hash(testId, type, logLine);
     }
 }
