@@ -32,10 +32,12 @@ import org.cempaka.cyclone.channel.PayloadListener;
 import org.cempaka.cyclone.channel.UdpDaemonChannel;
 import org.cempaka.cyclone.channel.payloads.Payload;
 import org.cempaka.cyclone.channel.payloads.PayloadType;
+import org.cempaka.cyclone.log.LogModule;
 import org.cempaka.cyclone.services.DistributedTestRunnerService;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
 import org.cempaka.cyclone.services.TestRunnerService;
 import org.cempaka.cyclone.services.listeners.EndedPayloadListener;
+import org.cempaka.cyclone.services.listeners.LogPayloadListener;
 import org.cempaka.cyclone.services.listeners.RunningPayloadListener;
 import org.cempaka.cyclone.services.listeners.StartedPayloadListener;
 import org.cempaka.cyclone.storage.StorageModule;
@@ -93,6 +95,8 @@ public class DaemonModule extends AbstractModule
         bind(Clock.class).toInstance(Clock.systemUTC());
 
         install(new StorageModule(storageConfiguration));
+
+        install(new LogModule());
     }
 
     @Inject
@@ -113,12 +117,14 @@ public class DaemonModule extends AbstractModule
     public Multimap<PayloadType, BiConsumer<String, Payload>> payloadListeners(
         final StartedPayloadListener startedPayloadListener,
         final RunningPayloadListener runningPayloadListener,
-        final EndedPayloadListener endedPayloadListener)
+        final EndedPayloadListener endedPayloadListener,
+        final LogPayloadListener logPayloadListener)
     {
         return ImmutableListMultimap.<PayloadType, BiConsumer<String, Payload>>builder()
             .put(PayloadType.STARTED, startedPayloadListener)
             .put(PayloadType.RUNNING, runningPayloadListener)
             .put(PayloadType.ENDED, endedPayloadListener)
+            .put(PayloadType.LOG, logPayloadListener)
             .build();
     }
 

@@ -22,6 +22,7 @@ import org.cempaka.cyclone.channel.UdpDaemonChannel;
 import org.cempaka.cyclone.channel.payloads.EndedPayload;
 import org.cempaka.cyclone.channel.payloads.RunningPayload;
 import org.cempaka.cyclone.channel.payloads.StartedPayload;
+import org.cempaka.cyclone.log.LoggerFactoryConfiguration;
 import org.cempaka.cyclone.measurements.MeasurementRegistry;
 import org.cempaka.cyclone.runner.LoopRunner;
 import org.cempaka.cyclone.runner.Runner;
@@ -69,7 +70,7 @@ public class CycloneCli
     public static void main(String[] args) throws IOException, InterruptedException
     {
         final CycloneCli cycloneCli = new CycloneCli();
-        new CommandLine(cycloneCli).parse(args);
+        new CommandLine(cycloneCli).parseArgs(args);
 
         final int exitCode = cycloneCli.run();
         System.exit(exitCode);
@@ -77,8 +78,10 @@ public class CycloneCli
 
     private int run() throws IOException, InterruptedException
     {
-
         if (isUdpEnabled()) {
+            LoggerFactoryConfiguration.ENABLED = true;
+            LoggerFactoryConfiguration.TEST_ID = testId;
+            LoggerFactoryConfiguration.PORT = daemonPort;
             daemonChannel.connect();
             daemonChannel.write(new StartedPayload(testId), daemonPort);
             metricsExecutor.scheduleAtFixedRate(this::reportMetrics, 1, measurementsPeriod,

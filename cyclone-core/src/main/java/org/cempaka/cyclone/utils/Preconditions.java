@@ -17,6 +17,11 @@ public final class Preconditions
         }
     }
 
+    public static void checkArgument(final boolean expression)
+    {
+        checkArgument(expression, "");
+    }
+
     public static void checkState(final boolean expression, final String description)
     {
         if (!expression) {

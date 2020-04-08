@@ -11,5 +11,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>cyclone-codehale-metrics</module>
+        <module>cyclone-slf4j</module>
     </modules>
 </project>
