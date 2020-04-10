@@ -12,6 +12,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -32,18 +34,17 @@ public class WorkerManager
     private final Map<UUID, Worker> runningTests = Maps.newConcurrentMap();
 
     private final ParcelRepository parcelRepository;
+    private final Executor executor;
     private final int udpServerPort;
-    private final String logsDirectory;
 
     @Inject
     public WorkerManager(final ParcelRepository parcelRepository,
                          @Named("udp.server.port") final int udpServerPort,
-                         @Named("worker.number") final int workerNumber,
-                         @Named("worker.logs.directory") final String logsDirectory)
+                         @Named("worker.number") final int workerNumber)
     {
         this.parcelRepository = checkNotNull(parcelRepository);
+        this.executor = Executors.newFixedThreadPool(workerNumber);
         this.udpServerPort = udpServerPort;
-        this.logsDirectory = checkNotNull(logsDirectory);
         initializeWorkers(workerNumber);
     }
 
@@ -51,7 +52,7 @@ public class WorkerManager
     {
         LOG.debug("Initializing workers...");
         for (int i = 0; i < workerNumber; i++) {
-            final Worker worker = new Worker();
+            final Worker worker = new Worker(udpServerPort);
             workerPool.add(worker);
         }
         LOG.info("Workers initialized.");
@@ -62,27 +63,14 @@ public class WorkerManager
         checkNotNull(testId);
         checkNotNull(testExecutionProperties);
         final UUID parcelId = testExecutionProperties.getParcelId();
-        final String testName = testExecutionProperties.getTestName();
-        final int loopCount = testExecutionProperties.getLoopCount();
-        final int threadsNumber = testExecutionProperties.getThreadsNumber();
-        final Map<String, String> parameters = testExecutionProperties.getParameters();
-        final String jvmOptions = testExecutionProperties.getJvmOptions();
         LOG.debug("About to start test for parcel {} ...", parcelId);
         final Parcel parcel = parcelRepository.get(parcelId);
         if (parcel != null) {
             final Worker worker = getIdleWorker();
             try {
-                worker.start(parcel,
-                    testId.toString(),
-                    ImmutableList.of(testName),
-                    loopCount,
-                    threadsNumber,
-                    udpServerPort,
-                    logsDirectory,
-                    parameters,
-                    jvmOptions);
+                worker.start(testId, parcel, testExecutionProperties);
                 LOG.debug("Test started successfully.");
-                final CompletableFuture<?> testFuture = worker.onDone();
+                final CompletableFuture<?> testFuture = CompletableFuture.supplyAsync(worker::waitFor, executor);
                 testFuture.whenComplete((ignore, throwable) -> cleanResources(worker, testId));
                 runningTests.put(testId, worker);
                 return testFuture.thenApply(ignore -> testId);

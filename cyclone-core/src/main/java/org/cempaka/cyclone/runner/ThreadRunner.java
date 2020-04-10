@@ -18,7 +18,7 @@ public class ThreadRunner extends ForwardingRunner
 {
     private final Runner delegated;
     private final ExecutorService executorService;
-    private final Queue<Future> futures = new LinkedBlockingQueue<>();
+    private final Queue<Future<?>> futures = new LinkedBlockingQueue<>();
 
     public ThreadRunner(final Runner delegated, final int poolSize)
     {

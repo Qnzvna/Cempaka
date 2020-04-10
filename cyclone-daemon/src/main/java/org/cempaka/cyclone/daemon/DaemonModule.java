@@ -82,8 +82,6 @@ public class DaemonModule extends AbstractModule
             .toInstance(workersConfiguration.getGuavaPath());
         bind(Integer.class).annotatedWith(Names.named("worker.number"))
             .toInstance(workersConfiguration.getWorkersNumber());
-        bind(String.class).annotatedWith(Names.named("worker.logs.directory"))
-            .toInstance(workersConfiguration.getLogsPath());
         bind(Integer.class).annotatedWith(Names.named("udp.server.port"))
             .toInstance(channelConfiguration.getUdpServerPort());
         bind(Long.class).annotatedWith(Names.named("heartbeat.interval"))

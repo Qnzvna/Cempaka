@@ -1,15 +1,13 @@
 package org.cempaka.cyclone.cli;
 
-import static org.cempaka.cyclone.utils.CliParametrs.DAEMON_PORT;
-import static org.cempaka.cyclone.utils.CliParametrs.LOOP_COUNT;
-import static org.cempaka.cyclone.utils.CliParametrs.PARAMETERS;
-import static org.cempaka.cyclone.utils.CliParametrs.TEST_CLASSES;
-import static org.cempaka.cyclone.utils.CliParametrs.TEST_ID;
-import static org.cempaka.cyclone.utils.CliParametrs.THREADS;
+import static org.cempaka.cyclone.utils.CliParameters.DAEMON_PORT;
+import static org.cempaka.cyclone.utils.CliParameters.LOOP_COUNT;
+import static org.cempaka.cyclone.utils.CliParameters.PARAMETERS;
+import static org.cempaka.cyclone.utils.CliParameters.TEST_CLASSES;
+import static org.cempaka.cyclone.utils.CliParameters.TEST_ID;
+import static org.cempaka.cyclone.utils.CliParameters.THREADS;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -98,7 +96,7 @@ public class CycloneCli
 
     private EndedPayload runTest() throws InterruptedException
     {
-        final List<Class> testClasses = loadTestClasses();
+        final List<Class<?>> testClasses = loadTestClasses();
         final SimpleRunner simpleRunner = new SimpleRunner(testClasses,
             parameters,
             measurementRegistry);
@@ -130,7 +128,7 @@ public class CycloneCli
         }
     }
 
-    private List<Class> loadTestClasses()
+    private List<Class<?>> loadTestClasses()
     {
         return Stream.of(testNames)
             .map(className -> {

@@ -14,7 +14,6 @@ storage:
 workers:
   workersNumber: 4
   guavaPath: /opt/cyclone/guava.jar
-  logsPath: /var/log/cyclone/
 
 auth:
   type: NONE
