@@ -1,9 +1,9 @@
 package org.cempaka.cyclone.services.listeners;
 
 import org.cempaka.cyclone.beans.MetricDataPoint;
-import org.cempaka.cyclone.listeners.payloads.Payload;
-import org.cempaka.cyclone.listeners.payloads.PayloadType;
-import org.cempaka.cyclone.listeners.payloads.RunningPayload;
+import org.cempaka.cyclone.channel.payloads.Payload;
+import org.cempaka.cyclone.channel.payloads.PayloadType;
+import org.cempaka.cyclone.channel.payloads.RunningPayload;
 import org.cempaka.cyclone.storage.repositories.TestMetricRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

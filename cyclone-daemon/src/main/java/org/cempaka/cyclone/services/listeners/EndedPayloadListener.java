@@ -1,8 +1,8 @@
 package org.cempaka.cyclone.services.listeners;
 
 import org.cempaka.cyclone.beans.TestState;
-import org.cempaka.cyclone.listeners.payloads.Payload;
-import org.cempaka.cyclone.listeners.payloads.PayloadType;
+import org.cempaka.cyclone.channel.payloads.Payload;
+import org.cempaka.cyclone.channel.payloads.PayloadType;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
 import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
 import org.slf4j.Logger;
