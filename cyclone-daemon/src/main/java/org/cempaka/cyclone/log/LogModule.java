@@ -7,7 +7,7 @@ public class LogModule extends PrivateModule
     @Override
     public void configure()
     {
-        bind(LogDataSink.class).to(BaseLogDataSink.class);
+        bind(LogDataSink.class).to(RepositoryLogDataSink.class);
         expose(LogDataSink.class);
     }
 }

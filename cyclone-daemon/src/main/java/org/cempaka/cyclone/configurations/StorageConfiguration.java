@@ -2,11 +2,13 @@ package org.cempaka.cyclone.configurations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.Valid;
+import org.cempaka.cyclone.storage.repositories.JdbiLogMessageRepository;
 import org.cempaka.cyclone.storage.repositories.JdbiNodeStateRepository;
 import org.cempaka.cyclone.storage.repositories.JdbiParcelRepository;
 import org.cempaka.cyclone.storage.repositories.JdbiTestExecutionRepository;
 import org.cempaka.cyclone.storage.repositories.JdbiTestMetricRepository;
 import org.cempaka.cyclone.storage.repositories.JdbiTestRepository;
+import org.cempaka.cyclone.storage.repositories.LogMessageRepository;
 import org.cempaka.cyclone.storage.repositories.NodeStateDataRepository;
 import org.cempaka.cyclone.storage.repositories.ParcelRepository;
 import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
@@ -35,6 +37,10 @@ public class StorageConfiguration
     @JsonProperty("metricsRepository")
     private TypedConfiguration<TestMetricRepository> metricsRepository =
         new TypedConfiguration<>(JdbiTestMetricRepository.class);
+    @Valid
+    @JsonProperty("logRepository")
+    private TypedConfiguration<LogMessageRepository> logRepository =
+        new TypedConfiguration<>(JdbiLogMessageRepository.class);
 
     public TypedConfiguration<ParcelRepository> getParcelRepositoryConfiguration()
     {
@@ -59,5 +65,10 @@ public class StorageConfiguration
     public TypedConfiguration<TestMetricRepository> getMetricsRepository()
     {
         return metricsRepository;
+    }
+
+    public TypedConfiguration<LogMessageRepository> getLogRepository()
+    {
+        return logRepository;
     }
 }

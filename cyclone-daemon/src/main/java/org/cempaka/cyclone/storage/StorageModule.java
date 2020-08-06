@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.inject.Singleton;
 import org.cempaka.cyclone.configurations.StorageConfiguration;
 import org.cempaka.cyclone.configurations.TypedConfiguration;
+import org.cempaka.cyclone.storage.jdbi.LogMessageDataAccess;
 import org.cempaka.cyclone.storage.jdbi.NodeStateDataAccess;
 import org.cempaka.cyclone.storage.jdbi.ParcelDataAccess;
 import org.cempaka.cyclone.storage.jdbi.TestDataAccess;
@@ -18,6 +19,7 @@ import org.cempaka.cyclone.storage.jdbi.TestExecutionDataAccess;
 import org.cempaka.cyclone.storage.jdbi.TestMetricDataAccess;
 import org.cempaka.cyclone.storage.repositories.JdbiTestMetricRepository;
 import org.cempaka.cyclone.storage.repositories.JdbiTestRepository;
+import org.cempaka.cyclone.storage.repositories.LogMessageRepository;
 import org.cempaka.cyclone.storage.repositories.NodeStateDataRepository;
 import org.cempaka.cyclone.storage.repositories.ParcelRepository;
 import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
@@ -50,12 +52,15 @@ public class StorageModule extends PrivateModule
             .to(storageConfiguration.getTestRepositoryConfiguration().getType());
         bind(TestMetricRepository.class)
             .to(storageConfiguration.getMetricsRepository().getType());
+        bind(LogMessageRepository.class)
+            .to(storageConfiguration.getLogRepository().getType());
 
         expose(ParcelRepository.class);
         expose(TestRepository.class);
         expose(TestMetricRepository.class);
         expose(TestExecutionRepository.class);
         expose(NodeStateDataRepository.class);
+        expose(LogMessageRepository.class);
     }
 
     @Provides
@@ -91,5 +96,12 @@ public class StorageModule extends PrivateModule
     TestMetricDataAccess testMetricsDataAccess(final Jdbi jdbi)
     {
         return jdbi.onDemand(TestMetricDataAccess.class);
+    }
+
+    @Provides
+    @Singleton
+    LogMessageDataAccess logMessageDataAccess(final Jdbi jdbi)
+    {
+        return jdbi.onDemand(LogMessageDataAccess.class);
     }
 }
