@@ -1,6 +1,7 @@
 package org.cempaka.cyclone.client;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -44,4 +45,6 @@ public interface CycloneClient
     void deleteTestExecution(UUID testExecutionId);
 
     Set<UUID> getTestExecutionsIds();
+
+    Set<String> getTestExecutionLogMessages(UUID testExecutionId, Instant from);
 }

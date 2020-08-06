@@ -19,6 +19,7 @@ import org.cempaka.cyclone.managed.DaemonTestRunnerManaged;
 import org.cempaka.cyclone.managed.HeartbeatManaged;
 import org.cempaka.cyclone.managed.StalledTestCleanerManaged;
 import org.cempaka.cyclone.resources.ClusterResource;
+import org.cempaka.cyclone.resources.LogMessagesResource;
 import org.cempaka.cyclone.resources.MetricsResource;
 import org.cempaka.cyclone.resources.ParcelResource;
 import org.cempaka.cyclone.resources.TestExecutionResource;
@@ -77,6 +78,7 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
         jersey.register(injector.getInstance(ClusterResource.class));
         jersey.register(injector.getInstance(MetricsResource.class));
         jersey.register(injector.getInstance(TestExecutionResource.class));
+        jersey.register(injector.getInstance(LogMessagesResource.class));
         LOG.info("Resources registered.");
     }
 

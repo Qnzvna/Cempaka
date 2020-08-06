@@ -11,6 +11,7 @@ import static org.cempaka.cyclone.client.Endpoints.TESTS;
 import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTION;
 import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS;
 import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS_KEYS;
+import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS_LOGS;
 import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS_QUERY;
 import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS_SEARCH;
 import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTION_METRICS;
@@ -23,6 +24,7 @@ import com.google.common.collect.ImmutableSet;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -217,6 +219,14 @@ public class ApacheCycloneClient extends BaseCycloneClient
     {
         final HttpGet httpGet = new HttpGet(createResource(TEST_EXECUTIONS_KEYS));
         return runRequest(createDeserializer(new TypeReference<Set<UUID>>() {}), httpGet);
+    }
+
+    @Override
+    public Set<String> getTestExecutionLogMessages(final UUID testExecutionId, final Instant from)
+    {
+        final HttpGet httpGet = new HttpGet(
+            createResource(MessageFormat.format(TEST_EXECUTIONS_LOGS, testExecutionId, from.getEpochSecond())));
+        return runRequest(createDeserializer(new TypeReference<Set<String>>() {}), httpGet);
     }
 
     @Override

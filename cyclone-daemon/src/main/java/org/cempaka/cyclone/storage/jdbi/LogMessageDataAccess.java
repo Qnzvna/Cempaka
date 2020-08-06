@@ -14,6 +14,6 @@ public interface LogMessageDataAccess
     void insert(String testId, Timestamp timestamp, String logLine);
 
     @RegisterRowMapper(LogMessageRowMapper.class)
-    @SqlQuery("SELECT test_id, log_line FROM log_messages WHERE test_id = ? update_timestamp > ?")
+    @SqlQuery("SELECT test_id, log_line FROM log_messages WHERE test_id = ? AND update_timestamp >= ?")
     List<LogMessage> getNewerThan(String testId, Timestamp timestamp);
 }
