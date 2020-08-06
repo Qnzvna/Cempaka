@@ -133,7 +133,6 @@ public class DaemonModule extends AbstractModule
     @Singleton
     public Jdbi dbi(final ObjectMapper objectMapper)
     {
-        checkNotNull(daemonConfiguration.getDataSourceFactory());
         final Jdbi jdbi = new JdbiFactory()
             .build(environment, daemonConfiguration.getDataSourceFactory(), "postgresql");
         jdbi.installPlugin(new Jackson2Plugin());

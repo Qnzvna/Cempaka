@@ -17,17 +17,7 @@ cluster:
 
 storage:
   parcelRepository:
-    type: org.cempaka.cyclone.storage.repositories.FileParcelRepository
-    parameters:
-      storagePath: tmp/
-  executionRepository:
-    type: org.cempaka.cyclone.storage.repositories.MemoryTestExecutionRepository
-  nodeStateRepository:
-    type: org.cempaka.cyclone.storage.repositories.MemoryNodeStateRepository
-  testRepository:
-    type: org.cempaka.cyclone.storage.repositories.MemoryTestRepository
-  metricsRepository:
-    type: org.cempaka.cyclone.storage.repositories.MemoryTestMetricRepository
+    type: org.cempaka.cyclone.storage.repositories.JdbiParcelRepository
 
 workers:
   # Number of test runners.
@@ -40,7 +30,22 @@ auth:
   type: NONE
 #  properties: {}
 
-database: null
+# JDBI configuration see: https://www.dropwizard.io/en/stable/manual/jdbi.html#configuration
+database:
+  driverClass: org.postgresql.Driver
+  user: postgres
+  password: cyclone
+  url: jdbc:postgresql://localhost/postgres
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 1s
+  validationQuery: "/* MyService Health Check */ SELECT 1"
+  validationQueryTimeout: 3s
+  minSize: 8
+  maxSize: 32
+  checkConnectionWhileIdle: false
+  evictionInterval: 10s
+  minIdleTime: 1 minute
 
 # Dropwizard logging configuration
 logging:

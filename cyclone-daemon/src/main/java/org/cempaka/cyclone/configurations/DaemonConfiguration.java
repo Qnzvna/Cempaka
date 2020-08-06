@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 public class DaemonConfiguration extends Configuration
 {
     @Valid
-    @Nullable
+    @NotNull
     private DataSourceFactory dataSourceFactory = new DataSourceFactory();
     @Valid
     @NotNull
