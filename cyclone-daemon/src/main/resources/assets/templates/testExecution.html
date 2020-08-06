@@ -65,3 +65,14 @@
         </table>
     </div>
 </div>
+<div class="card mb-1">
+    <h5 class="card-header">
+        <i class="fas fa-file-contract"></i> Test executions logs
+    </h5>
+    <div class="card-body">
+        <div class="spinner-border" role="status" ng-if="$ctrl.logs === undefined">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <pre>{{ $ctrl.logs }}</pre>
+    </div>
+</div>

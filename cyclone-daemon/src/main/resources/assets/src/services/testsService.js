@@ -125,4 +125,17 @@ export class TestsService
                 throw error;
             });
     }
+
+    getTestExecutionLogs(id)
+    {
+        return this.$http({
+            method: 'GET',
+            url: `/api/tests/executions/${id}/logs`
+        }).then(response => response.data,
+            error => {
+                this.ngToast.danger(
+                    `Failed to get test logs by id [${id}]. ${error.data.message}`);
+                throw error;
+            });
+    }
 }

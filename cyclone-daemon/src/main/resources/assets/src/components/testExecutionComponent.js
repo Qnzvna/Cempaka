@@ -15,14 +15,17 @@ export const TestExecutionComponent = {
             this.id = this.$routeParams.id;
             this.executions = undefined;
             this.metrics = undefined;
+            this.logs = undefined;
             this.reloadExecution();
             this.reloadMetrics();
+            this.reloadLogs();
             this.$interval(() => {
             });
             this.$interval(() => {
                 if (this.isTestRunning()) {
                     this.reloadExecution();
                     this.reloadMetrics();
+                    this.reloadLogs();
                 }
             }, 10000);
         }
@@ -42,6 +45,13 @@ export const TestExecutionComponent = {
                 const size = _.uniq(_.map(metrics, metric => metric.name)).length;
                 this.metrics = _.slice(metrics, 0, size);
                 this.metrics = _.sortBy(this.metrics, metric => metric.name)
+            });
+        }
+
+        reloadLogs()
+        {
+            this.testsService.getTestExecutionLogs(this.id).then(logs => {
+                this.logs = logs.join('\n');
             });
         }
 
