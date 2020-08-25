@@ -6,6 +6,7 @@ import static org.awaitility.Awaitility.await;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.io.File;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -15,9 +16,9 @@ import org.cempaka.cyclone.client.ApacheCycloneClient;
 import org.cempaka.cyclone.client.CycloneClient;
 import org.cempaka.cyclone.client.NodeCapacity;
 import org.cempaka.cyclone.client.TestExecution;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestResourceBigTest
 {
@@ -25,7 +26,7 @@ public class TestResourceBigTest
 
     private static UUID PARCEL_ID;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass()
     {
         PARCEL_ID = TEST_CLIENT.uploadParcel(new File(Tests.EXAMPLES));
@@ -33,7 +34,7 @@ public class TestResourceBigTest
         Awaitility.setDefaultTimeout(30, TimeUnit.SECONDS);
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass()
     {
         TEST_CLIENT.deleteParcel(PARCEL_ID);
@@ -41,7 +42,7 @@ public class TestResourceBigTest
     }
 
     @Test
-    public void shouldReturnTests()
+    void shouldReturnTests()
     {
         //given
         //when
@@ -51,7 +52,7 @@ public class TestResourceBigTest
     }
 
     @Test
-    public void shouldStartTest()
+    void shouldStartTest()
     {
         //given
         //when
@@ -61,7 +62,7 @@ public class TestResourceBigTest
     }
 
     @Test
-    public void shouldRunFailingTest()
+    void shouldRunFailingTest()
     {
         //given
         //when
@@ -73,7 +74,7 @@ public class TestResourceBigTest
     }
 
     @Test
-    public void shouldStopTest()
+    void shouldStopTest()
     {
         //given
         final UUID testId = TEST_CLIENT.startTest(Tests.getExampleTest(PARCEL_ID,
@@ -97,5 +98,21 @@ public class TestResourceBigTest
         });
     }
 
-    // TODO should use metadata
+    @Test
+    void shouldRunTestUsingMetadata()
+    {
+        //given
+        final String password = "password";
+        TEST_CLIENT.uploadMetadata("bytes", password.getBytes());
+        //when
+        final UUID testId = TEST_CLIENT.startTest(Tests.getMetadataTest(PARCEL_ID, ImmutableSet.of(Tests.NODE)));
+        //then
+        await().untilAsserted(() -> {
+            assertThat(TEST_CLIENT.getTestExecutions(testId))
+                .extracting(TestExecution::getState)
+                .contains(TestState.ENDED);
+            assertThat(TEST_CLIENT.getTestExecutionLogMessages(testId, Instant.EPOCH))
+                .hasOnlyOneElementSatisfying(logLine -> assertThat(logLine).contains(password));
+        });
+    }
 }

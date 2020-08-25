@@ -4,7 +4,7 @@ import org.cempaka.cyclone.client.ApacheCycloneClient;
 import org.cempaka.cyclone.client.CycloneClient;
 import org.junit.jupiter.api.Test;
 
-public class MetadataResourceBigTest
+class MetadataParameterResourceBigTest
 {
     private static final CycloneClient TEST_CLIENT = ApacheCycloneClient.builder().withApiUrl(Tests.API).build();
 

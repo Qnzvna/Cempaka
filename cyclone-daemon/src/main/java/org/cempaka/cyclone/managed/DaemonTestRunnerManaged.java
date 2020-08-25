@@ -6,6 +6,7 @@ import org.cempaka.cyclone.beans.TestState;
 import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
 import org.cempaka.cyclone.beans.exceptions.WorkerNotAvailableException;
 import org.cempaka.cyclone.configurations.TestRunnerConfiguration;
+import org.cempaka.cyclone.services.MetadataService;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
 import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
 import org.cempaka.cyclone.tests.TestExecution;
@@ -28,6 +29,7 @@ public class DaemonTestRunnerManaged implements Managed
     private static final Logger LOG = LoggerFactory.getLogger(DaemonTestRunnerManaged.class);
 
     private final TestExecutionRepository testExecutionRepository;
+    private final MetadataService metadataService;
     private final NodeIdentifierProvider nodeIdentifierProvider;
     private final WorkerManager workerManager;
     private final TestRunnerConfiguration testRunnerConfiguration;
@@ -35,11 +37,13 @@ public class DaemonTestRunnerManaged implements Managed
 
     @Inject
     public DaemonTestRunnerManaged(final TestExecutionRepository testExecutionRepository,
+                                   final MetadataService metadataService,
                                    final NodeIdentifierProvider nodeIdentifierProvider,
                                    final WorkerManager workerManager,
                                    final TestRunnerConfiguration testRunnerConfiguration)
     {
         this.testExecutionRepository = checkNotNull(testExecutionRepository);
+        this.metadataService = checkNotNull(metadataService);
         this.nodeIdentifierProvider = checkNotNull(nodeIdentifierProvider);
         this.workerManager = checkNotNull(workerManager);
         this.testRunnerConfiguration = checkNotNull(testRunnerConfiguration);
@@ -68,7 +72,7 @@ public class DaemonTestRunnerManaged implements Managed
     {
         final UUID testId = testExecution.getId();
         try {
-            workerManager.startTest(testId, testExecution.getProperties());
+            workerManager.startTest(testId, testExecution.getProperties(), metadataService.getEncodedMetadata());
             testExecutionRepository.setState(testId, testExecution.getNode(), TestState.STARTED);
         } catch (ParcelNotFoundException e) {
             LOG.warn("Parcel for test {} could'nt be found.", testId);

@@ -2,6 +2,7 @@ package org.cempaka.cyclone.storage.repositories;
 
 import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
 
+import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,7 +33,7 @@ public class JooqMetadataRepository implements MetadataRepository
                     .where(Tables.METADATA.METADATA_ID.eq(metadataRecord.getMetadataId()))
                     .execute();
             } else {
-                context.insertInto(Tables.METADATA).values(metadataRecord).execute();
+                context.insertInto(Tables.METADATA).set(metadataRecord).execute();
             }
         });
     }
@@ -56,5 +57,11 @@ public class JooqMetadataRepository implements MetadataRepository
     {
         checkNotNull(metadataId);
         context.deleteFrom(Tables.METADATA).where(Tables.METADATA.METADATA_ID.eq(metadataId)).execute();
+    }
+
+    @Override
+    public List<MetadataRecord> getAll()
+    {
+        return context.selectFrom(Tables.METADATA).fetch();
     }
 }

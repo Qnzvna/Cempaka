@@ -45,12 +45,22 @@ class WorkerCommandBuilder
 
     WorkerCommandBuilder setParameters(final Map<String, String> parameters)
     {
-        checkNotNull(parameters);
-        if (!parameters.isEmpty()) {
-            final String serializedParameters = parameters.entrySet().stream()
+        return setMapParameter(parameters, CliParameters.PARAMETERS);
+    }
+
+    WorkerCommandBuilder setMetadata(final Map<String, String> metadata)
+    {
+        return setMapParameter(metadata, CliParameters.METADATA);
+    }
+
+    private WorkerCommandBuilder setMapParameter(final Map<String, String> map, final String paramName)
+    {
+        checkNotNull(map);
+        if (!map.isEmpty()) {
+            final String serializedParameters = map.entrySet().stream()
                 .map(entry -> entry.getKey() + "=" + entry.getValue())
                 .collect(Collectors.joining(","));
-            commands.add(CliParameters.PARAMETERS, serializedParameters);
+            commands.add(paramName, serializedParameters);
         }
         return this;
     }

@@ -2,6 +2,7 @@ package org.cempaka.cyclone.client;
 
 import static org.cempaka.cyclone.client.Endpoints.CLUSTER_NODE_CAPACITY;
 import static org.cempaka.cyclone.client.Endpoints.CLUSTER_STATUS;
+import static org.cempaka.cyclone.client.Endpoints.METADATA;
 import static org.cempaka.cyclone.client.Endpoints.PARCEL;
 import static org.cempaka.cyclone.client.Endpoints.PARCELS;
 import static org.cempaka.cyclone.client.Endpoints.START_TEST;
@@ -24,29 +25,35 @@ class DefaultResponseValidator extends ResponseValidator
 {
     private final Set<ResponseValidator> validators;
 
-    DefaultResponseValidator()
+    DefaultResponseValidator(final String apiUrl)
     {
         validators = ImmutableSet.<ResponseValidator>builder()
-            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(CLUSTER_STATUS)))
-            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(CLUSTER_NODE_CAPACITY)))
-            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(PARCELS)))
-            .add(StatusCodeValidator.of(HttpStatus.SC_NO_CONTENT, UriRegexMatcher.ofFormat(PARCEL)))
-            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(TESTS)))
-            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(START_TEST)))
-            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(STOP_TEST)))
-            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(TEST_EXECUTIONS)))
-            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(TEST_EXECUTIONS_QUERY)))
-            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(TEST_EXECUTION)))
-            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(TEST_EXECUTION_METRICS)))
-            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(TEST_EXECUTIONS_SEARCH)))
-            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(TEST_EXECUTIONS_KEYS)))
+            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(apiUrl + CLUSTER_STATUS)))
+            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(apiUrl + CLUSTER_NODE_CAPACITY)))
+            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(apiUrl + PARCELS)))
+            .add(StatusCodeValidator.of(HttpStatus.SC_NO_CONTENT, UriRegexMatcher.ofFormat(apiUrl + PARCEL)))
+            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(apiUrl + TESTS)))
+            .add(StatusCodeValidator.of(HttpStatus.SC_ACCEPTED, UriRegexMatcher.ofFormat(apiUrl + START_TEST)))
+            .add(StatusCodeValidator.of(HttpStatus.SC_NO_CONTENT, UriRegexMatcher.ofFormat(apiUrl + STOP_TEST)))
+            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(apiUrl + TEST_EXECUTIONS)))
+            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(apiUrl + TEST_EXECUTIONS_QUERY)))
+            .add(StatusCodeValidator.of(
+                new int[]{HttpStatus.SC_OK, HttpStatus.SC_NO_CONTENT},
+                UriRegexMatcher.ofFormat(apiUrl + TEST_EXECUTION)
+            ))
+            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(apiUrl + TEST_EXECUTION_METRICS)))
+            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(apiUrl + TEST_EXECUTIONS_SEARCH)))
+            .add(StatusCodeValidator.of(HttpStatus.SC_OK, UriRegexMatcher.ofFormat(apiUrl + TEST_EXECUTIONS_KEYS)))
+            .add(StatusCodeValidator.of(HttpStatus.SC_NO_CONTENT, UriRegexMatcher.ofFormat(apiUrl + METADATA)))
             .build();
     }
 
     @Override
     public void validate(final HttpRequest request, final HttpResponse response)
     {
-        validators.forEach(validator -> validator.validate(request, response));
+        validators.stream()
+            .filter(validator -> validator.isEnabled(request))
+            .forEach(validator -> validator.runValidation(response));
     }
 
     @Override

@@ -6,6 +6,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -58,7 +60,15 @@ public class WorkerManager
         LOG.info("Workers initialized.");
     }
 
-    public CompletableFuture<UUID> startTest(final UUID testId, final TestExecutionProperties testExecutionProperties)
+    public CompletableFuture<UUID> startTest(final UUID testId,
+                                             final TestExecutionProperties testExecutionProperties)
+    {
+        return startTest(testId, testExecutionProperties, Collections.emptyMap());
+    }
+
+    public CompletableFuture<UUID> startTest(final UUID testId,
+                                             final TestExecutionProperties testExecutionProperties,
+                                             final Map<String, String> metadata)
     {
         checkNotNull(testId);
         checkNotNull(testExecutionProperties);
@@ -68,7 +78,7 @@ public class WorkerManager
         if (parcel != null) {
             final Worker worker = getIdleWorker();
             try {
-                worker.start(testId, parcel, testExecutionProperties);
+                worker.start(testId, parcel, testExecutionProperties, metadata);
                 LOG.debug("Test started successfully.");
                 final CompletableFuture<?> testFuture = CompletableFuture.supplyAsync(worker::waitFor, executor);
                 testFuture.whenComplete((ignore, throwable) -> cleanResources(worker, testId));

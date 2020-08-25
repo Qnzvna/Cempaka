@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.stream.Stream;
+import org.cempaka.cyclone.annotations.MetadataParameter;
 import org.cempaka.cyclone.annotations.Parameter;
 import org.cempaka.cyclone.annotations.Thunderbolt;
 import org.cempaka.cyclone.measurements.Measure;
@@ -58,6 +59,12 @@ public final class Reflections
     {
         return Stream.of(field.getDeclaredAnnotations())
             .anyMatch(annotation -> annotation.annotationType().equals(Parameter.class));
+    }
+
+    public static boolean isFieldMetadataParameter(final Field field)
+    {
+        return Stream.of(field.getDeclaredAnnotations())
+            .anyMatch(annotation -> annotation.annotationType().equals(MetadataParameter.class));
     }
 
     public static void setFieldValue(final Field field, final Object object, final Object value)

@@ -2,7 +2,10 @@ package org.cempaka.cyclone.services;
 
 import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
 
+import java.util.Base64;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.ImmutableMetadata;
@@ -41,5 +44,16 @@ public class MetadataService
     {
         checkNotNull(metadataId);
         metadataRepository.delete(metadataId);
+    }
+
+    public Map<String, String> getEncodedMetadata()
+    {
+        return metadataRepository.getAll().stream()
+            .collect(Collectors.toMap(MetadataRecord::getMetadataId, this::encode));
+    }
+
+    private String encode(final MetadataRecord record)
+    {
+        return new String(Base64.getEncoder().encode(record.getValue()));
     }
 }

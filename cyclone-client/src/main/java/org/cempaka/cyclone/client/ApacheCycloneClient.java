@@ -360,7 +360,7 @@ public class ApacheCycloneClient extends BaseCycloneClient
                 HttpClients.createDefault() :
                 this.httpClient;
             final ResponseValidator responseValidator = this.responseValidator == null ?
-                new DefaultResponseValidator() :
+                new DefaultResponseValidator(apiUrl) :
                 this.responseValidator;
             return new ApacheCycloneClient(apiUrl, objectMapper, httpClient, responseValidator);
         }
