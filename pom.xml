@@ -221,6 +221,11 @@
                 <version>${flyway.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq</artifactId>
+                <version>3.13.4</version> <!--TODO version-->
+            </dependency>
+            <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
@@ -372,6 +377,43 @@
                         <target>${java.version}</target>
                         <encoding>${encoding}</encoding>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jooq</groupId>
+                    <artifactId>jooq-codegen-maven</artifactId>
+                    <version>3.13.4</version>
+                    <configuration>
+                        <jdbc>
+                            <driver>org.postgresql.Driver</driver>
+                            <url>jdbc:postgresql://localhost/postgres</url>
+                            <user>postgres</user>
+                            <password>cyclone</password>
+                        </jdbc>
+                        <generator>
+                            <database>
+                                <name>org.jooq.meta.postgres.PostgresDatabase</name>
+                                <inputSchema>public</inputSchema>
+                            </database>
+                            <target>
+                                <packageName>org.cempaka.cyclone.jooq</packageName>
+                                <directory>target/generated-sources/jooq</directory>
+                            </target>
+                        </generator>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.postgresql</groupId>
+                            <artifactId>postgresql</artifactId>
+                            <version>${postgresql.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

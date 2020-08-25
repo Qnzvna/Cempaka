@@ -7,15 +7,16 @@ import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Environment;
 import java.time.Clock;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.cempaka.cyclone.configurations.AuthenticationConfiguration;
@@ -45,6 +46,8 @@ import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.jackson2.Jackson2Config;
 import org.jdbi.v3.jackson2.Jackson2Plugin;
 import org.jdbi.v3.postgres.PostgresPlugin;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 public class DaemonModule extends AbstractModule
 {
@@ -139,6 +142,15 @@ public class DaemonModule extends AbstractModule
         jdbi.installPlugin(new PostgresPlugin());
         jdbi.getConfig().get(Jackson2Config.class).setMapper(objectMapper);
         return jdbi;
+    }
+
+    @Provides
+    @Singleton
+    public DSLContext context()
+    {
+        final DataSourceFactory dataSourceFactory = daemonConfiguration.getDataSourceFactory();
+        // TODO pooling
+        return DSL.using(dataSourceFactory.getUrl(), dataSourceFactory.getUser(), dataSourceFactory.getPassword());
     }
 
     @Inject

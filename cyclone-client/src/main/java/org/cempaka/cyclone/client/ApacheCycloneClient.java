@@ -3,6 +3,7 @@ package org.cempaka.cyclone.client;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.cempaka.cyclone.client.Endpoints.CLUSTER_NODE_CAPACITY;
 import static org.cempaka.cyclone.client.Endpoints.CLUSTER_STATUS;
+import static org.cempaka.cyclone.client.Endpoints.METADATA;
 import static org.cempaka.cyclone.client.Endpoints.PARCEL;
 import static org.cempaka.cyclone.client.Endpoints.PARCELS;
 import static org.cempaka.cyclone.client.Endpoints.START_TEST;
@@ -39,6 +40,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
@@ -215,6 +217,15 @@ public class ApacheCycloneClient extends BaseCycloneClient
     }
 
     @Override
+    public void deleteTestExecution(final UUID testExecutionId)
+    {
+        checkNotNull(testExecutionId);
+        final HttpDelete httpDelete = new HttpDelete(
+            createResource(MessageFormat.format(TEST_EXECUTION, testExecutionId)));
+        runRequest(httpDelete);
+    }
+
+    @Override
     public Set<UUID> getTestExecutionsIds()
     {
         final HttpGet httpGet = new HttpGet(createResource(TEST_EXECUTIONS_KEYS));
@@ -230,11 +241,34 @@ public class ApacheCycloneClient extends BaseCycloneClient
     }
 
     @Override
-    public void deleteTestExecution(final UUID testExecutionId)
+    public void uploadMetadata(final String id, final File data)
     {
-        checkNotNull(testExecutionId);
-        final HttpDelete httpDelete = new HttpDelete(
-            createResource(MessageFormat.format(TEST_EXECUTION, testExecutionId)));
+        checkNotNull(id);
+        checkNotNull(data);
+        final HttpPut httpPut = new HttpPut(createResource(MessageFormat.format(METADATA, id)));
+        httpPut.setEntity(MultipartEntityBuilder.create()
+            .addBinaryBody("file", data)
+            .build());
+        runRequest(httpPut);
+    }
+
+    @Override
+    public void uploadMetadata(final String id, final byte[] data)
+    {
+        checkNotNull(id);
+        checkNotNull(data);
+        final HttpPut httpPut = new HttpPut(createResource(MessageFormat.format(METADATA, id)));
+        httpPut.setEntity(MultipartEntityBuilder.create()
+            .addBinaryBody("file", data)
+            .build());
+        runRequest(httpPut);
+    }
+
+    @Override
+    public void deleteMetadata(final String id)
+    {
+        checkNotNull(id);
+        final HttpDelete httpDelete = new HttpDelete(createResource(MessageFormat.format(METADATA, id)));
         runRequest(httpDelete);
     }
 

@@ -47,4 +47,10 @@ public interface CycloneClient
     Set<UUID> getTestExecutionsIds();
 
     Set<String> getTestExecutionLogMessages(UUID testExecutionId, Instant from);
+
+    void uploadMetadata(String id, File data);
+
+    void uploadMetadata(String id, byte[] data);
+
+    void deleteMetadata(String id);
 }
