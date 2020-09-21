@@ -1,0 +1,33 @@
+<form ng-if="$ctrl.metadata">
+    <div class="form-group">
+        <label for="id">Id</label>
+        <input type="text" class="form-control" id="id" ng-model="$ctrl.metadata.id">
+    </div>
+
+    <div class="form-group">
+        <label for="inputType">Type of metadata</label>
+        <select class="form-control" ng-model="$ctrl.inputType" id="inputType">
+            <option selected>File</option>
+            <option>Text</option>
+        </select>
+    </div>
+
+    <div class="input-group mb-3" ng-if="$ctrl.inputType === 'File'">
+        <div class="custom-file">
+            <input ngf-select ng-model="$ctrl.metadataFile" type="file" class="custom-file-input"
+                   id="metadataFileInput">
+            <label class="custom-file-label" for="metadataFileInput">{{$ctrl.metadataFile.name || "Choose file to
+                upload"}}</label>
+        </div>
+    </div>
+
+    <div class="form-group" ng-if="$ctrl.inputType === 'Text'">
+        <label for="id">Value</label>
+        <textarea class="form-control" id="value" ng-model="$ctrl.metadata.value"></textarea>
+    </div>
+
+    <button type="button" class="btn btn-primary float-right" ng-click="$ctrl.saveMetadata()"
+            ng-disabled="$ctrl.uploading">
+        <i class="fas fa-save"></i> Save
+    </button>
+</form>

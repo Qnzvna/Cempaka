@@ -40,7 +40,6 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
@@ -245,11 +244,11 @@ public class ApacheCycloneClient extends BaseCycloneClient
     {
         checkNotNull(id);
         checkNotNull(data);
-        final HttpPut httpPut = new HttpPut(createResource(MessageFormat.format(METADATA, id)));
-        httpPut.setEntity(MultipartEntityBuilder.create()
+        final HttpPost httpPost = new HttpPost(createResource(MessageFormat.format(METADATA, id)));
+        httpPost.setEntity(MultipartEntityBuilder.create()
             .addBinaryBody("file", data)
             .build());
-        runRequest(httpPut);
+        runRequest(httpPost);
     }
 
     @Override
@@ -257,11 +256,11 @@ public class ApacheCycloneClient extends BaseCycloneClient
     {
         checkNotNull(id);
         checkNotNull(data);
-        final HttpPut httpPut = new HttpPut(createResource(MessageFormat.format(METADATA, id)));
-        httpPut.setEntity(MultipartEntityBuilder.create()
+        final HttpPost httpPost = new HttpPost(createResource(MessageFormat.format(METADATA, id)));
+        httpPost.setEntity(MultipartEntityBuilder.create()
             .addBinaryBody("file", data)
             .build());
-        runRequest(httpPut);
+        runRequest(httpPost);
     }
 
     @Override
@@ -346,6 +345,12 @@ public class ApacheCycloneClient extends BaseCycloneClient
         public Builder withObjectMapper(final ObjectMapper objectMapper)
         {
             this.objectMapper = checkNotNull(objectMapper);
+            return this;
+        }
+
+        public Builder withResponseValidator(final ResponseValidator responseValidator)
+        {
+            this.responseValidator = checkNotNull(responseValidator);
             return this;
         }
 

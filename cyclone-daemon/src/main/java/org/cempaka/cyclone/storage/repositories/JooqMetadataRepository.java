@@ -64,4 +64,10 @@ public class JooqMetadataRepository implements MetadataRepository
     {
         return context.selectFrom(Tables.METADATA).fetch();
     }
+
+    @Override
+    public List<MetadataRecord> getAllWithoutValue()
+    {
+        return context.select(Tables.METADATA.METADATA_ID).from(Tables.METADATA).fetchInto(Tables.METADATA);
+    }
 }

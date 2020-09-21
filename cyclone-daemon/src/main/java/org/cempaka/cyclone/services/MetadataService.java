@@ -2,7 +2,10 @@ package org.cempaka.cyclone.services;
 
 import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
 
+import com.google.common.base.Strings;
+import com.google.common.primitives.Bytes;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,20 +27,38 @@ public class MetadataService
         this.metadataRepository = checkNotNull(metadataRepository);
     }
 
-    public void put(final Metadata metadata)
+    public List<Metadata> getAll()
     {
-        checkNotNull(metadata);
-        metadataRepository.put(new MetadataRecord(metadata.getId(), metadata.getValue()));
+        return metadataRepository.getAll().stream()
+            .map(this::fromRecord)
+            .collect(Collectors.toList());
+    }
+
+    public List<Metadata> getAllWithoutValue()
+    {
+        return metadataRepository.getAllWithoutValue().stream()
+            .map(this::fromRecord)
+            .collect(Collectors.toList());
     }
 
     public Optional<Metadata> get(final String metadataId)
     {
         checkNotNull(metadataId);
-        return metadataRepository.get(metadataId)
-            .map(metadataRecord -> ImmutableMetadata.builder()
-                .id(metadataRecord.getMetadataId())
-                .value(metadataRecord.getValue())
-                .build());
+        return metadataRepository.get(metadataId).map(this::fromRecord);
+    }
+
+    private ImmutableMetadata fromRecord(final MetadataRecord metadataRecord)
+    {
+        return ImmutableMetadata.builder()
+            .id(metadataRecord.getMetadataId())
+            .value(metadataRecord.getValue() == null ? new byte[]{} : metadataRecord.getValue())
+            .build();
+    }
+
+    public void put(final Metadata metadata)
+    {
+        checkNotNull(metadata);
+        metadataRepository.put(new MetadataRecord(metadata.getId(), metadata.getValue()));
     }
 
     public void delete(final String metadataId)

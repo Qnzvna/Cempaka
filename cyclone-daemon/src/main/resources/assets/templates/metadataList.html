@@ -1,0 +1,30 @@
+<h5 class="mb-3 mt-4">Metadata</h5>
+
+<div class="text-center">
+    <div ng-if="$ctrl.metadata === undefined" class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<div class="btn-group btn-group-sm float-right mb-3">
+    <button type="button" class="btn btn-sm btn-secondary ml-2" ng-click="$ctrl.addMetadata()">
+        <i class="fas fa-plus"></i> Add metadata
+    </button>
+</div>
+
+<div class="clearfix"></div>
+
+<ul class="list-group">
+    <li class="list-group-item" ng-repeat="meta in $ctrl.metadata">
+        <div class="btn-group float-right" role="group">
+            <button type="button" class="btn btn-danger"
+                    ng-click="$ctrl.deleteMetadata(meta)"
+                    uib-tooltip="Delete">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        <h5>
+            {{meta.id}}
+        </h5>
+    </li>
+</ul>

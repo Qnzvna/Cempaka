@@ -13,4 +13,6 @@ public interface MetadataRepository
     void delete(String metadataId);
 
     List<MetadataRecord> getAll();
+
+    List<MetadataRecord> getAllWithoutValue();
 }

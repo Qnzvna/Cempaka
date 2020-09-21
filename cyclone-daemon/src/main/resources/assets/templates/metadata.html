@@ -1,0 +1,9 @@
+<h5 class="mb-3 mt-4">Add metadata</h5>
+
+<div class="text-center">
+    <div ng-if="$ctrl.metadata === undefined" class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<metadata-form metadata="$ctrl.metadata"></metadata-form>
