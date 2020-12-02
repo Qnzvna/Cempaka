@@ -55,6 +55,8 @@ public class CycloneCli
     @Option(names = "--measurement-period",
         description = "measurements period in seconds", defaultValue = "5")
     private int measurementsPeriod;
+    @Option(names = "--measurements-print", description = "enables measurement printing", defaultValue = "false")
+    private boolean measurementsPrint;
 
     private final MeasurementRegistry measurementRegistry;
     private final DaemonChannel daemonChannel;
@@ -84,9 +86,8 @@ public class CycloneCli
             LoggerFactoryConfiguration.PORT = daemonPort;
             daemonChannel.connect();
             daemonChannel.write(new StartedPayload(testId), daemonPort);
-            metricsExecutor.scheduleAtFixedRate(this::reportMetrics, 1, measurementsPeriod,
-                TimeUnit.SECONDS);
         }
+        metricsExecutor.scheduleAtFixedRate(this::reportMetrics, 1, measurementsPeriod, TimeUnit.SECONDS);
         final EndedPayload endedPayload = runTest();
         metricsExecutor.shutdown();
         metricsExecutor.awaitTermination(1, TimeUnit.MINUTES);
@@ -124,10 +125,13 @@ public class CycloneCli
 
     private void reportMetrics()
     {
+        final Map<String, Double> measurements = measurementRegistry.getSnapshots();
         if (isUdpEnabled()) {
-            final Map<String, Double> measurements = measurementRegistry.getSnapshots();
             final RunningPayload runningPayload = new RunningPayload(testId, measurements);
             daemonChannel.write(runningPayload, daemonPort);
+        }
+        if (measurementsPrint) {
+            measurements.forEach((name, value) -> System.out.printf("%s=%s\n", name, value));
         }
     }
 
