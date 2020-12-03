@@ -1,7 +1,7 @@
 CREATE TABLE test_executions
 (
   id character varying NOT NULL,
-  node text NOT NULL,
+  node character varying NOT NULL,
   state text,
   properties jsonb
 );
