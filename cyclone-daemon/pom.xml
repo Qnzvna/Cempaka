@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.cempaka.cyclone</groupId>
         <artifactId>cyclone</artifactId>
-        <version>0.4-SNAPSHOT</version>
+        <version>0.4</version>
     </parent>
 
     <artifactId>cyclone-daemon</artifactId>
