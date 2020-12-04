@@ -15,7 +15,8 @@ class UriRegexMatcher implements RequestMatcher
 
     public static RequestMatcher ofFormat(final String format)
     {
-        return ofRegex(format.replaceAll("\\{.*}", ".*") + "$");
+        return ofRegex(format.replaceAll("\\{[^/]*}", "[^\\/]*")
+            .replaceAll("\\?", "\\\\?") + "$");
     }
 
     private UriRegexMatcher(final String regex)
@@ -26,6 +27,6 @@ class UriRegexMatcher implements RequestMatcher
     @Override
     public boolean test(final HttpRequest request)
     {
-        return request.getRequestLine().getUri().matches("(http|https)://.+:[0-9]+" + regex);
+        return request.getRequestLine().getUri().matches(regex);
     }
 }

@@ -1,6 +1,5 @@
 package org.cempaka.cyclone.resources;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +15,7 @@ final class Tests
     private static final String EXAMPLE_TEST_FQDN = "org.cempaka.cyclone.examples.ExampleTest";
     private static final String TOO_BIG_PAYLOAD_TEST_FQDN = "org.cempaka.cyclone.examples.TooBigPayloadTest";
     private static final String LOG_TEST_FQDN = "org.cempaka.cyclone.examples.LoggingTest";
+    private static final String METADATA_TEST_FQDN = "org.cempaka.cyclone.examples.MetadataParameterExampleTest";
 
     static TestExecutionProperties getExampleTest(final UUID parcelId,
                                                   final Set<String> nodes,
@@ -37,6 +37,11 @@ final class Tests
     static TestExecutionProperties getLoggingTest(final UUID parcelId, final Set<String> nodes)
     {
         return getTest(parcelId, nodes, LOG_TEST_FQDN, ImmutableMap.of());
+    }
+
+    static TestExecutionProperties getMetadataTest(final UUID parcelId, final Set<String> nodes)
+    {
+        return getTest(parcelId, nodes, METADATA_TEST_FQDN, ImmutableMap.of());
     }
 
     private static TestExecutionProperties getTest(final UUID parcelId,

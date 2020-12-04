@@ -19,7 +19,9 @@ import org.cempaka.cyclone.storage.jdbi.TestExecutionDataAccess;
 import org.cempaka.cyclone.storage.jdbi.TestMetricDataAccess;
 import org.cempaka.cyclone.storage.repositories.JdbiTestMetricRepository;
 import org.cempaka.cyclone.storage.repositories.JdbiTestRepository;
+import org.cempaka.cyclone.storage.repositories.JooqMetadataRepository;
 import org.cempaka.cyclone.storage.repositories.LogMessageRepository;
+import org.cempaka.cyclone.storage.repositories.MetadataRepository;
 import org.cempaka.cyclone.storage.repositories.NodeStateDataRepository;
 import org.cempaka.cyclone.storage.repositories.ParcelRepository;
 import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
@@ -54,6 +56,8 @@ public class StorageModule extends PrivateModule
             .to(storageConfiguration.getMetricsRepository().getType());
         bind(LogMessageRepository.class)
             .to(storageConfiguration.getLogRepository().getType());
+        bind(MetadataRepository.class)
+            .to(JooqMetadataRepository.class); // TODO
 
         expose(ParcelRepository.class);
         expose(TestRepository.class);
@@ -61,6 +65,7 @@ public class StorageModule extends PrivateModule
         expose(TestExecutionRepository.class);
         expose(NodeStateDataRepository.class);
         expose(LogMessageRepository.class);
+        expose(MetadataRepository.class);
     }
 
     @Provides

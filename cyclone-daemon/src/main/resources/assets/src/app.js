@@ -8,6 +8,10 @@ import {TestExecutionComponent} from './components/testExecutionComponent.js';
 import {TestsService} from './services/testsService.js';
 import {ClusterService} from './services/clusterService.js';
 import {ExecutionService} from './services/executionService.js';
+import {MetadataService} from './services/metadataService.js';
+import {MetadataListComponent} from './components/metadataListComponent.js';
+import {MetadataComponent} from './components/metadataComponent.js';
+import {MetadataForm} from './components/metadataForm.js';
 
 export const CycloneModule = angular.module('cyclone', [
     'ngRoute',
@@ -23,9 +27,13 @@ export const CycloneModule = angular.module('cyclone', [
     .component('tests', TestsComponent)
     .component('testExecutions', TestExecutionsComponent)
     .component('testExecution', TestExecutionComponent)
+    .component('metadataList', MetadataListComponent)
+    .component('metadata', MetadataComponent)
+    .component('metadataForm', MetadataForm)
     .service('testService', TestsService)
     .service('clusterService', ClusterService)
     .service('executionService', ExecutionService)
+    .service('metadataService', MetadataService)
     .config($routeProvider => {
         $routeProvider.when('/tests/start', {
             template: '<start-test></start-test>'
@@ -37,5 +45,9 @@ export const CycloneModule = angular.module('cyclone', [
             template: '<test-execution></test-execution>'
         }).when('/cluster', {
             template: '<cluster></cluster>'
+        }).when('/metadata', {
+            template: '<metadata-list></metadata-list>'
+        }).when('/metadata/add', {
+            template: '<metadata></metadata>'
         }).otherwise('/tests/start');
     });

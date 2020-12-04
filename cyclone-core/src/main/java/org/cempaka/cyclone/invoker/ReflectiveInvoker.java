@@ -18,6 +18,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.cempaka.cyclone.annotations.AfterStorm;
 import org.cempaka.cyclone.annotations.BeforeStorm;
+import org.cempaka.cyclone.annotations.MetadataParameter;
 import org.cempaka.cyclone.annotations.Parameter;
 import org.cempaka.cyclone.annotations.SuppressThrowables;
 import org.cempaka.cyclone.annotations.Throttle;
@@ -37,7 +40,7 @@ import org.cempaka.cyclone.utils.Reflections;
 
 public class ReflectiveInvoker implements Invoker
 {
-    private final Class testClass;
+    private final Class<?> testClass;
     private final MeasurementRegistry measurementRegistry;
     private final Supplier<Object> testInstance;
 
@@ -45,19 +48,28 @@ public class ReflectiveInvoker implements Invoker
 
     private ReflectiveInvoker(final Class testClass,
                               final Map<String, String> parameters,
+                              final Map<String, String> metadata,
                               final MeasurementRegistry measurementRegistry)
     {
         this.testClass = checkNotNull(testClass);
         this.measurementRegistry = checkNotNull(measurementRegistry);
-        this.testInstance = Memoizer.memoize(() -> createTest(testClass, parameters));
+        this.testInstance = Memoizer.memoize(() -> createTest(testClass, parameters, metadata));
         measurementRegistrar.registerAll(testClass, measurementRegistry);
     }
 
-    public static Invoker forTestClass(final Class testClass,
+    public static Invoker forTestClass(final Class<?> testClass,
                                        final Map<String, String> parameters,
                                        final MeasurementRegistry measurementRegistry)
     {
-        return new ReflectiveInvoker(testClass, parameters, measurementRegistry);
+        return forTestClass(testClass, parameters, new HashMap<>(), measurementRegistry);
+    }
+
+    public static Invoker forTestClass(final Class<?> testClass,
+                                       final Map<String, String> parameters,
+                                       final Map<String, String> metadata,
+                                       final MeasurementRegistry measurementRegistry)
+    {
+        return new ReflectiveInvoker(testClass, parameters, metadata, measurementRegistry);
     }
 
     @Override
@@ -78,12 +90,14 @@ public class ReflectiveInvoker implements Invoker
         runOneAnnotatedMethod(testClass, testInstance.get(), AfterStorm.class);
     }
 
-    private Object createTest(final Class testClass, final Map<String, String> parameters)
+    private Object createTest(final Class<?> testClass,
+                              final Map<String, String> parameters,
+                              final Map<String, String> metadata)
     {
-        final Constructor[] constructors = testClass.getConstructors();
+        final Constructor<?>[] constructors = testClass.getConstructors();
         checkArgument(constructors.length == 1,
             "Test classes should have only one constructor.");
-        final Constructor constructor = constructors[0];
+        final Constructor<?> constructor = constructors[0];
         checkArgument(constructor.getParameterCount() == 0,
             "Test classes should have no-params constructor only.");
         try {
@@ -93,6 +107,9 @@ public class ReflectiveInvoker implements Invoker
                     .filter(Reflections::isFieldParameter)
                     .forEach(field -> setParameterField(parameters, testObject, field));
             }
+            Stream.of(testClass.getDeclaredFields())
+                .filter(Reflections::isFieldMetadataParameter)
+                .forEach(field -> setMetadataParameter(field, testObject, metadata));
             getMeasureAnnotatedFields(testClass)
                 .forEach(field -> setFieldValue(field,
                     testObject,
@@ -131,6 +148,26 @@ public class ReflectiveInvoker implements Invoker
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    private void setMetadataParameter(final Field field,
+                                      final Object testObject,
+                                      final Map<String, String> metadata)
+    {
+        final String id = field.getAnnotation(MetadataParameter.class).value();
+        try {
+            field.setAccessible(true);
+            final Class<?> fieldType = field.getType();
+            final byte[] value = Base64.getDecoder().decode(metadata.getOrDefault(id, ""));
+            if (fieldType.equals(byte[].class)) {
+                field.set(testObject, value);
+            } else {
+                throw new IllegalArgumentException(
+                    "MetadataParameter annotation should be of byte[] type.");
+            }
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 

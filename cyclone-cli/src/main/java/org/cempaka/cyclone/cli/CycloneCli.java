@@ -2,6 +2,7 @@ package org.cempaka.cyclone.cli;
 
 import static org.cempaka.cyclone.utils.CliParameters.DAEMON_PORT;
 import static org.cempaka.cyclone.utils.CliParameters.LOOP_COUNT;
+import static org.cempaka.cyclone.utils.CliParameters.METADATA;
 import static org.cempaka.cyclone.utils.CliParameters.PARAMETERS;
 import static org.cempaka.cyclone.utils.CliParameters.TEST_CLASSES;
 import static org.cempaka.cyclone.utils.CliParameters.TEST_ID;
@@ -57,6 +58,8 @@ public class CycloneCli
     private int measurementsPeriod;
     @Option(names = "--measurements-print", description = "enables measurement printing", defaultValue = "false")
     private boolean measurementsPrint;
+    @Option(names = METADATA)
+    private Map<String, String> metadata = new HashMap<>();
 
     private final MeasurementRegistry measurementRegistry;
     private final DaemonChannel daemonChannel;
@@ -103,6 +106,7 @@ public class CycloneCli
         final List<Class<?>> testClasses = loadTestClasses();
         final SimpleRunner simpleRunner = new SimpleRunner(testClasses,
             parameters,
+            metadata,
             measurementRegistry);
         final ThreadRunner threadRunner = new ThreadRunner(simpleRunner, threads);
         final Runner runner = new LoopRunner(threadRunner, loopCount);

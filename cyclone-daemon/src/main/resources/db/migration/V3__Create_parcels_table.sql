@@ -1,6 +1,6 @@
 CREATE TABLE parcels
 (
-  id text NOT NULL,
+  id character varying NOT NULL,
   parcel bytea
 );
 

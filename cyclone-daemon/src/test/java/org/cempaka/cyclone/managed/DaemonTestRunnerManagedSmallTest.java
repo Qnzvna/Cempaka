@@ -1,16 +1,19 @@
 package org.cempaka.cyclone.managed;
 
 import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.ImmutableSet;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.cempaka.cyclone.beans.TestState;
 import org.cempaka.cyclone.configurations.TestRunnerConfiguration;
+import org.cempaka.cyclone.services.MetadataService;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
 import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
 import org.cempaka.cyclone.tests.ImmutableTestExecution;
@@ -39,6 +42,8 @@ public class DaemonTestRunnerManagedSmallTest
     private TestRunnerConfiguration testRunnerConfiguration;
     @Mock
     private TestExecutionProperties testExecutionProperties;
+    @Mock
+    private MetadataService metadataService;
 
     @InjectMocks
     private DaemonTestRunnerManaged daemonTestRunnerManaged;
@@ -48,6 +53,7 @@ public class DaemonTestRunnerManagedSmallTest
     {
         given(testRunnerConfiguration.getPeriodInterval()).willReturn(1);
         given(nodeIdentifierProvider.get()).willReturn(NODE_IDENTIFIER);
+        given(metadataService.getEncodedMetadata()).willReturn(Collections.emptyMap());
     }
 
     @Test
@@ -66,7 +72,7 @@ public class DaemonTestRunnerManagedSmallTest
         //then
         await().atMost(2, TimeUnit.SECONDS)
             .untilAsserted(() -> {
-                verify(workerManager, times(1)).startTest(any(), any());
+                verify(workerManager, times(1)).startTest(any(), any(), anyMap());
                 verify(testExecutionRepository, times(1))
                     .setState(TEST_ID, NODE_IDENTIFIER, TestState.STARTED);
             });

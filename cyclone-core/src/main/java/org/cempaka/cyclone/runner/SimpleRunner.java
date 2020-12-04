@@ -16,12 +16,13 @@ public class SimpleRunner implements Runner
 
     public SimpleRunner(final List<Class<?>> testClasses,
                         final Map<String, String> parameters,
+                        final Map<String, String> metadata,
                         final MeasurementRegistry measurementRegistry)
     {
         this.testClasses = new ArrayList<>(testClasses);
         this.invokers = getTestClasses().stream()
             .map(testClass ->
-                ReflectiveInvoker.forTestClass(testClass, parameters, measurementRegistry))
+                ReflectiveInvoker.forTestClass(testClass, parameters, metadata, measurementRegistry))
             .collect(Collectors.toList());
     }
 

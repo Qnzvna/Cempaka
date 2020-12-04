@@ -3,6 +3,7 @@ package org.cempaka.cyclone.client;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.cempaka.cyclone.client.Endpoints.CLUSTER_NODE_CAPACITY;
 import static org.cempaka.cyclone.client.Endpoints.CLUSTER_STATUS;
+import static org.cempaka.cyclone.client.Endpoints.METADATA;
 import static org.cempaka.cyclone.client.Endpoints.PARCEL;
 import static org.cempaka.cyclone.client.Endpoints.PARCELS;
 import static org.cempaka.cyclone.client.Endpoints.START_TEST;
@@ -215,6 +216,15 @@ public class ApacheCycloneClient extends BaseCycloneClient
     }
 
     @Override
+    public void deleteTestExecution(final UUID testExecutionId)
+    {
+        checkNotNull(testExecutionId);
+        final HttpDelete httpDelete = new HttpDelete(
+            createResource(MessageFormat.format(TEST_EXECUTION, testExecutionId)));
+        runRequest(httpDelete);
+    }
+
+    @Override
     public Set<UUID> getTestExecutionsIds()
     {
         final HttpGet httpGet = new HttpGet(createResource(TEST_EXECUTIONS_KEYS));
@@ -230,11 +240,34 @@ public class ApacheCycloneClient extends BaseCycloneClient
     }
 
     @Override
-    public void deleteTestExecution(final UUID testExecutionId)
+    public void uploadMetadata(final String id, final File data)
     {
-        checkNotNull(testExecutionId);
-        final HttpDelete httpDelete = new HttpDelete(
-            createResource(MessageFormat.format(TEST_EXECUTION, testExecutionId)));
+        checkNotNull(id);
+        checkNotNull(data);
+        final HttpPost httpPost = new HttpPost(createResource(MessageFormat.format(METADATA, id)));
+        httpPost.setEntity(MultipartEntityBuilder.create()
+            .addBinaryBody("file", data)
+            .build());
+        runRequest(httpPost);
+    }
+
+    @Override
+    public void uploadMetadata(final String id, final byte[] data)
+    {
+        checkNotNull(id);
+        checkNotNull(data);
+        final HttpPost httpPost = new HttpPost(createResource(MessageFormat.format(METADATA, id)));
+        httpPost.setEntity(MultipartEntityBuilder.create()
+            .addBinaryBody("file", data)
+            .build());
+        runRequest(httpPost);
+    }
+
+    @Override
+    public void deleteMetadata(final String id)
+    {
+        checkNotNull(id);
+        final HttpDelete httpDelete = new HttpDelete(createResource(MessageFormat.format(METADATA, id)));
         runRequest(httpDelete);
     }
 
@@ -315,6 +348,12 @@ public class ApacheCycloneClient extends BaseCycloneClient
             return this;
         }
 
+        public Builder withResponseValidator(final ResponseValidator responseValidator)
+        {
+            this.responseValidator = checkNotNull(responseValidator);
+            return this;
+        }
+
         public CycloneClient build()
         {
             final ObjectMapper objectMapper = this.objectMapper == null ?
@@ -326,7 +365,7 @@ public class ApacheCycloneClient extends BaseCycloneClient
                 HttpClients.createDefault() :
                 this.httpClient;
             final ResponseValidator responseValidator = this.responseValidator == null ?
-                new DefaultResponseValidator() :
+                new DefaultResponseValidator(apiUrl) :
                 this.responseValidator;
             return new ApacheCycloneClient(apiUrl, objectMapper, httpClient, responseValidator);
         }

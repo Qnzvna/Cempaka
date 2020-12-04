@@ -72,6 +72,8 @@
         <jdbi3.version>3.12.2</jdbi3.version>
         <flyway.version>6.3.0</flyway.version>
         <jackson.version>2.10.3</jackson.version>
+        <jooq.version>3.14.4</jooq.version>
+        <slf4j.version>1.7.30</slf4j.version>
 
         <junit.version>4.13</junit.version>
         <assertj-core.version>3.15.0</assertj-core.version>
@@ -221,6 +223,11 @@
                 <version>${flyway.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq</artifactId>
+                <version>${jooq.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
@@ -238,7 +245,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.30</version>
+                <version>${slf4j.version}</version>
             </dependency>
 
             <dependency>
@@ -372,6 +379,53 @@
                         <target>${java.version}</target>
                         <encoding>${encoding}</encoding>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jooq</groupId>
+                    <artifactId>jooq-codegen-maven</artifactId>
+                    <version>${jooq.version}</version>
+                    <configuration>
+                        <generator>
+                            <database>
+                                <name>org.jooq.meta.extensions.ddl.DDLDatabase</name>
+                                <properties>
+                                    <property>
+                                        <key>scripts</key>
+                                        <value>src/main/resources/db/migration/*.sql</value>
+                                    </property>
+                                    <property>
+                                        <key>sort</key>
+                                        <value>semantic</value>
+                                    </property>
+                                    <property>
+                                        <key>unqualifiedSchema</key>
+                                        <value>none</value>
+                                    </property>
+                                    <property>
+                                        <key>defaultNameCase</key>
+                                        <value>lower</value>
+                                    </property>
+                                </properties>
+                            </database>
+                            <target>
+                                <packageName>org.cempaka.cyclone.jooq</packageName>
+                            </target>
+                        </generator>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.jooq</groupId>
+                            <artifactId>jooq-meta-extensions</artifactId>
+                            <version>${jooq.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
+import java.util.Map;
 import java.util.UUID;
 import org.cempaka.cyclone.beans.Parcel;
 import org.cempaka.cyclone.beans.exceptions.ProcessFailureException;
@@ -30,7 +31,9 @@ class Worker
         this.daemonPort = daemonPort;
     }
 
-    synchronized void start(final UUID testId, final Parcel parcel, final TestExecutionProperties properties)
+    synchronized void start(final UUID testId, final Parcel parcel,
+                            final TestExecutionProperties properties,
+                            final Map<String, String> metadata)
     {
         checkNotNull(testId);
         checkNotNull(parcel);
@@ -42,6 +45,7 @@ class Worker
             .setThreadsNumber(properties.getThreadsNumber())
             .setParameters(properties.getParameters())
             .setTestId(testId.toString())
+            .setMetadata(metadata)
             .setDaemonPort(daemonPort)
             .build();
         runningProcess = startProcess(command);
