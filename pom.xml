@@ -60,28 +60,30 @@
         <java.version>1.8</java.version>
         <encoding>UTF-8</encoding>
 
-        <guava.version>28.2-jre</guava.version>
-        <immutables.version>2.8.3</immutables.version>
-        <picocli.version>4.2.0</picocli.version>
+        <guava.version>30.0-jre</guava.version>
+        <immutables.version>2.8.8</immutables.version>
+        <picocli.version>4.5.2</picocli.version>
         <jersey.version>2.25.1</jersey.version>
-        <dropwizard.version>1.3.5</dropwizard.version>
-        <guice.version>4.2.2</guice.version>
+        <dropwizard.version>1.3.27</dropwizard.version>
+        <guice.version>4.2.3</guice.version>
         <metrics-core.version>3.0.2</metrics-core.version>
-        <httpclient.version>4.5.11</httpclient.version>
-        <postgresql.version>42.2.10</postgresql.version>
-        <jdbi3.version>3.12.2</jdbi3.version>
-        <flyway.version>6.3.0</flyway.version>
-        <jackson.version>2.10.3</jackson.version>
+        <httpclient.version>4.5.13</httpclient.version>
+        <postgresql.version>42.2.18</postgresql.version>
+        <jdbi3.version>3.18.0</jdbi3.version>
+        <flyway.version>7.3.1</flyway.version>
+        <jackson.version>2.12.0</jackson.version>
         <jooq.version>3.14.4</jooq.version>
         <slf4j.version>1.7.30</slf4j.version>
+        <javax.annotation.version>1.2</javax.annotation.version>
+        <dropwizard-webjars-bundle.version>1.3.5</dropwizard-webjars-bundle.version>
 
-        <junit.version>4.13</junit.version>
-        <assertj-core.version>3.15.0</assertj-core.version>
-        <awaitility.version>4.0.2</awaitility.version>
-        <httpmime.version>4.5.11</httpmime.version>
+        <junit.version>4.13.1</junit.version>
+        <assertj-core.version>3.18.1</assertj-core.version>
+        <awaitility.version>4.0.3</awaitility.version>
+        <httpmime.version>4.5.13</httpmime.version>
         <jacoco.version>0.8.5</jacoco.version>
-        <junit-jupiter.version>5.6.0</junit-jupiter.version>
-        <mockito-junit-jupiter.version>3.3.0</mockito-junit-jupiter.version>
+        <junit-jupiter.version>5.7.0</junit-jupiter.version>
+        <mockito-junit-jupiter.version>3.6.28</mockito-junit-jupiter.version>
 
         <angularjs.version>1.7.7</angularjs.version>
         <bootstrap.version>4.3.1</bootstrap.version>
@@ -165,7 +167,7 @@
             <dependency>
                 <groupId>io.dropwizard-bundles</groupId>
                 <artifactId>dropwizard-webjars-bundle</artifactId>
-                <version>${dropwizard.version}</version>
+                <version>${dropwizard-webjars-bundle.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.inject</groupId>
@@ -230,6 +232,16 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
@@ -620,9 +632,7 @@
                     <version>${jacoco.version}</version>
                     <configuration>
                         <excludes>
-                            <exclude>
-                                <exclude>org.cempaka.cyclone.jooq.*</exclude>
-                            </exclude>
+                            <exclude>org.cempaka.cyclone.jooq.*</exclude>
                         </excludes>
                     </configuration>
                     <executions>

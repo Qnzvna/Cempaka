@@ -29,7 +29,7 @@ public class MigrationRunner implements Runnable
             dataSourceFactory.getPassword())
             .connectRetries(3)
             .load();
-        final int migrationsApplied = flyway.migrate();
+        final int migrationsApplied = flyway.migrate().migrationsExecuted;
         LOG.info("Database migration completed. {} migrations applied.", migrationsApplied);
     }
 }
