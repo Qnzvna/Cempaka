@@ -62,7 +62,7 @@ public class StalledTestCleanerManaged implements Managed
             } catch (Exception e) {
                 LOG.error("Cleaning stalled test executions failed.", e);
             }
-        }, 0, stalledTestCleanerConfiguration.getPeriodInterval(), TimeUnit.MINUTES);
+        }, 10, stalledTestCleanerConfiguration.getPeriodInterval(), TimeUnit.SECONDS);
     }
 
     void execute()
