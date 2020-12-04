@@ -7,17 +7,17 @@ import org.cempaka.cyclone.channel.payloads.Payload;
 class MessageEncoder
 {
     private final HeaderEncoder headerEncoder;
-    private final PayloadEncoder payloadEncoder;
+    private final TypePayloadEncoder typePayloadEncoder;
 
     MessageEncoder()
     {
         this.headerEncoder = new HeaderEncoder();
-        this.payloadEncoder = new PayloadEncoder();
+        this.typePayloadEncoder = new TypePayloadEncoder();
     }
 
     ByteBuffer encode(final Payload payload)
     {
-        final ByteBuffer payloadData = payloadEncoder.encode(payload);
+        final ByteBuffer payloadData = typePayloadEncoder.encode(payload);
         final Header header = new Header(payloadData.remaining(), UUID.fromString(payload.getTestId()),
             payload.getType());
         final byte[] headerData = headerEncoder.encode(header).array();
@@ -37,6 +37,6 @@ class MessageEncoder
         final String testId = header.getTestId().toString();
         final byte[] payloadData = new byte[header.getSize()];
         buffer.get(payloadData);
-        return payloadEncoder.decode(header.getPayloadType(), testId, payloadData);
+        return typePayloadEncoder.decode(header.getPayloadType(), testId, payloadData);
     }
 }
