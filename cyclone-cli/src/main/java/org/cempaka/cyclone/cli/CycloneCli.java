@@ -20,15 +20,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.cempaka.cyclone.channel.DaemonChannel;
 import org.cempaka.cyclone.channel.UdpDaemonChannel;
-import org.cempaka.cyclone.channel.payloads.EndedPayload;
-import org.cempaka.cyclone.channel.payloads.RunningPayload;
-import org.cempaka.cyclone.channel.payloads.StartedPayload;
 import org.cempaka.cyclone.log.LoggerFactoryConfiguration;
 import org.cempaka.cyclone.measurements.MeasurementRegistry;
-import org.cempaka.cyclone.runner.LoopRunner;
-import org.cempaka.cyclone.runner.Runner;
-import org.cempaka.cyclone.runner.SimpleRunner;
-import org.cempaka.cyclone.runner.ThreadRunner;
+import org.cempaka.cyclone.runners.Runner;
+import org.cempaka.cyclone.runners.Runners;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 
@@ -87,36 +82,36 @@ public class CycloneCli
             LoggerFactoryConfiguration.ENABLED = true;
             LoggerFactoryConfiguration.TEST_ID = testId;
             LoggerFactoryConfiguration.PORT = daemonPort;
-            daemonChannel.connect();
-            daemonChannel.write(new StartedPayload(testId), daemonPort);
+            daemonChannel.connect(daemonPort);
+            daemonChannel.start(testId);
         }
         metricsExecutor.scheduleAtFixedRate(this::reportMetrics, 1, measurementsPeriod, TimeUnit.SECONDS);
-        final EndedPayload endedPayload = runTest();
+        final int exitCode = runTest();
         metricsExecutor.shutdown();
         metricsExecutor.awaitTermination(1, TimeUnit.MINUTES);
         if (isUdpEnabled()) {
-            daemonChannel.write(endedPayload, daemonPort);
+            daemonChannel.end(testId, exitCode);
         }
         daemonChannel.close();
-        return endedPayload.getExitCode();
+        return exitCode;
     }
 
-    private EndedPayload runTest() throws InterruptedException
+    private int runTest() throws InterruptedException
     {
         final List<Class<?>> testClasses = loadTestClasses();
-        final SimpleRunner simpleRunner = new SimpleRunner(testClasses,
+        final Runner simpleRunner = Runners.simpleRunner(testClasses,
             parameters,
             metadata,
             measurementRegistry);
-        final ThreadRunner threadRunner = new ThreadRunner(simpleRunner, threads);
-        final Runner runner = new LoopRunner(threadRunner, loopCount);
+        final Runner threadRunner = Runners.threadRunner(simpleRunner, threads);
+        final Runner runner = Runners.loopRunner(threadRunner, loopCount);
         try {
             runner.run();
             reportMetrics();
-            return new EndedPayload(testId, 0);
+            return 0;
         } catch (Exception e) {
             e.printStackTrace();
-            return new EndedPayload(testId, -1);
+            return -1;
         } finally {
             threadRunner.awaitTermination(RUNNER_AWAIT_TIME);
         }
@@ -131,8 +126,7 @@ public class CycloneCli
     {
         final Map<String, Double> measurements = measurementRegistry.getSnapshots();
         if (isUdpEnabled()) {
-            final RunningPayload runningPayload = new RunningPayload(testId, measurements);
-            daemonChannel.write(runningPayload, daemonPort);
+            daemonChannel.running(testId, measurements);
         }
         if (measurementsPrint) {
             measurements.forEach((name, value) -> System.out.printf("%s=%s\n", name, value));

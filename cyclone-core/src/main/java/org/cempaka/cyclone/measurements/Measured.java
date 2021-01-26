@@ -5,7 +5,6 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.cempaka.cyclone.measurements.tickers.Ticker;
 
 @Repeatable(MultiMeasured.class)
 @Retention(RetentionPolicy.RUNTIME)

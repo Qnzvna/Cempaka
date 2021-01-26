@@ -3,13 +3,14 @@ package org.cempaka.cyclone.measurements;
 import java.util.Collections;
 import java.util.Map;
 
-public class NoopMeasurement extends Measurement
+class NoopMeasurement extends Measurement
 {
-    public static Measurement INSTANCE = new NoopMeasurement();
+    public static final String NAME = "noop";
+    public static Measurement INSTANCE = new NoopMeasurement(NAME);
 
-    private NoopMeasurement()
+    NoopMeasurement(final String name)
     {
-        super("");
+        super(name);
     }
 
     @Override

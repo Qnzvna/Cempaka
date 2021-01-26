@@ -10,10 +10,8 @@ import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import org.cempaka.cyclone.channel.payloads.EndedPayload;
-import org.cempaka.cyclone.channel.payloads.RunningPayload;
 
-public class RunningPayloadEncoder implements PayloadEncoder<RunningPayload>
+class RunningPayloadEncoder implements PayloadEncoder<RunningPayload>
 {
     @Override
     public ByteBuffer encode(final RunningPayload payload)

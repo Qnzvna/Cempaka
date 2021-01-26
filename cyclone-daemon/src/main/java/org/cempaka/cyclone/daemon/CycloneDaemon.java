@@ -59,7 +59,7 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
         registerFilters(environment, injector);
 
         final DaemonChannel daemonChannel = injector.getInstance(DaemonChannel.class);
-        daemonChannel.connect(daemonConfiguration.getChannelConfiguration().getUdpServerPort());
+        daemonChannel.listen(daemonConfiguration.getChannelConfiguration().getUdpServerPort());
 
         LOG.info("Daemon started.");
     }

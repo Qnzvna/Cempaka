@@ -2,7 +2,6 @@ package org.cempaka.cyclone.channel;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;
-import org.cempaka.cyclone.channel.payloads.Payload;
 
 class MessageEncoder
 {

@@ -10,9 +10,9 @@ import java.net.SocketException;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import org.cempaka.cyclone.channel.UdpDaemonChannel;
-import org.cempaka.cyclone.channel.payloads.LogPayload;
-import org.cempaka.cyclone.channel.payloads.Payload;
-import org.cempaka.cyclone.channel.payloads.PayloadType;
+import org.cempaka.cyclone.channel.LogPayload;
+import org.cempaka.cyclone.channel.Payload;
+import org.cempaka.cyclone.channel.PayloadType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ExtendWith(MockitoExtension.class)
-public class CycloneLoggerMediumTest
+class CycloneLoggerMediumTest
 {
     private static final Logger LOG = LoggerFactory.getLogger("cyclone");
     private static final int PORT = 5000;
@@ -49,7 +49,7 @@ public class CycloneLoggerMediumTest
     @BeforeEach
     void setUp() throws SocketException
     {
-        channel.connect(PORT);
+        channel.listen(PORT);
         channel.addReadListener(consumer);
     }
 

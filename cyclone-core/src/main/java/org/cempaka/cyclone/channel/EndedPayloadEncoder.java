@@ -8,9 +8,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
-import org.cempaka.cyclone.channel.payloads.EndedPayload;
 
-public class EndedPayloadEncoder implements PayloadEncoder<EndedPayload>
+class EndedPayloadEncoder implements PayloadEncoder<EndedPayload>
 {
     @Override
     public ByteBuffer encode(final EndedPayload payload)

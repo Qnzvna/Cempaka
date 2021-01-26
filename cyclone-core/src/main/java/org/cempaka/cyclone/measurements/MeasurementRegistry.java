@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.cempaka.cyclone.utils.Reflections;
 
 public class MeasurementRegistry
 {
@@ -28,6 +29,34 @@ public class MeasurementRegistry
     {
         checkNotNull(method);
         measurements.put(MeasurementKey.of(method, measurement.getName()), measurement);
+    }
+
+    public void registerAll(final Class<?> testClass)
+    {
+        Reflections.getThunderboltMethods(testClass)
+            .forEach(method -> {
+                Reflections.getMeasuredAnnotations(method)
+                    .forEach(measured -> {
+                        final Measurement measurement = Reflections.newInstance(measured.value(), measured.name());
+                        register(method, measurement);
+                    });
+                Reflections.getMeasureAnnotatedParameters(method)
+                    .forEach(parameter -> {
+                        final Measure measure = parameter.getAnnotation(Measure.class);
+                        final Class<?> measurementClass = parameter.getType();
+                        final Measurement measurement =
+                            (Measurement) Reflections.newInstance(measurementClass, measure.value());
+                        register(method, measurement);
+                    });
+            });
+        Reflections.getMeasureAnnotatedFields(testClass)
+            .forEach(field -> {
+                final Measure measure = field.getAnnotation(Measure.class);
+                final Class<?> measurementClass = field.getType();
+                final Measurement measurement =
+                    (Measurement) Reflections.newInstance(measurementClass, measure.value());
+                register(measurement);
+            });
     }
 
     public Measurement get(final String name)

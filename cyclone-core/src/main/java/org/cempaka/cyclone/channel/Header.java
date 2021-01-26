@@ -4,7 +4,6 @@ import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
 
 import java.util.Objects;
 import java.util.UUID;
-import org.cempaka.cyclone.channel.payloads.PayloadType;
 
 class Header
 {

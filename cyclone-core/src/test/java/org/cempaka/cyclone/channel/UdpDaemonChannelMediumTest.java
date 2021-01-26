@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.net.SocketException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import org.cempaka.cyclone.channel.payloads.Payload;
-import org.cempaka.cyclone.channel.payloads.StartedPayload;
 import org.junit.Test;
 
 public class UdpDaemonChannelMediumTest
@@ -22,13 +20,13 @@ public class UdpDaemonChannelMediumTest
         //given
         final AtomicReference<Payload> payloadReference = new AtomicReference<>();
         server.addReadListener((receivedPort, payload) -> payloadReference.set(payload));
-        final StartedPayload payload = new StartedPayload(UUID.randomUUID().toString());
+        final String testId = UUID.randomUUID().toString();
         //when
-        client.connect();
-        server.connect(SERVER_PORT);
-        client.write(payload, SERVER_PORT);
+        client.connect(SERVER_PORT);
+        server.listen(SERVER_PORT);
+        client.start(testId);
         Thread.sleep(1_000);
         //then
-        assertThat(payloadReference.get()).isEqualTo(payload);
+        assertThat(payloadReference.get()).isInstanceOf(StartedPayload.class);
     }
 }

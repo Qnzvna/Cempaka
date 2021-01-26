@@ -3,17 +3,23 @@ package org.cempaka.cyclone.channel;
 import java.io.Closeable;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import org.cempaka.cyclone.channel.payloads.Payload;
 
 public interface DaemonChannel extends Closeable
 {
-    void connect(int port) throws UnknownHostException, SocketException;
+    void listen(int port) throws UnknownHostException, SocketException;
 
-    void connect() throws SocketException;
+    void connect(int port) throws SocketException;
 
-    void write(Payload payload, int port);
+    void start(String testId);
+
+    void end(String testId, int exitCode);
+
+    void running(String testId, Map<String, Double> measurements);
+
+    void log(String testId, String message);
 
     void addWriteListener(Consumer<Payload> listener);
 

@@ -3,8 +3,6 @@ package org.cempaka.cyclone.channel;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.ByteBuffer;
-import org.cempaka.cyclone.channel.payloads.EndedPayload;
-import org.cempaka.cyclone.channel.payloads.LogPayload;
 import org.junit.jupiter.api.Test;
 
 class LogPayloadEncoderTest

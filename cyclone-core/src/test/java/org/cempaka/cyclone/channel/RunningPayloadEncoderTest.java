@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import org.cempaka.cyclone.channel.payloads.RunningPayload;
 import org.junit.jupiter.api.Test;
 
 class RunningPayloadEncoderTest

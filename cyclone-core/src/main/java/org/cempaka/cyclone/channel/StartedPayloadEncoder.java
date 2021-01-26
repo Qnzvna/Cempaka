@@ -1,9 +1,8 @@
 package org.cempaka.cyclone.channel;
 
 import java.nio.ByteBuffer;
-import org.cempaka.cyclone.channel.payloads.StartedPayload;
 
-public class StartedPayloadEncoder implements PayloadEncoder<StartedPayload>
+class StartedPayloadEncoder implements PayloadEncoder<StartedPayload>
 {
     @Override
     public ByteBuffer encode(final StartedPayload payload)

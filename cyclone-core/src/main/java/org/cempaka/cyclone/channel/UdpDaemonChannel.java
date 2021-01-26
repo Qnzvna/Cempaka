@@ -9,6 +9,7 @@ import java.io.UncheckedIOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -17,7 +18,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import org.cempaka.cyclone.channel.payloads.Payload;
 
 public class UdpDaemonChannel implements DaemonChannel
 {
@@ -32,6 +32,7 @@ public class UdpDaemonChannel implements DaemonChannel
     private final ExecutorService listenersService;
 
     private boolean running;
+    private int port;
     private DatagramSocket socket;
 
     public UdpDaemonChannel()
@@ -54,11 +55,12 @@ public class UdpDaemonChannel implements DaemonChannel
     }
 
     @Override
-    public void connect(final int port) throws SocketException
+    public void listen(final int port) throws SocketException
     {
         try {
             runningLock.lock();
             checkState(socket == null, "Channel already connected");
+            this.port = port;
             socket = new DatagramSocket(port, getLoopbackAddress());
             running = true;
             executorService.submit(this::awaitPacket);
@@ -68,16 +70,58 @@ public class UdpDaemonChannel implements DaemonChannel
     }
 
     @Override
-    public void connect() throws SocketException
+    public void connect(int port) throws SocketException
     {
         try {
             runningLock.lock();
             checkState(socket == null, "Channel already connected");
+            this.port = port;
             socket = new DatagramSocket();
             running = true;
         } finally {
             runningLock.unlock();
         }
+    }
+
+    @Override
+    public void start(final String testId)
+    {
+        write(new StartedPayload(testId));
+    }
+
+    @Override
+    public void end(final String testId, final int exitCode)
+    {
+        write(new EndedPayload(testId, exitCode));
+    }
+
+    @Override
+    public void running(final String testId, final Map<String, Double> measurements)
+    {
+        write(new RunningPayload(testId, measurements));
+    }
+
+    @Override
+    public void log(final String testId, final String message)
+    {
+        write(new LogPayload(testId, message));
+    }
+
+    private void write(final Payload payload)
+    {
+        checkState(socket != null, "Socket not initialized");
+        final byte[] bytes = messageEncoder.encode(payload).array();
+        checkArgument(bytes.length < SIZE, String.format("Payload is too big to transfer [%s]", bytes.length));
+        final DatagramPacket datagramPacket = new DatagramPacket(bytes,
+            bytes.length,
+            getLoopbackAddress(),
+            port);
+        try {
+            socket.send(datagramPacket);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        writeListeners.forEach(listener -> listener.accept(payload));
     }
 
     private void awaitPacket()
@@ -97,24 +141,6 @@ public class UdpDaemonChannel implements DaemonChannel
             }
         }
 
-    }
-
-    @Override
-    public void write(final Payload payload, final int port)
-    {
-        checkState(socket != null, "Socket not initialized");
-        final byte[] bytes = messageEncoder.encode(payload).array();
-        checkArgument(bytes.length < SIZE, String.format("Payload is too big to transfer [%s]", bytes.length));
-        final DatagramPacket datagramPacket = new DatagramPacket(bytes,
-            bytes.length,
-            getLoopbackAddress(),
-            port);
-        try {
-            socket.send(datagramPacket);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-        writeListeners.forEach(listener -> listener.accept(payload));
     }
 
     @Override

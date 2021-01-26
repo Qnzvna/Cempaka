@@ -2,22 +2,7 @@ package org.cempaka.cyclone.channel;
 
 import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
-import org.cempaka.cyclone.channel.payloads.EndedPayload;
-import org.cempaka.cyclone.channel.payloads.LogPayload;
-import org.cempaka.cyclone.channel.payloads.Payload;
-import org.cempaka.cyclone.channel.payloads.PayloadType;
-import org.cempaka.cyclone.channel.payloads.RunningPayload;
-import org.cempaka.cyclone.channel.payloads.StartedPayload;
 
 class TypePayloadEncoder implements PayloadEncoder<Payload>
 {
