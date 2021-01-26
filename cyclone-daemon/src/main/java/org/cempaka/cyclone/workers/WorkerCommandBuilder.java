@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.cempaka.cyclone.utils.CliParameters;
+import org.cempaka.cyclone.core.utils.CliParameters;
 
 class WorkerCommandBuilder
 {

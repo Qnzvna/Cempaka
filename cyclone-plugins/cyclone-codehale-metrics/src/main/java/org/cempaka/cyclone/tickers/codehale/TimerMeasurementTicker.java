@@ -1,10 +1,10 @@
 package org.cempaka.cyclone.tickers.codehale;
 
 import java.util.concurrent.TimeUnit;
-import org.cempaka.cyclone.runners.ExecutionContext;
-import org.cempaka.cyclone.measurements.Measurement;
+import org.cempaka.cyclone.core.measurements.Measurement;
+import org.cempaka.cyclone.core.measurements.Ticker;
+import org.cempaka.cyclone.core.runners.ExecutionContext;
 import org.cempaka.cyclone.measurements.codehale.TimerMeasurement;
-import org.cempaka.cyclone.measurements.Ticker;
 
 public class TimerMeasurementTicker implements Ticker
 {

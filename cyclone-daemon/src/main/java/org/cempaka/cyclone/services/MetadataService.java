@@ -1,9 +1,7 @@
 package org.cempaka.cyclone.services;
 
-import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
+import static org.cempaka.cyclone.core.utils.Preconditions.checkNotNull;
 
-import com.google.common.base.Strings;
-import com.google.common.primitives.Bytes;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;

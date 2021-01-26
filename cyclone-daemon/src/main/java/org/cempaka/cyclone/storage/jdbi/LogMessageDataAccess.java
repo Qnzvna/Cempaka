@@ -2,7 +2,7 @@ package org.cempaka.cyclone.storage.jdbi;
 
 import java.sql.Timestamp;
 import java.util.List;
-import org.cempaka.cyclone.log.LogMessage;
+import org.cempaka.cyclone.core.log.LogMessage;
 import org.cempaka.cyclone.storage.mappers.LogMessageRowMapper;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;

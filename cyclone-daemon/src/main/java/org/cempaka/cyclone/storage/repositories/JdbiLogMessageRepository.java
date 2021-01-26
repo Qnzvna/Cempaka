@@ -1,6 +1,6 @@
 package org.cempaka.cyclone.storage.repositories;
 
-import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
+import static org.cempaka.cyclone.core.utils.Preconditions.checkNotNull;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.cempaka.cyclone.log.LogMessage;
+import org.cempaka.cyclone.core.log.LogMessage;
 import org.cempaka.cyclone.storage.jdbi.LogMessageDataAccess;
 
 @Singleton

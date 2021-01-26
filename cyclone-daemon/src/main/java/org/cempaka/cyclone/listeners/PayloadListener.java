@@ -5,8 +5,8 @@ import com.google.common.collect.Multimap;
 import java.util.function.BiConsumer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.cempaka.cyclone.channel.Payload;
-import org.cempaka.cyclone.channel.PayloadType;
+import org.cempaka.cyclone.core.channel.Payload;
+import org.cempaka.cyclone.core.channel.PayloadType;
 
 @Singleton
 public class PayloadListener implements BiConsumer<Integer, Payload>

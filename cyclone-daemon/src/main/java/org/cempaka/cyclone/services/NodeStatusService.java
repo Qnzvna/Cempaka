@@ -2,7 +2,6 @@ package org.cempaka.cyclone.services;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Map;
@@ -13,7 +12,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.NodeState;
 import org.cempaka.cyclone.beans.NodeStatus;
-import org.cempaka.cyclone.storage.jdbi.NodeStateDataAccess;
 import org.cempaka.cyclone.storage.repositories.NodeStateDataRepository;
 
 @Singleton

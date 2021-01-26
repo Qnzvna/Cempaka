@@ -1,11 +1,11 @@
 package org.cempaka.cyclone.log;
 
-import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
+import static org.cempaka.cyclone.core.utils.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.net.SocketException;
-import org.cempaka.cyclone.channel.DaemonChannel;
-import org.cempaka.cyclone.channel.UdpDaemonChannel;
+import org.cempaka.cyclone.core.channel.DaemonChannel;
+import org.cempaka.cyclone.core.channel.UdpDaemonChannel;
 
 public class UdpMessageSink implements MessageSink
 {

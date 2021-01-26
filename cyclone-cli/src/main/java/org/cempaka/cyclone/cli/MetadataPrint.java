@@ -1,15 +1,15 @@
 package org.cempaka.cyclone.cli;
 
-import static org.cempaka.cyclone.utils.Metadata.PARAMETER_SEPARATOR;
-import static org.cempaka.cyclone.utils.Metadata.SEPARATOR;
-import static org.cempaka.cyclone.utils.Metadata.TEST_PATTERN;
-import static org.cempaka.cyclone.utils.Metadata.TEST_SEPARATOR;
+import static org.cempaka.cyclone.core.utils.Metadata.PARAMETER_SEPARATOR;
+import static org.cempaka.cyclone.core.utils.Metadata.SEPARATOR;
+import static org.cempaka.cyclone.core.utils.Metadata.TEST_PATTERN;
+import static org.cempaka.cyclone.core.utils.Metadata.TEST_SEPARATOR;
 
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import java.io.IOException;
 import java.util.stream.Stream;
-import org.cempaka.cyclone.utils.Reflections;
+import org.cempaka.cyclone.core.utils.Reflections;
 
 /**
  * Extract metadata from load test and print them on stdout.

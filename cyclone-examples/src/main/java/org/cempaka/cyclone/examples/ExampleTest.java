@@ -1,10 +1,10 @@
 package org.cempaka.cyclone.examples;
 
-import org.cempaka.cyclone.annotations.AfterStorm;
-import org.cempaka.cyclone.annotations.BeforeStorm;
-import org.cempaka.cyclone.annotations.Parameter;
-import org.cempaka.cyclone.annotations.Thunderbolt;
-import org.cempaka.cyclone.measurements.Counted;
+import org.cempaka.cyclone.core.annotations.AfterStorm;
+import org.cempaka.cyclone.core.annotations.BeforeStorm;
+import org.cempaka.cyclone.core.annotations.Parameter;
+import org.cempaka.cyclone.core.annotations.Thunderbolt;
+import org.cempaka.cyclone.core.measurements.Counted;
 
 public class ExampleTest
 {

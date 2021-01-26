@@ -1,6 +1,6 @@
 package org.cempaka.cyclone.storage.repositories;
 
-import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
+import static org.cempaka.cyclone.core.utils.Preconditions.checkNotNull;
 
 import java.util.List;
 import java.util.Optional;

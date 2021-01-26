@@ -2,7 +2,6 @@ package org.cempaka.cyclone.storage;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.inject.Exposed;
 import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
@@ -17,8 +16,6 @@ import org.cempaka.cyclone.storage.jdbi.ParcelDataAccess;
 import org.cempaka.cyclone.storage.jdbi.TestDataAccess;
 import org.cempaka.cyclone.storage.jdbi.TestExecutionDataAccess;
 import org.cempaka.cyclone.storage.jdbi.TestMetricDataAccess;
-import org.cempaka.cyclone.storage.repositories.JdbiTestMetricRepository;
-import org.cempaka.cyclone.storage.repositories.JdbiTestRepository;
 import org.cempaka.cyclone.storage.repositories.JooqMetadataRepository;
 import org.cempaka.cyclone.storage.repositories.LogMessageRepository;
 import org.cempaka.cyclone.storage.repositories.MetadataRepository;

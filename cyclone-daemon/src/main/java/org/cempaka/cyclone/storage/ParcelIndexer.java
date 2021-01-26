@@ -18,11 +18,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.Parcel;
 import org.cempaka.cyclone.beans.exceptions.IndexingParcelException;
+import org.cempaka.cyclone.core.utils.Metadata;
 import org.cempaka.cyclone.tests.ImmutableTest;
 import org.cempaka.cyclone.tests.ImmutableTestParameter;
 import org.cempaka.cyclone.tests.Test;
 import org.cempaka.cyclone.tests.TestParameter;
-import org.cempaka.cyclone.utils.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

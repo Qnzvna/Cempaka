@@ -1,12 +1,12 @@
 package org.cempaka.cyclone.cli;
 
-import static org.cempaka.cyclone.utils.CliParameters.DAEMON_PORT;
-import static org.cempaka.cyclone.utils.CliParameters.LOOP_COUNT;
-import static org.cempaka.cyclone.utils.CliParameters.METADATA;
-import static org.cempaka.cyclone.utils.CliParameters.PARAMETERS;
-import static org.cempaka.cyclone.utils.CliParameters.TEST_CLASSES;
-import static org.cempaka.cyclone.utils.CliParameters.TEST_ID;
-import static org.cempaka.cyclone.utils.CliParameters.THREADS;
+import static org.cempaka.cyclone.core.utils.CliParameters.DAEMON_PORT;
+import static org.cempaka.cyclone.core.utils.CliParameters.LOOP_COUNT;
+import static org.cempaka.cyclone.core.utils.CliParameters.METADATA;
+import static org.cempaka.cyclone.core.utils.CliParameters.PARAMETERS;
+import static org.cempaka.cyclone.core.utils.CliParameters.TEST_CLASSES;
+import static org.cempaka.cyclone.core.utils.CliParameters.TEST_ID;
+import static org.cempaka.cyclone.core.utils.CliParameters.THREADS;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -18,12 +18,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.cempaka.cyclone.channel.DaemonChannel;
-import org.cempaka.cyclone.channel.UdpDaemonChannel;
-import org.cempaka.cyclone.log.LoggerFactoryConfiguration;
-import org.cempaka.cyclone.measurements.MeasurementRegistry;
-import org.cempaka.cyclone.runners.Runner;
-import org.cempaka.cyclone.runners.Runners;
+import org.cempaka.cyclone.core.channel.DaemonChannel;
+import org.cempaka.cyclone.core.channel.UdpDaemonChannel;
+import org.cempaka.cyclone.core.log.LoggerFactoryConfiguration;
+import org.cempaka.cyclone.core.measurements.MeasurementRegistry;
+import org.cempaka.cyclone.core.runners.Runner;
+import org.cempaka.cyclone.core.runners.Runners;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 

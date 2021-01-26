@@ -1,19 +1,18 @@
 package org.cempaka.cyclone.listeners;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.UUID;
+import java.util.function.BiConsumer;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.TestState;
-import org.cempaka.cyclone.channel.Payload;
-import org.cempaka.cyclone.channel.PayloadType;
+import org.cempaka.cyclone.core.channel.Payload;
+import org.cempaka.cyclone.core.channel.PayloadType;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
 import org.cempaka.cyclone.storage.repositories.TestExecutionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.UUID;
-import java.util.function.BiConsumer;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 public class StartedPayloadListener implements BiConsumer<String, Payload>

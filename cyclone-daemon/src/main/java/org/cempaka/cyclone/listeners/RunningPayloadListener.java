@@ -1,21 +1,20 @@
 package org.cempaka.cyclone.listeners;
 
-import org.cempaka.cyclone.beans.MetricDataPoint;
-import org.cempaka.cyclone.channel.Payload;
-import org.cempaka.cyclone.channel.PayloadType;
-import org.cempaka.cyclone.channel.RunningPayload;
-import org.cempaka.cyclone.storage.repositories.TestMetricRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.function.BiConsumer;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.cempaka.cyclone.beans.MetricDataPoint;
+import org.cempaka.cyclone.core.channel.Payload;
+import org.cempaka.cyclone.core.channel.PayloadType;
+import org.cempaka.cyclone.core.channel.RunningPayload;
+import org.cempaka.cyclone.storage.repositories.TestMetricRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class RunningPayloadListener implements BiConsumer<String, Payload>
