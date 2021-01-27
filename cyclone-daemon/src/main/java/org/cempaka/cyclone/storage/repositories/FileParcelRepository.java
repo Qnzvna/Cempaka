@@ -54,6 +54,13 @@ public class FileParcelRepository implements ParcelRepository
     }
 
     @Override
+    public boolean contains(final UUID id)
+    {
+        final Path path = getParcelPath(id);
+        return Files.isRegularFile(path);
+    }
+
+    @Override
     public void put(final Parcel parcel)
     {
         final Path parcelPath = getParcelPath(parcel.getId());

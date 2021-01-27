@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
+import org.cempaka.cyclone.beans.exceptions.TestNotFoundException;
 import org.cempaka.cyclone.services.TestRunnerService;
 import org.cempaka.cyclone.storage.repositories.TestRepository;
 import org.cempaka.cyclone.tests.TestExecutionProperties;
@@ -50,6 +51,8 @@ public class TestResource
             return Response.accepted(uuid).build();
         } catch (ParcelNotFoundException e) {
             return Response.status(Status.NOT_FOUND).entity("Parcel for test not found.").build();
+        } catch (TestNotFoundException e) {
+            return Response.status(Status.NOT_FOUND).entity("Test not found.").build();
         }
     }
 

@@ -10,6 +10,8 @@ public interface ParcelRepository
     @Nullable
     Parcel get(UUID id);
 
+    boolean contains(UUID id);
+
     void put(Parcel parcel);
 
     void delete(UUID id);
