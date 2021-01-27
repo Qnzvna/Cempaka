@@ -1,6 +1,7 @@
 package org.cempaka.cyclone.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.awaitility.Awaitility.await;
 
 import com.google.common.collect.ImmutableMap;
@@ -14,8 +15,10 @@ import org.awaitility.Awaitility;
 import org.cempaka.cyclone.beans.TestState;
 import org.cempaka.cyclone.client.ApacheCycloneClient;
 import org.cempaka.cyclone.client.CycloneClient;
+import org.cempaka.cyclone.client.InvalidResponseException;
 import org.cempaka.cyclone.client.NodeCapacity;
 import org.cempaka.cyclone.client.TestExecution;
+import org.cempaka.cyclone.client.TestExecutionProperties;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -114,5 +117,34 @@ public class TestResourceBigTest
             assertThat(TEST_CLIENT.getTestExecutionLogMessages(testId, Instant.EPOCH))
                 .hasOnlyOneElementSatisfying(logLine -> assertThat(logLine).contains(password));
         });
+    }
+
+    @Test
+    void shouldFailStartingNotExistingParcel()
+    {
+        //given
+        //when
+        final Throwable throwable = catchThrowable(() ->
+            TEST_CLIENT.startTest(Tests.getMetadataTest(UUID.randomUUID(), ImmutableSet.of(Tests.NODE))));
+        //then
+        assertThat(throwable).isInstanceOf(InvalidResponseException.class);
+        assertThat(throwable.getMessage()).contains("404");
+    }
+
+    @Test
+    void shouldFailStartingNotExistingTest()
+    {
+        //given
+        final TestExecutionProperties testExecutionProperties = Tests.getTest(
+            PARCEL_ID,
+            ImmutableSet.of(Tests.NODE),
+            "not_existing_test",
+            ImmutableMap.of()
+        );
+        //when
+        final Throwable throwable = catchThrowable(() -> TEST_CLIENT.startTest(testExecutionProperties));
+        //then
+        assertThat(throwable).isInstanceOf(InvalidResponseException.class);
+        assertThat(throwable.getMessage()).contains("404");
     }
 }

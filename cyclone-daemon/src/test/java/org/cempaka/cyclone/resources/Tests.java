@@ -44,10 +44,10 @@ final class Tests
         return getTest(parcelId, nodes, METADATA_TEST_FQDN, ImmutableMap.of());
     }
 
-    private static TestExecutionProperties getTest(final UUID parcelId,
-                                                   final Set<String> nodes,
-                                                   final String testName,
-                                                   final Map<String, String> parameters)
+    static TestExecutionProperties getTest(final UUID parcelId,
+                                           final Set<String> nodes,
+                                           final String testName,
+                                           final Map<String, String> parameters)
     {
         return ImmutableTestExecutionProperties.builder()
             .parcelId(parcelId)
