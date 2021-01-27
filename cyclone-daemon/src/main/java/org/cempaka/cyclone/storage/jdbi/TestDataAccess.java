@@ -1,5 +1,6 @@
 package org.cempaka.cyclone.storage.jdbi;
 
+import java.util.Optional;
 import java.util.Set;
 import org.cempaka.cyclone.tests.Test;
 import org.jdbi.v3.json.Json;
@@ -26,6 +27,10 @@ public interface TestDataAccess
     @Json
     @SqlQuery("SELECT value FROM tests WHERE name = ?")
     Set<Test> get(String name);
+
+    @Json
+    @SqlQuery("SELECT value FROM tests WHERE id = ? AND name = ?")
+    Optional<Test> getByIdAndName(String id, String name);
 
     @SqlUpdate("DELETE FROM tests WHERE id = ?")
     void delete(String id);

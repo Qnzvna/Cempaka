@@ -3,6 +3,7 @@ package org.cempaka.cyclone.storage.repositories;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -32,6 +33,14 @@ public class JdbiTestRepository implements TestRepository
     {
         checkNotNull(name);
         return testDataAccess.get(name);
+    }
+
+    @Override
+    public Optional<Test> getByIdAndName(final UUID id, final String name)
+    {
+        checkNotNull(id);
+        checkNotNull(name);
+        return testDataAccess.getByIdAndName(id.toString(), name);
     }
 
     @Override

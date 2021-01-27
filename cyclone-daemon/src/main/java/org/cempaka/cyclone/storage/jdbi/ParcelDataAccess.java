@@ -17,6 +17,9 @@ public interface ParcelDataAccess
     @SqlQuery("SELECT id, parcel FROM parcels WHERE id = ?")
     Parcel get(String id);
 
+    @SqlQuery("SELECT count(id) FROM parcels WHERE id = ?")
+    int count(String id);
+
     @SqlUpdate("DELETE FROM parcels WHERE id = ?")
     void delete(String id);
 
