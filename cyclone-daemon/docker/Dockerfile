@@ -1,4 +1,4 @@
-FROM openjdk:8u232-jre-slim
+FROM openjdk:11-jre-slim
 
 RUN mkdir /opt/cyclone /opt/cyclone/parcels /etc/cyclone /var/log/cyclone
 
