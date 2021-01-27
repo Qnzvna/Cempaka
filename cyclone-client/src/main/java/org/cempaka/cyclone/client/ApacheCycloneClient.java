@@ -1,21 +1,6 @@
 package org.cempaka.cyclone.client;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.cempaka.cyclone.client.Endpoints.CLUSTER_NODE_CAPACITY;
-import static org.cempaka.cyclone.client.Endpoints.CLUSTER_STATUS;
-import static org.cempaka.cyclone.client.Endpoints.METADATA;
-import static org.cempaka.cyclone.client.Endpoints.PARCEL;
-import static org.cempaka.cyclone.client.Endpoints.PARCELS;
-import static org.cempaka.cyclone.client.Endpoints.START_TEST;
-import static org.cempaka.cyclone.client.Endpoints.STOP_TEST;
-import static org.cempaka.cyclone.client.Endpoints.TESTS;
-import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTION;
-import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS;
-import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS_KEYS;
-import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS_LOGS;
-import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS_QUERY;
-import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS_SEARCH;
-import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTION_METRICS;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +9,6 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableSet;
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
@@ -71,7 +55,7 @@ public class ApacheCycloneClient extends BaseCycloneClient
     @Override
     public Map<String, Boolean> getClusterStatus()
     {
-        final HttpGet httpGet = new HttpGet(createResource(CLUSTER_STATUS));
+        final HttpGet httpGet = new HttpGet(createClusterStatusResource());
         return runRequest(createDeserializer(new TypeReference<Map<String, Boolean>>() {}), httpGet);
     }
 
@@ -79,7 +63,7 @@ public class ApacheCycloneClient extends BaseCycloneClient
     public NodeCapacity getNodeCapacity(final String node)
     {
         checkNotNull(node);
-        final HttpGet httpGet = new HttpGet(createResource(MessageFormat.format(CLUSTER_NODE_CAPACITY, node)));
+        final HttpGet httpGet = new HttpGet(createClusterNodeCapacityResource(node));
         return runRequest(createDeserializer(NodeCapacity.class), httpGet);
     }
 
@@ -87,7 +71,7 @@ public class ApacheCycloneClient extends BaseCycloneClient
     public UUID uploadParcel(final File parcel)
     {
         checkNotNull(parcel);
-        final HttpPost httpPost = new HttpPost(createResource(PARCELS));
+        final HttpPost httpPost = new HttpPost(createParcelsResource());
         httpPost.setEntity(MultipartEntityBuilder.create()
             .addBinaryBody("file", parcel)
             .build());
@@ -98,7 +82,7 @@ public class ApacheCycloneClient extends BaseCycloneClient
     public UUID uploadParcel(final ParcelUpload parcelUpload)
     {
         checkNotNull(parcelUpload);
-        final HttpPost httpPost = new HttpPost(createResource(PARCELS));
+        final HttpPost httpPost = new HttpPost(createParcelsResource());
         return runRequest(parcelUpload, createDeserializer(UUID.class), httpPost);
     }
 
@@ -106,14 +90,14 @@ public class ApacheCycloneClient extends BaseCycloneClient
     public void deleteParcel(final UUID parcelId)
     {
         checkNotNull(parcelId);
-        final HttpDelete httpDelete = new HttpDelete(createResource(MessageFormat.format(PARCEL, parcelId)));
+        final HttpDelete httpDelete = new HttpDelete(createParcelResource(parcelId));
         runRequest(httpDelete);
     }
 
     @Override
     public Set<Test> getTests()
     {
-        final HttpGet httpGet = new HttpGet(createResource(TESTS));
+        final HttpGet httpGet = new HttpGet(createTestsResource());
         return runRequest(createDeserializer(new TypeReference<Set<Test>>() {}), httpGet);
     }
 
@@ -121,7 +105,7 @@ public class ApacheCycloneClient extends BaseCycloneClient
     public UUID startTest(final TestExecutionProperties testExecutionProperties)
     {
         checkNotNull(testExecutionProperties);
-        final HttpPost httpPost = new HttpPost(createResource(START_TEST));
+        final HttpPost httpPost = new HttpPost(createStartTestResource());
         return runRequest(testExecutionProperties, createDeserializer(UUID.class), httpPost);
     }
 
@@ -129,41 +113,38 @@ public class ApacheCycloneClient extends BaseCycloneClient
     public void stopTest(final UUID testExecutionId)
     {
         checkNotNull(testExecutionId);
-        final HttpPost httpPost = new HttpPost(createResource(MessageFormat.format(STOP_TEST, testExecutionId)));
+        final HttpPost httpPost = new HttpPost(createStopTestResource(testExecutionId));
         runRequest(httpPost);
     }
 
     @Override
     public TestExecutionPage getTestExecutions()
     {
-        final HttpGet httpGet = new HttpGet(createResource(TEST_EXECUTIONS));
+        final HttpGet httpGet = new HttpGet(createTestExecutionsResource());
         return runRequest(createDeserializer(TestExecutionPage.class), httpGet);
     }
 
     @Override
     public TestExecutionPage getTestExecutionsLimitedBy(final int limit)
     {
-        final String query = MessageFormat.format("limit={0}", limit);
-        return getTestExecutionPage(query);
+        return getTestExecutionPage(createLimitQuery(limit));
     }
 
     @Override
     public TestExecutionPage getTestExecutionsOffsetBy(final int offset)
     {
-        final String query = MessageFormat.format("offset={0}", offset);
-        return getTestExecutionPage(query);
+        return getTestExecutionPage(createOffsetQuery(offset));
     }
 
     @Override
     public TestExecutionPage getTestExecutions(final int limit, final int offset)
     {
-        final String query = MessageFormat.format("limit={0}&offset={1}", limit, offset);
-        return getTestExecutionPage(query);
+        return getTestExecutionPage(createLimitQuery(limit) + "&" + createOffsetQuery(offset));
     }
 
     private TestExecutionPage getTestExecutionPage(final String query)
     {
-        final HttpGet httpGet = new HttpGet(createResource(MessageFormat.format(TEST_EXECUTIONS_QUERY, query)));
+        final HttpGet httpGet = new HttpGet(createTestExecutionsQueryResource(query));
         return runRequest(createDeserializer(TestExecutionPage.class), httpGet);
     }
 
@@ -171,8 +152,7 @@ public class ApacheCycloneClient extends BaseCycloneClient
     public Set<MetricDataPoint> getTestExecutionMetrics(final UUID testExecutionId)
     {
         checkNotNull(testExecutionId);
-        final HttpGet httpGet = new HttpGet(
-            createResource(MessageFormat.format(TEST_EXECUTION_METRICS, testExecutionId)));
+        final HttpGet httpGet = new HttpGet(createTestExecutionsMetricsQuery(testExecutionId));
         return runRequest(createDeserializer(new TypeReference<Set<MetricDataPoint>>() {}), httpGet);
     }
 
@@ -198,20 +178,15 @@ public class ApacheCycloneClient extends BaseCycloneClient
         final String query = Stream.of(createQuery("state", states), createQuery("name", names))
             .filter(queryPart -> !queryPart.isEmpty())
             .collect(Collectors.joining("&"));
-        final HttpGet httpGet = new HttpGet(createResource(MessageFormat.format(TEST_EXECUTIONS_SEARCH, query)));
+        final HttpGet httpGet = new HttpGet(createTestExecutionsSearchResource(query));
         return runRequest(createDeserializer(TestExecutionPage.class), httpGet);
-    }
-
-    private String createQuery(final String key, final Set<String> values)
-    {
-        return values.stream().map(state -> key + "=" + state).collect(Collectors.joining("&"));
     }
 
     @Override
     public Set<TestExecution> getTestExecutions(final UUID testExecutionId)
     {
         checkNotNull(testExecutionId);
-        final HttpGet httpGet = new HttpGet(createResource(MessageFormat.format(TEST_EXECUTION, testExecutionId)));
+        final HttpGet httpGet = new HttpGet(createTestExecutionResource(testExecutionId));
         return runRequest(createDeserializer(new TypeReference<Set<TestExecution>>() {}), httpGet);
     }
 
@@ -219,23 +194,21 @@ public class ApacheCycloneClient extends BaseCycloneClient
     public void deleteTestExecution(final UUID testExecutionId)
     {
         checkNotNull(testExecutionId);
-        final HttpDelete httpDelete = new HttpDelete(
-            createResource(MessageFormat.format(TEST_EXECUTION, testExecutionId)));
+        final HttpDelete httpDelete = new HttpDelete(createTestExecutionResource(testExecutionId));
         runRequest(httpDelete);
     }
 
     @Override
     public Set<UUID> getTestExecutionsIds()
     {
-        final HttpGet httpGet = new HttpGet(createResource(TEST_EXECUTIONS_KEYS));
+        final HttpGet httpGet = new HttpGet(createTestExecutionsKeysResource());
         return runRequest(createDeserializer(new TypeReference<Set<UUID>>() {}), httpGet);
     }
 
     @Override
     public Set<String> getTestExecutionLogMessages(final UUID testExecutionId, final Instant from)
     {
-        final HttpGet httpGet = new HttpGet(
-            createResource(MessageFormat.format(TEST_EXECUTIONS_LOGS, testExecutionId, from.getEpochSecond())));
+        final HttpGet httpGet = new HttpGet(createTestExecutionLogsResource(testExecutionId, from));
         return runRequest(createDeserializer(new TypeReference<Set<String>>() {}), httpGet);
     }
 
@@ -244,7 +217,7 @@ public class ApacheCycloneClient extends BaseCycloneClient
     {
         checkNotNull(id);
         checkNotNull(data);
-        final HttpPost httpPost = new HttpPost(createResource(MessageFormat.format(METADATA, id)));
+        final HttpPost httpPost = new HttpPost(createMetadataResource(id));
         httpPost.setEntity(MultipartEntityBuilder.create()
             .addBinaryBody("file", data)
             .build());
@@ -256,7 +229,7 @@ public class ApacheCycloneClient extends BaseCycloneClient
     {
         checkNotNull(id);
         checkNotNull(data);
-        final HttpPost httpPost = new HttpPost(createResource(MessageFormat.format(METADATA, id)));
+        final HttpPost httpPost = new HttpPost(createMetadataResource(id));
         httpPost.setEntity(MultipartEntityBuilder.create()
             .addBinaryBody("file", data)
             .build());
@@ -267,7 +240,7 @@ public class ApacheCycloneClient extends BaseCycloneClient
     public void deleteMetadata(final String id)
     {
         checkNotNull(id);
-        final HttpDelete httpDelete = new HttpDelete(createResource(MessageFormat.format(METADATA, id)));
+        final HttpDelete httpDelete = new HttpDelete(createMetadataResource(id));
         runRequest(httpDelete);
     }
 
