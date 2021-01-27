@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTION;
 import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS;
 import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS_KEYS;
-import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS_LOGS;
+import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTION_LOGS;
 import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS_QUERY;
 import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTIONS_SEARCH;
 import static org.cempaka.cyclone.client.Endpoints.TEST_EXECUTION_METRICS;
@@ -140,7 +140,7 @@ class UriRegexMatcherSmallTest
             TEST_EXECUTIONS_KEYS,
             TEST_EXECUTIONS_QUERY,
             TEST_EXECUTIONS_SEARCH,
-            TEST_EXECUTIONS_LOGS
+            TEST_EXECUTION_LOGS
         )
             .map(UriRegexMatcher::ofFormat)
             .collect(Collectors.toList());

@@ -19,6 +19,8 @@ final class Endpoints
     static final String TEST_EXECUTION_METRICS = "/tests/executions/{0}/metrics";
     static final String TEST_EXECUTIONS_SEARCH = "/tests/executions/search?{0}";
     static final String TEST_EXECUTIONS_KEYS = "/tests/executions/keys";
-    static final String TEST_EXECUTIONS_LOGS = "/tests/executions/{0}/logs?from={1}";
+    static final String TEST_EXECUTION_LOGS = "/tests/executions/{0}/logs?from={1}";
     static final String METADATA = "/metadata/{0}";
+    static final String LIMIT_QUERY = "limit={0}";
+    static final String OFFSET_QUERY = "offset={0}";
 }
