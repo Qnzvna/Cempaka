@@ -30,6 +30,12 @@ public class JdbiParcelRepository implements ParcelRepository
     }
 
     @Override
+    public boolean contains(final UUID id)
+    {
+        return parcelDataAccess.count(id.toString()) == 1;
+    }
+
+    @Override
     public void put(final Parcel parcel)
     {
         parcelDataAccess.upsert(parcel.getId().toString(), parcel.getData());

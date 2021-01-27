@@ -28,7 +28,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class StalledTestCleanerManagedTest
+public class StalledTestCleanerManagedSmallTest
 {
     private static final Instant NOW = Instant.now();
     public static final long HEARTBEAT_INTERVAl = 10L;
