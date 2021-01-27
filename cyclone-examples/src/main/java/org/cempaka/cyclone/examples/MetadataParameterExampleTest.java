@@ -1,7 +1,7 @@
 package org.cempaka.cyclone.examples;
 
-import org.cempaka.cyclone.annotations.MetadataParameter;
-import org.cempaka.cyclone.annotations.Thunderbolt;
+import org.cempaka.cyclone.core.annotations.MetadataParameter;
+import org.cempaka.cyclone.core.annotations.Thunderbolt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

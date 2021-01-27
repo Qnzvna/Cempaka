@@ -1,9 +1,10 @@
 package org.cempaka.cyclone.log;
 
-import static org.cempaka.cyclone.utils.Preconditions.checkArgument;
+import static org.cempaka.cyclone.core.utils.Preconditions.checkArgument;
 
 import java.io.UncheckedIOException;
 import java.net.SocketException;
+import org.cempaka.cyclone.core.log.LoggerFactoryConfiguration;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 

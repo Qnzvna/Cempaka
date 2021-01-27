@@ -1,9 +1,9 @@
 package org.cempaka.cyclone.tickers.codehale;
 
-import org.cempaka.cyclone.invoker.ExecutionContext;
-import org.cempaka.cyclone.measurements.Measurement;
+import org.cempaka.cyclone.core.measurements.Measurement;
+import org.cempaka.cyclone.core.measurements.Ticker;
+import org.cempaka.cyclone.core.runners.ExecutionContext;
 import org.cempaka.cyclone.measurements.codehale.MeterMeasurement;
-import org.cempaka.cyclone.measurements.tickers.Ticker;
 
 public class MeterMeasurementTicker implements Ticker
 {

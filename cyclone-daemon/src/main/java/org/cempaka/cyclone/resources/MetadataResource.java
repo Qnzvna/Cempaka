@@ -1,6 +1,6 @@
 package org.cempaka.cyclone.resources;
 
-import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
+import static org.cempaka.cyclone.core.utils.Preconditions.checkNotNull;
 
 import com.google.common.io.ByteStreams;
 import java.io.IOException;

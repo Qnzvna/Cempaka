@@ -4,7 +4,7 @@ import com.codahale.metrics.Counter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import org.cempaka.cyclone.measurements.Measurement;
+import org.cempaka.cyclone.core.measurements.Measurement;
 
 public class CounterMeasurement extends Measurement
 {

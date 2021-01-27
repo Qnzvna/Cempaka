@@ -3,8 +3,8 @@ package org.cempaka.cyclone.storage.mappers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
-import org.cempaka.cyclone.log.ImmutableLogMessage;
-import org.cempaka.cyclone.log.LogMessage;
+import org.cempaka.cyclone.core.log.ImmutableLogMessage;
+import org.cempaka.cyclone.core.log.LogMessage;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 

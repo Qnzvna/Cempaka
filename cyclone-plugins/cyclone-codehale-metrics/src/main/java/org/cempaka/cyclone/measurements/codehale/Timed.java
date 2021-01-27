@@ -4,7 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.cempaka.cyclone.measurements.Measured;
+import org.cempaka.cyclone.core.measurements.Measured;
 import org.cempaka.cyclone.tickers.codehale.TimerMeasurementTicker;
 
 @Retention(RetentionPolicy.RUNTIME)

@@ -4,7 +4,7 @@ import com.codahale.metrics.Meter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import org.cempaka.cyclone.measurements.Measurement;
+import org.cempaka.cyclone.core.measurements.Measurement;
 
 public class MeterMeasurement extends Measurement
 {

@@ -8,7 +8,7 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 
-public class StatusCodeValidator extends ResponseValidator
+class StatusCodeValidator extends ResponseValidator
 {
     private final int[] statusCodes;
     private final Predicate<HttpRequest> requestPredicate;

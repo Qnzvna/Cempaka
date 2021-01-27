@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import org.cempaka.cyclone.measurements.Measurement;
+import org.cempaka.cyclone.core.measurements.Measurement;
 
 public class TimerMeasurement extends Measurement
 {

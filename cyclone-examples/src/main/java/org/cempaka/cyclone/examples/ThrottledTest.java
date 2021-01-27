@@ -1,7 +1,7 @@
 package org.cempaka.cyclone.examples;
 
-import org.cempaka.cyclone.annotations.Throttle;
-import org.cempaka.cyclone.annotations.Thunderbolt;
+import org.cempaka.cyclone.core.annotations.Throttle;
+import org.cempaka.cyclone.core.annotations.Thunderbolt;
 
 public class ThrottledTest
 {

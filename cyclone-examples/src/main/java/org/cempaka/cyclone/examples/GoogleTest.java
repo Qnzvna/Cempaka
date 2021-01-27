@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
-import org.cempaka.cyclone.annotations.Thunderbolt;
+import org.cempaka.cyclone.core.annotations.Thunderbolt;
 
 public class GoogleTest
 {

@@ -14,7 +14,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import org.cempaka.cyclone.auth.AuthFilterFactory;
 import org.cempaka.cyclone.configurations.DaemonConfiguration;
-import org.cempaka.cyclone.channel.DaemonChannel;
+import org.cempaka.cyclone.core.channel.DaemonChannel;
 import org.cempaka.cyclone.managed.DaemonTestRunnerManaged;
 import org.cempaka.cyclone.managed.HeartbeatManaged;
 import org.cempaka.cyclone.managed.StalledTestCleanerManaged;
@@ -59,7 +59,7 @@ public class CycloneDaemon extends Application<DaemonConfiguration>
         registerFilters(environment, injector);
 
         final DaemonChannel daemonChannel = injector.getInstance(DaemonChannel.class);
-        daemonChannel.connect(daemonConfiguration.getChannelConfiguration().getUdpServerPort());
+        daemonChannel.listen(daemonConfiguration.getChannelConfiguration().getUdpServerPort());
 
         LOG.info("Daemon started.");
     }

@@ -1,7 +1,7 @@
 package org.cempaka.cyclone.examples;
 
-import org.cempaka.cyclone.annotations.SuppressThrowables;
-import org.cempaka.cyclone.measurements.Counted;
+import org.cempaka.cyclone.core.annotations.SuppressThrowables;
+import org.cempaka.cyclone.core.measurements.Counted;
 
 public class SuppressedFailingTest
 {

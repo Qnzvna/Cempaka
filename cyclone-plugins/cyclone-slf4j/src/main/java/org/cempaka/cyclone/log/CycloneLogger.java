@@ -1,6 +1,6 @@
 package org.cempaka.cyclone.log;
 
-import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
+import static org.cempaka.cyclone.core.utils.Preconditions.checkNotNull;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;

@@ -1,9 +1,6 @@
 package org.cempaka.cyclone.examples;
 
-import org.cempaka.cyclone.annotations.Thunderbolt;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
+import org.cempaka.cyclone.core.annotations.Thunderbolt;
 
 public class FailingTest
 {

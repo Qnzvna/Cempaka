@@ -1,6 +1,6 @@
 package org.cempaka.cyclone.services;
 
-import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
+import static org.cempaka.cyclone.core.utils.Preconditions.checkNotNull;
 
 import java.util.Map;
 import javax.inject.Inject;

@@ -1,6 +1,6 @@
 package org.cempaka.cyclone.resources;
 
-import static org.cempaka.cyclone.utils.Preconditions.checkNotNull;
+import static org.cempaka.cyclone.core.utils.Preconditions.checkNotNull;
 
 import java.time.Instant;
 import java.util.List;
@@ -16,7 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.cempaka.cyclone.log.LogMessage;
+import org.cempaka.cyclone.core.log.LogMessage;
 import org.cempaka.cyclone.storage.repositories.LogMessageRepository;
 
 @Singleton

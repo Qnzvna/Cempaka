@@ -1,7 +1,7 @@
 package org.cempaka.cyclone.examples;
 
-import org.cempaka.cyclone.annotations.Thunderbolt;
-import org.cempaka.cyclone.measurements.Measure;
+import org.cempaka.cyclone.core.annotations.Thunderbolt;
+import org.cempaka.cyclone.core.measurements.Measure;
 
 public class TooBigPayloadTest
 {

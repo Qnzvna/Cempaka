@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.function.Function;
 
-public abstract class BaseCycloneClient implements CycloneClient
+abstract class BaseCycloneClient implements CycloneClient
 {
     private final String apiUrl;
     private final ObjectMapper objectMapper;
