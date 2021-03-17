@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 import org.cempaka.cyclone.beans.Parcel;
 import org.cempaka.cyclone.beans.exceptions.ParcelNotFoundException;
 import org.cempaka.cyclone.beans.exceptions.WorkerNotAvailableException;
+import org.cempaka.cyclone.configurations.WorkersConfiguration;
 import org.cempaka.cyclone.storage.repositories.ParcelRepository;
 import org.cempaka.cyclone.tests.TestExecutionProperties;
 import org.slf4j.Logger;
@@ -35,15 +36,18 @@ public class WorkerManager
     private final Map<UUID, Worker> runningTests = Maps.newConcurrentMap();
 
     private final ParcelRepository parcelRepository;
+    private final WorkersConfiguration workersConfiguration;
     private final Executor executor;
     private final int udpServerPort;
 
     @Inject
     public WorkerManager(final ParcelRepository parcelRepository,
+                         final WorkersConfiguration workersConfiguration,
                          @Named("udp.server.port") final int udpServerPort,
                          @Named("worker.number") final int workerNumber)
     {
         this.parcelRepository = checkNotNull(parcelRepository);
+        this.workersConfiguration = checkNotNull(workersConfiguration);
         this.executor = Executors.newFixedThreadPool(workerNumber);
         this.udpServerPort = udpServerPort;
         initializeWorkers(workerNumber);
@@ -53,7 +57,7 @@ public class WorkerManager
     {
         LOG.debug("Initializing workers...");
         for (int i = 0; i < workerNumber; i++) {
-            final Worker worker = new Worker(udpServerPort);
+            final Worker worker = new Worker(udpServerPort, workersConfiguration.getUser());
             workerPool.add(worker);
         }
         LOG.info("Workers initialized.");

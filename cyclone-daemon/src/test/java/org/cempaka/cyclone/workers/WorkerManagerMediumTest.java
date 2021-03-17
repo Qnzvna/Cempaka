@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.cempaka.cyclone.beans.Parcel;
 import org.cempaka.cyclone.beans.exceptions.ProcessFailureException;
+import org.cempaka.cyclone.configurations.WorkersConfiguration;
 import org.cempaka.cyclone.storage.repositories.ParcelRepository;
 import org.cempaka.cyclone.tests.ImmutableTestExecutionProperties;
 import org.cempaka.cyclone.tests.TestExecutionProperties;
@@ -37,6 +38,8 @@ public class WorkerManagerMediumTest
 
     @Mock
     private ParcelRepository parcelRepository;
+    @Mock
+    private WorkersConfiguration workersConfiguration;
 
     private WorkerManager workerManager;
 
@@ -47,7 +50,7 @@ public class WorkerManagerMediumTest
         final byte[] parcelData = Resources.toByteArray(resource);
         final Parcel parcel = Parcel.of(EXAMPLE_ID, parcelData);
         given(parcelRepository.get(EXAMPLE_ID)).willReturn(parcel);
-        workerManager = new WorkerManager(parcelRepository, 0, WORKER_NUMBER);
+        workerManager = new WorkerManager(parcelRepository, workersConfiguration, 0, WORKER_NUMBER);
     }
 
     @Test

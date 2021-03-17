@@ -7,8 +7,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import org.cempaka.cyclone.beans.Parcel;
 import org.cempaka.cyclone.beans.exceptions.ProcessFailureException;
 import org.cempaka.cyclone.tests.TestExecutionProperties;
@@ -22,13 +24,15 @@ class Worker
     private static final String PARCEL_SUFFIX = ".jar";
 
     private final int daemonPort;
+    private final String user;
 
     private File temporaryParcelFile;
     private Process runningProcess;
 
-    Worker(final int daemonPort)
+    Worker(final int daemonPort, @Nullable final String user)
     {
         this.daemonPort = daemonPort;
+        this.user = user;
     }
 
     synchronized void start(final UUID testId, final Parcel parcel,
@@ -40,6 +44,7 @@ class Worker
         checkNotNull(properties);
         temporaryParcelFile = createTemporaryParcelFile(parcel);
         final String[] command = new WorkerCommandBuilder(temporaryParcelFile.getPath(), properties.getJvmOptions())
+            .setUser(user)
             .setTestName(properties.getTestName())
             .setLoopCount(properties.getLoopCount())
             .setThreadsNumber(properties.getThreadsNumber())
@@ -66,6 +71,7 @@ class Worker
     private Process startProcess(final String[] command)
     {
         try {
+            LOG.debug("Starting process: {}", Arrays.toString(command));
             return new ProcessBuilder(command).start();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
