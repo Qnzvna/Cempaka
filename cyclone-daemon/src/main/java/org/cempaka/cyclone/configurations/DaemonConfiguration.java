@@ -16,7 +16,7 @@ public class DaemonConfiguration extends Configuration
     private StorageConfiguration storageConfiguration;
     @Valid
     @NotNull
-    private WorkersConfiguration workersConfiguration;
+    private WorkersConfiguration workersConfiguration = new WorkersConfiguration();
     @Valid
     @NotNull
     private ChannelConfiguration channelConfiguration = new ChannelConfiguration();

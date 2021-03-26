@@ -1,6 +1,9 @@
 package org.cempaka.cyclone.configurations;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import org.cempaka.cyclone.workers.WorkerConfiguration;
 import org.hibernate.validator.constraints.NotEmpty;
 
 public class WorkersConfiguration
@@ -9,6 +12,7 @@ public class WorkersConfiguration
     private int workersNumber;
     @NotEmpty
     private String guavaPath;
+    private String user;
 
     public int getWorkersNumber()
     {
@@ -18,5 +22,11 @@ public class WorkersConfiguration
     public String getGuavaPath()
     {
         return guavaPath;
+    }
+
+    @Nullable
+    public String getUser()
+    {
+        return user;
     }
 }

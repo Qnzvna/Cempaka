@@ -42,6 +42,7 @@ import org.cempaka.cyclone.services.DistributedTestRunnerService;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
 import org.cempaka.cyclone.services.TestRunnerService;
 import org.cempaka.cyclone.storage.StorageModule;
+import org.cempaka.cyclone.workers.WorkerConfiguration;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.jackson2.Jackson2Config;
 import org.jdbi.v3.jackson2.Jackson2Plugin;

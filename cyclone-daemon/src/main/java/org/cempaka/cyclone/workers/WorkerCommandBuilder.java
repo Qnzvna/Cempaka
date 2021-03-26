@@ -3,7 +3,8 @@ package org.cempaka.cyclone.workers;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
@@ -11,7 +12,8 @@ import org.cempaka.cyclone.core.utils.CliParameters;
 
 class WorkerCommandBuilder
 {
-    private final ImmutableList.Builder<String> commands = ImmutableList.builder();
+    private final List<String> suCommand = new ArrayList<>();
+    private final List<String> commands = new ArrayList<>();
 
     public WorkerCommandBuilder(final String parcelPath, @Nullable final String jvmOptions)
     {
@@ -20,26 +22,40 @@ class WorkerCommandBuilder
         if (jvmOptions != null && !jvmOptions.isEmpty()) {
             commands.add(jvmOptions);
         }
-        commands.add("-jar", parcelPath);
+        commands.add("-jar");
+        commands.add(parcelPath);
+    }
+
+    WorkerCommandBuilder setUser(@Nullable final String user)
+    {
+        if (user != null) {
+            suCommand.add("su");
+            suCommand.add(user);
+            suCommand.add("-c");
+        }
+        return this;
     }
 
     WorkerCommandBuilder setTestName(final String testName)
     {
         checkNotNull(testName);
         checkArgument(!testName.isEmpty());
-        commands.add(CliParameters.TEST_CLASSES, testName);
+        commands.add(CliParameters.TEST_CLASSES);
+        commands.add(testName);
         return this;
     }
 
     WorkerCommandBuilder setLoopCount(final long loopCount)
     {
-        commands.add(CliParameters.LOOP_COUNT, Long.toString(loopCount));
+        commands.add(CliParameters.LOOP_COUNT);
+        commands.add(Long.toString(loopCount));
         return this;
     }
 
     WorkerCommandBuilder setThreadsNumber(final int threadsNumber)
     {
-        commands.add(CliParameters.THREADS, Integer.toString(threadsNumber));
+        commands.add(CliParameters.THREADS);
+        commands.add(Integer.toString(threadsNumber));
         return this;
     }
 
@@ -60,7 +76,8 @@ class WorkerCommandBuilder
             final String serializedParameters = map.entrySet().stream()
                 .map(entry -> entry.getKey() + "=" + entry.getValue())
                 .collect(Collectors.joining(","));
-            commands.add(paramName, serializedParameters);
+            commands.add(paramName);
+            commands.add(serializedParameters);
         }
         return this;
     }
@@ -68,19 +85,27 @@ class WorkerCommandBuilder
     WorkerCommandBuilder setTestId(final String testId)
     {
         checkNotNull(testId);
-        commands.add(CliParameters.TEST_ID, testId);
+        commands.add(CliParameters.TEST_ID);
+        commands.add(testId);
         return this;
     }
 
     WorkerCommandBuilder setDaemonPort(final int daemonPort)
     {
-        commands.add(CliParameters.DAEMON_PORT, Integer.toString(daemonPort));
+        commands.add(CliParameters.DAEMON_PORT);
+        commands.add(Integer.toString(daemonPort));
         return this;
     }
 
     String[] build()
     {
-        return commands.build().toArray(new String[]{});
+        if (suCommand.isEmpty()) {
+            return commands.toArray(new String[0]);
+        } else {
+            final String command = String.join(" ", commands);
+            suCommand.add(command);
+            return suCommand.toArray(new String[0]);
+        }
     }
 
 }
