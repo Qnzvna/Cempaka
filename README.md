@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/Qnzvna/Cempaka.svg?branch=master)](https://travis-ci.org/Qnzvna/Cempaka)
 ![Maven Central](https://img.shields.io/maven-central/v/org.cempaka.cyclone/cyclone)
+[![javadoc](https://javadoc.io/badge2/org.cempaka.cyclone/cyclone-core/javadoc.svg)](https://javadoc.io/doc/org.cempaka.cyclone/cyclone-core)
 [![codecov](https://codecov.io/gh/Qnzvna/Cempaka/branch/master/graph/badge.svg)](https://codecov.io/gh/Qnzvna/Cempaka)
 ![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/Qnzvna/Cempaka)
 
