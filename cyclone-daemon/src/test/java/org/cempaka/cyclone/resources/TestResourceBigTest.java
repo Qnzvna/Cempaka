@@ -147,4 +147,20 @@ public class TestResourceBigTest
         assertThat(throwable).isInstanceOf(InvalidResponseException.class);
         assertThat(throwable.getMessage()).contains("404");
     }
+
+    @Test
+    void shouldFailStartingOnNotAliveNode()
+    {
+        //given
+        final String node = "not_alive_node";
+        final TestExecutionProperties testProperties = Tests.getExampleTest(
+            PARCEL_ID,
+            ImmutableSet.of(node)
+        );
+        //when
+        final Throwable throwable = catchThrowable(() -> TEST_CLIENT.startTest(testProperties));
+        //then
+        assertThat(throwable).isInstanceOf(InvalidResponseException.class);
+        assertThat(throwable.getMessage()).contains(node);
+    }
 }

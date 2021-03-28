@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.io.NotActiveException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -77,7 +78,11 @@ public class DistributedTestRunnerService implements TestRunnerService
     private void checkAvailableNodes(final Set<String> nodesToRun)
     {
         final Set<String> liveNodes = nodeStatusService.getLiveNodes();
-        checkState(liveNodes.containsAll(nodesToRun), "Not all nodes are alive");
+        for (final String node : nodesToRun) {
+            if (!liveNodes.contains(node)) {
+                throw new NodeNotAliveException(node);
+            }
+        }
     }
 
     @Override
