@@ -43,6 +43,8 @@ class ReflectiveInvoker implements Invoker
     private final MeasurementRegistry measurementRegistry;
     private final Supplier<Object> testInstance;
 
+    private long throttleMultiplier = 1;
+
     private ReflectiveInvoker(final Class<?> testClass,
                               final Map<String, String> parameters,
                               final Map<String, String> metadata,
@@ -67,6 +69,12 @@ class ReflectiveInvoker implements Invoker
                                        final MeasurementRegistry measurementRegistry)
     {
         return new ReflectiveInvoker(testClass, parameters, metadata, measurementRegistry);
+    }
+
+    @Override
+    public void setThrottleMultiplier(final long multiplier)
+    {
+        this.throttleMultiplier = multiplier;
     }
 
     @Override
@@ -237,7 +245,8 @@ class ReflectiveInvoker implements Invoker
             .orElse(0L);
         if (throttle > 0) {
             try {
-                final long sleepTime = 1_000 / throttle - executionContext.getMillisExecutionTime();
+                final long sleepTime =
+                    throttleMultiplier * (1_000 / throttle - executionContext.getMillisExecutionTime());
                 if (sleepTime > 0) {
                     Thread.sleep(sleepTime);
                 }
