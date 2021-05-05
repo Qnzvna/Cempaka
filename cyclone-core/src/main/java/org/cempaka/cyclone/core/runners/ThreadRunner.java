@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 class ThreadRunner extends ForwardingRunner
 {
     private final Runner delegated;
+    private final int poolSize;
     private final ExecutorService executorService;
     private final Queue<Future<?>> futures = new LinkedBlockingQueue<>();
 
@@ -23,6 +24,7 @@ class ThreadRunner extends ForwardingRunner
     {
         this.delegated = checkNotNull(delegated);
         checkArgument(poolSize > 0, "Number of threads has to be greater than 0.");
+        this.poolSize = poolSize;
         this.executorService = Executors.newFixedThreadPool(poolSize);
     }
 
@@ -30,6 +32,13 @@ class ThreadRunner extends ForwardingRunner
     Runner getDelegate()
     {
         return delegated;
+    }
+
+    @Override
+    public void beforeInvocation(final Invoker invoker)
+    {
+        invoker.setThrottleMultiplier(this.poolSize);
+        invoker.invokeBefore();
     }
 
     @Override
