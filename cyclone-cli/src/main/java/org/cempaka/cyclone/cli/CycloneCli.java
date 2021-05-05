@@ -1,12 +1,14 @@
 package org.cempaka.cyclone.cli;
 
 import static org.cempaka.cyclone.core.utils.CliParameters.DAEMON_PORT;
+import static org.cempaka.cyclone.core.utils.CliParameters.DURATION;
 import static org.cempaka.cyclone.core.utils.CliParameters.LOOP_COUNT;
 import static org.cempaka.cyclone.core.utils.CliParameters.METADATA;
 import static org.cempaka.cyclone.core.utils.CliParameters.PARAMETERS;
 import static org.cempaka.cyclone.core.utils.CliParameters.TEST_CLASSES;
 import static org.cempaka.cyclone.core.utils.CliParameters.TEST_ID;
 import static org.cempaka.cyclone.core.utils.CliParameters.THREADS;
+import static org.cempaka.cyclone.core.utils.Preconditions.checkArgument;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -25,6 +27,7 @@ import org.cempaka.cyclone.core.measurements.MeasurementRegistry;
 import org.cempaka.cyclone.core.runners.Runner;
 import org.cempaka.cyclone.core.runners.Runners;
 import picocli.CommandLine;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Option;
 
 /**
@@ -38,8 +41,6 @@ public class CycloneCli
         description = "test names to run", required = true,
         split = ",")
     private String[] testNames;
-    @Option(names = {LOOP_COUNT, "--loopCount"}, description = "number of loops to run", defaultValue = "1")
-    private long loopCount;
     @Option(names = {THREADS, "--threads"}, description = "number of threads to run", defaultValue = "1")
     private int threads;
     @Option(names = {PARAMETERS, "--parameters"}, description = "passed parameters to tests", split = ",")
@@ -55,6 +56,16 @@ public class CycloneCli
     private boolean measurementsPrint;
     @Option(names = METADATA)
     private Map<String, String> metadata = new HashMap<>();
+    @ArgGroup(multiplicity = "1")
+    Executions executions;
+
+    static class Executions
+    {
+        @Option(names = {LOOP_COUNT, "--loopCount"}, description = "number of loops to run")
+        private Long loopCount;
+        @Option(names = {DURATION, "--duration"}, description = "amount of time to run")
+        private Duration duration;
+    }
 
     private final MeasurementRegistry measurementRegistry;
     private final DaemonChannel daemonChannel;
@@ -104,7 +115,12 @@ public class CycloneCli
             metadata,
             measurementRegistry);
         final Runner threadRunner = Runners.threadRunner(simpleRunner, threads);
-        final Runner runner = Runners.loopRunner(threadRunner, loopCount);
+        final Runner runner;
+        if (executions.loopCount != null) {
+            runner = Runners.loopRunner(threadRunner, executions.loopCount);
+        } else {
+            runner = Runners.durationRunner(threadRunner, executions.duration);
+        }
         try {
             runner.run();
             reportMetrics();
