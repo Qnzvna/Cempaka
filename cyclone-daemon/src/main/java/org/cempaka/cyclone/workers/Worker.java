@@ -43,16 +43,18 @@ class Worker
         checkNotNull(parcel);
         checkNotNull(properties);
         temporaryParcelFile = createTemporaryParcelFile(parcel);
-        final String[] command = new WorkerCommandBuilder(temporaryParcelFile.getPath(), properties.getJvmOptions())
+        final WorkerCommandBuilder commandBuilder = new WorkerCommandBuilder(temporaryParcelFile.getPath(),
+            properties.getJvmOptions())
             .setUser(user)
             .setTestName(properties.getTestName())
-            .setLoopCount(properties.getLoopCount())
             .setThreadsNumber(properties.getThreadsNumber())
             .setParameters(properties.getParameters())
             .setTestId(testId.toString())
             .setMetadata(metadata)
-            .setDaemonPort(daemonPort)
-            .build();
+            .setDaemonPort(daemonPort);
+        properties.getLoopCount().ifPresent(commandBuilder::setLoopCount);
+        properties.getDuration().ifPresent(commandBuilder::setDuration);
+        final String[] command = commandBuilder.build();
         runningProcess = startProcess(command);
     }
 

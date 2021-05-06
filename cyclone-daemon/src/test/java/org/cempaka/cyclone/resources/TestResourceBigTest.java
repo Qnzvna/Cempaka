@@ -3,10 +3,12 @@ package org.cempaka.cyclone.resources;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.awaitility.Awaitility.await;
+import static org.cempaka.cyclone.resources.Tests.EXAMPLE_TEST_FQDN;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.io.File;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
@@ -16,6 +18,7 @@ import org.cempaka.cyclone.beans.TestState;
 import org.cempaka.cyclone.client.ApacheCycloneClient;
 import org.cempaka.cyclone.client.CycloneClient;
 import org.cempaka.cyclone.client.InvalidResponseException;
+import org.cempaka.cyclone.client.MetricDataPoint;
 import org.cempaka.cyclone.client.NodeCapacity;
 import org.cempaka.cyclone.client.TestExecution;
 import org.cempaka.cyclone.client.TestExecutionProperties;
@@ -162,5 +165,30 @@ public class TestResourceBigTest
         //then
         assertThat(throwable).isInstanceOf(InvalidResponseException.class);
         assertThat(throwable.getMessage()).contains(node);
+    }
+
+    @Test
+    void shouldRunTestFor10Seconds()
+    {
+        //given
+        final TestExecutionProperties test = Tests.getTest(
+            PARCEL_ID,
+            ImmutableSet.of(Tests.NODE),
+            EXAMPLE_TEST_FQDN,
+            ImmutableMap.of("sleep", "1000"),
+            Duration.ofSeconds(10)
+        );
+        //when
+        final UUID executionId = TEST_CLIENT.startTest(test);
+        await().untilAsserted(() -> {
+            assertThat(TEST_CLIENT.getTestExecutions(executionId))
+                .extracting(TestExecution::getState)
+                .contains(TestState.ENDED);
+            assertThat(TEST_CLIENT.getTestExecutionMetrics(executionId))
+                .filteredOn(dataPoint -> dataPoint.getName().endsWith("success:count"))
+                .extracting(MetricDataPoint::getValue)
+                .last()
+                .isEqualTo(10D);
+        });
     }
 }

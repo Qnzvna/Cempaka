@@ -37,6 +37,13 @@
         <small id="loopCountHelp" class="form-text text-muted">Enter number of loops to run.</small>
     </div>
     <div class="form-group">
+        <label for="duration">Duration</label>
+        <input type="number" class="form-control" id="duration" aria-describedby="durationHelp"
+               ng-model="$ctrl.properties.duration">
+        <small id="durationHelp" class="form-text text-muted">Enter the test duration (minutes). (Loop count will be
+            ignored)</small>
+    </div>
+    <div class="form-group">
         <label for="threadsNumber">Threads</label>
         <span class="badge badge-light float-right">{{$ctrl.properties.threadsNumber}}</span>
         <input type="range" class="custom-range" id="threadsNumber" min="1" max="512"

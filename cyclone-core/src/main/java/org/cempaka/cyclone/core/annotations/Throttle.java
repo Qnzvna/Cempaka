@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
  * By default test methods will be executed with maximum throughput. By adding {@code @Throttle} annotations the test
  * method will be slowed downed to specified throughput.
  *
- * Throughput is not synchronized between different cyclone instances.
+ * Throughput is not synchronized between different cyclone instances but is synchronized between threads.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})

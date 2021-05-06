@@ -1,6 +1,7 @@
 package org.cempaka.cyclone.client;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -16,7 +17,9 @@ public interface TestExecutionProperties
 
     String getTestName();
 
-    int getLoopCount();
+    Optional<Integer> getLoopCount();
+
+    Optional<Duration> getDuration();
 
     int getThreadsNumber();
 

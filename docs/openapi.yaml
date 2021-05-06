@@ -325,6 +325,8 @@ components:
           type: string
         loopCount:
           type: integer
+        duration:
+          type: string
         threadsNumber:
           type: integer
         parameters:
