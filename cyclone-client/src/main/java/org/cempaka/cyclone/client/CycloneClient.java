@@ -2,6 +2,7 @@ package org.cempaka.cyclone.client;
 
 import java.io.File;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -32,7 +33,7 @@ public interface CycloneClient
 
     TestExecutionPage getTestExecutions(int limit, int offset);
 
-    Set<MetricDataPoint> getTestExecutionMetrics(UUID testExecutionId);
+    List<MetricDataPoint> getTestExecutionMetrics(UUID testExecutionId);
 
     TestExecutionPage searchTestExecutionsByStates(Set<String> states);
 

@@ -13,6 +13,7 @@ export const StartTestComponent = {
             this.aliveNodes = [];
             this.properties = {
                 loopCount: 1,
+                duration: 0,
                 threadsNumber: 1,
                 parameters: {},
                 nodes: [],
@@ -37,7 +38,8 @@ export const StartTestComponent = {
             this.testService.startTest({
                 parcelId: this.test.parcelId,
                 testName: this.test.name,
-                loopCount: this.properties.loopCount,
+                loopCount: this.properties.duration == 0 ? this.properties.loopCount : null,
+                duration: this.properties.duration != 0 ? "PT" + this.properties.duration + "M" : null,
                 threadsNumber: this.properties.threadsNumber,
                 parameters: this.properties.parameters,
                 nodes: this.properties.nodes,

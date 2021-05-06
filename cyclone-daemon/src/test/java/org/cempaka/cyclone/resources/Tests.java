@@ -1,6 +1,7 @@
 package org.cempaka.cyclone.resources;
 
 import com.google.common.collect.ImmutableMap;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -12,7 +13,7 @@ final class Tests
     static final String API = "http://localhost:8080/api";
     static final String NODE = "cyclone";
     static final String EXAMPLES = "target/examples.jar";
-    private static final String EXAMPLE_TEST_FQDN = "org.cempaka.cyclone.examples.ExampleTest";
+    static final String EXAMPLE_TEST_FQDN = "org.cempaka.cyclone.examples.ExampleTest";
     private static final String TOO_BIG_PAYLOAD_TEST_FQDN = "org.cempaka.cyclone.examples.TooBigPayloadTest";
     private static final String LOG_TEST_FQDN = "org.cempaka.cyclone.examples.LoggingTest";
     private static final String METADATA_TEST_FQDN = "org.cempaka.cyclone.examples.MetadataParameterExampleTest";
@@ -54,6 +55,22 @@ final class Tests
             .testName(testName)
             .threadsNumber(1)
             .loopCount(1)
+            .nodes(nodes)
+            .parameters(parameters)
+            .build();
+    }
+
+    static TestExecutionProperties getTest(final UUID parcelId,
+                                           final Set<String> nodes,
+                                           final String testName,
+                                           final Map<String, String> parameters,
+                                           final Duration duration)
+    {
+        return ImmutableTestExecutionProperties.builder()
+            .parcelId(parcelId)
+            .testName(testName)
+            .duration(duration)
+            .threadsNumber(1)
             .nodes(nodes)
             .parameters(parameters)
             .build();

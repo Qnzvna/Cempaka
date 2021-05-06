@@ -5,6 +5,7 @@ import static org.awaitility.Awaitility.await;
 
 import com.google.common.collect.ImmutableSet;
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +43,7 @@ public class MetricsResourceBigTest
         await().pollInterval(5, TimeUnit.SECONDS)
             .atMost(30, TimeUnit.SECONDS)
             .untilAsserted(() -> {
-                final Set<MetricDataPoint> metrics = TEST_CLIENT.getTestExecutionMetrics(executionId);
+                final List<MetricDataPoint> metrics = TEST_CLIENT.getTestExecutionMetrics(executionId);
                 assertThat(metrics).isNotEmpty().anySatisfy(metricDataPoint -> {
                     assertThat(metricDataPoint.getName()).isEqualTo("test1:success:count");
                     assertThat(metricDataPoint.getValue()).isEqualTo(1);

@@ -3,6 +3,7 @@ package org.cempaka.cyclone.workers;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,13 @@ class WorkerCommandBuilder
     {
         commands.add(CliParameters.LOOP_COUNT);
         commands.add(Long.toString(loopCount));
+        return this;
+    }
+
+    WorkerCommandBuilder setDuration(final Duration duration)
+    {
+        commands.add(CliParameters.DURATION);
+        commands.add(duration.toString());
         return this;
     }
 

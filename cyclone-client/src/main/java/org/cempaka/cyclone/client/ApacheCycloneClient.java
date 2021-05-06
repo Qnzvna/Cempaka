@@ -6,12 +6,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.ImmutableSet;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -149,11 +152,11 @@ public class ApacheCycloneClient extends BaseCycloneClient
     }
 
     @Override
-    public Set<MetricDataPoint> getTestExecutionMetrics(final UUID testExecutionId)
+    public List<MetricDataPoint> getTestExecutionMetrics(final UUID testExecutionId)
     {
         checkNotNull(testExecutionId);
         final HttpGet httpGet = new HttpGet(createTestExecutionsMetricsQuery(testExecutionId));
-        return runRequest(createDeserializer(new TypeReference<Set<MetricDataPoint>>() {}), httpGet);
+        return runRequest(createDeserializer(new TypeReference<List<MetricDataPoint>>() {}), httpGet);
     }
 
     @Override
@@ -332,7 +335,8 @@ public class ApacheCycloneClient extends BaseCycloneClient
             final ObjectMapper objectMapper = this.objectMapper == null ?
                 new ObjectMapper()
                     .registerModule(new GuavaModule())
-                    .registerModule(new Jdk8Module()) :
+                    .registerModule(new Jdk8Module())
+                    .registerModule(new JavaTimeModule()) :
                 this.objectMapper;
             final CloseableHttpClient httpClient = this.httpClient == null ?
                 HttpClients.createDefault() :
