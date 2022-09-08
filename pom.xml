@@ -69,7 +69,7 @@
         <guice.version>4.2.3</guice.version>
         <metrics-core.version>3.0.2</metrics-core.version>
         <httpclient.version>4.5.13</httpclient.version>
-        <postgresql.version>42.2.18</postgresql.version>
+        <postgresql.version>42.4.1</postgresql.version>
         <jdbi3.version>3.18.0</jdbi3.version>
         <flyway.version>7.3.1</flyway.version>
         <jackson.version>2.12.0</jackson.version>
