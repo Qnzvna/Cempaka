@@ -8,6 +8,7 @@ import static org.cempaka.cyclone.core.utils.CliParameters.PARAMETERS;
 import static org.cempaka.cyclone.core.utils.CliParameters.TEST_CLASSES;
 import static org.cempaka.cyclone.core.utils.CliParameters.TEST_ID;
 import static org.cempaka.cyclone.core.utils.CliParameters.THREADS;
+import static org.cempaka.cyclone.core.utils.CliParameters.WARMUPS;
 import static org.cempaka.cyclone.core.utils.Preconditions.checkArgument;
 
 import java.io.IOException;
@@ -43,6 +44,8 @@ public class CycloneCli
     private String[] testNames;
     @Option(names = {THREADS, "--threads"}, description = "number of threads to run", defaultValue = "1")
     private int threads;
+    @Option(names = {WARMUPS, "--warmups"}, description = "number of warmup iterations per thread", defaultValue = "0")
+    private int warmups;
     @Option(names = {PARAMETERS, "--parameters"}, description = "passed parameters to tests", split = ",")
     private Map<String, String> parameters = new HashMap<>();
     @Option(names = DAEMON_PORT, description = "daemon port to send updates")
@@ -114,7 +117,7 @@ public class CycloneCli
             parameters,
             metadata,
             measurementRegistry);
-        final Runner threadRunner = Runners.threadRunner(simpleRunner, threads);
+        final Runner threadRunner = Runners.threadRunner(simpleRunner, threads, warmups);
         final Runner runner;
         if (executions.loopCount != null) {
             runner = Runners.loopRunner(threadRunner, executions.loopCount);

@@ -21,7 +21,12 @@ public final class Runners
 
     public static Runner threadRunner(final Runner delegate, final int poolSize)
     {
-        return new ThreadRunner(delegate, poolSize);
+        return threadRunner(delegate, poolSize, 0);
+    }
+
+    public static Runner threadRunner(final Runner delegate, final int poolSize, int warmups)
+    {
+        return new ThreadRunner(delegate, poolSize, warmups);
     }
 
     public static Runner loopRunner(final Runner delegate, final long loopCount)
