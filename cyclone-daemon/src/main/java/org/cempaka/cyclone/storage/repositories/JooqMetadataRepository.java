@@ -4,8 +4,8 @@ import static org.cempaka.cyclone.core.utils.Preconditions.checkNotNull;
 
 import java.util.List;
 import java.util.Optional;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cempaka.cyclone.jooq.Tables;
 import org.cempaka.cyclone.jooq.tables.records.MetadataRecord;
 import org.jooq.DSLContext;

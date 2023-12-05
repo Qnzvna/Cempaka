@@ -5,8 +5,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import io.dropwizard.auth.AuthFilter;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cempaka.cyclone.configurations.AuthenticationConfiguration;
 
 @Singleton

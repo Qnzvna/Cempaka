@@ -5,8 +5,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cempaka.cyclone.beans.NodeState;
 import org.cempaka.cyclone.storage.jdbi.NodeStateDataAccess;
 

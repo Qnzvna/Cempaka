@@ -7,7 +7,7 @@ import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import java.util.Map;
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
 import org.cempaka.cyclone.configurations.StorageConfiguration;
 import org.cempaka.cyclone.configurations.TypedConfiguration;
 import org.cempaka.cyclone.storage.jdbi.LogMessageDataAccess;

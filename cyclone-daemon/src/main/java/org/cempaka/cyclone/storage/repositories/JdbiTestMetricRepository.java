@@ -7,8 +7,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cempaka.cyclone.beans.MetricDataPoint;
 import org.cempaka.cyclone.storage.jdbi.TestMetricDataAccess;
 

@@ -3,8 +3,8 @@ package org.cempaka.cyclone.services;
 import java.io.UncheckedIOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 public class LocalHostNodeIdentifierProvider implements NodeIdentifierProvider

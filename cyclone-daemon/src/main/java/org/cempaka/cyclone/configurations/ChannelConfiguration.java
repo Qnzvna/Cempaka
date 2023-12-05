@@ -1,6 +1,6 @@
 package org.cempaka.cyclone.configurations;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 public class ChannelConfiguration
 {

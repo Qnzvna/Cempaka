@@ -6,8 +6,9 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cempaka.cyclone.storage.jdbi.TestDataAccess;
 import org.cempaka.cyclone.tests.Test;
 

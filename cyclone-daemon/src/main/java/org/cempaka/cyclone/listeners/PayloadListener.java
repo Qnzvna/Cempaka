@@ -3,8 +3,8 @@ package org.cempaka.cyclone.listeners;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.util.function.BiConsumer;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cempaka.cyclone.core.channel.Payload;
 import org.cempaka.cyclone.core.channel.PayloadType;
 

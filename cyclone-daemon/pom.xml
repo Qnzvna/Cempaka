@@ -25,6 +25,12 @@
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>jakarta.activation</groupId>
+                    <artifactId>jakarta.activation-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
@@ -43,12 +49,14 @@
             <artifactId>dropwizard-auth</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.dropwizard-bundles</groupId>
-            <artifactId>dropwizard-webjars-bundle</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>aopalliance</groupId>
+                    <artifactId>aopalliance</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -163,8 +171,8 @@
                         <phase>generate-test-resources</phase>
                         <configuration>
                             <target name="copy examples">
-                                <copy file="${project.basedir}/../cyclone-examples/target/cyclone-examples-${project.version}.jar" tofile="${project.basedir}/target/test-classes/67548d96-076d-4f69-bd1d-3b9316b2ba15" />
-                                <copy file="${project.basedir}/../cyclone-examples/target/cyclone-examples-${project.version}.jar" tofile="${project.basedir}/target/examples.jar" />
+                                <copy file="${project.basedir}/../cyclone-examples/target/cyclone-examples-${project.version}.jar" tofile="${project.basedir}/target/test-classes/67548d96-076d-4f69-bd1d-3b9316b2ba15"/>
+                                <copy file="${project.basedir}/../cyclone-examples/target/cyclone-examples-${project.version}.jar" tofile="${project.basedir}/target/examples.jar"/>
                             </target>
                         </configuration>
                     </execution>
@@ -214,7 +222,7 @@
                             <createDependencyReducedPom>true</createDependencyReducedPom>
                             <outputFile>target/cyclone-daemon.jar</outputFile>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>org.cempaka.cyclone.daemon.CycloneDaemon</mainClass>
                                 </transformer>
@@ -226,7 +234,16 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/*.md</exclude>
+                                        <exclude>META-INF/*.txt</exclude>
+                                        <exclude>*.module-info</exclude>
+                                        <exclude>META-INF/NOTICE</exclude>
+                                        <exclude>META-INF/DEPENDENCIES</exclude>
+                                        <exclude>META-INF/LICENSE</exclude>
+                                        <exclude>META-INF/*.MF</exclude>
+                                        <exclude>META-INF/*.markdown</exclude>
                                         <exclude>module-info.*</exclude>
+                                        <exclude>about.html</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
