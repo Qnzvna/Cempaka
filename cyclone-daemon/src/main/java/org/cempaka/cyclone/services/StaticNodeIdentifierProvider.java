@@ -3,9 +3,9 @@ package org.cempaka.cyclone.services;
 import static org.cempaka.cyclone.core.utils.Preconditions.checkNotNull;
 
 import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+import com.google.inject.Singleton;
 
 @Singleton
 public class StaticNodeIdentifierProvider implements NodeIdentifierProvider

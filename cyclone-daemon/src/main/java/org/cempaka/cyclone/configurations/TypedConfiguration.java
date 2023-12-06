@@ -2,7 +2,7 @@ package org.cempaka.cyclone.configurations;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public class TypedConfiguration<T>
 {

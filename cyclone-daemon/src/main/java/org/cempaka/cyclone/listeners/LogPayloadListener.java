@@ -4,8 +4,8 @@ import static org.cempaka.cyclone.core.utils.Preconditions.checkNotNull;
 
 import java.util.UUID;
 import java.util.function.BiConsumer;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cempaka.cyclone.core.channel.LogPayload;
 import org.cempaka.cyclone.core.channel.Payload;
 import org.cempaka.cyclone.core.channel.PayloadType;

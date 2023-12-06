@@ -1,7 +1,7 @@
 package org.cempaka.cyclone.configurations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import org.cempaka.cyclone.storage.repositories.JdbiLogMessageRepository;
 import org.cempaka.cyclone.storage.repositories.JdbiNodeStateRepository;
 import org.cempaka.cyclone.storage.repositories.JdbiParcelRepository;

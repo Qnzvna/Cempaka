@@ -1,10 +1,11 @@
 package org.cempaka.cyclone.auth;
 
 import io.dropwizard.auth.AuthFilter;
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.container.ContainerRequestContext;
+
 import java.util.Optional;
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.container.ContainerRequestContext;
 
 @Priority(Priorities.AUTHENTICATION)
 class NoopAuthFilter extends AuthFilter<Object, AdminUser>

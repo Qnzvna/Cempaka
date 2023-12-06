@@ -1,6 +1,6 @@
 package org.cempaka.cyclone.core.log;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -2,16 +2,13 @@ package org.cempaka.cyclone.daemon;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
-import io.dropwizard.bundles.webjars.WebJarBundle;
+import io.dropwizard.core.Application;
+import io.dropwizard.core.setup.Bootstrap;
+import io.dropwizard.core.setup.Environment;
 import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.lifecycle.setup.LifecycleEnvironment;
-import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.setup.Environment;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import org.cempaka.cyclone.auth.AuthFilterFactory;
 import org.cempaka.cyclone.configurations.DaemonConfiguration;
 import org.cempaka.cyclone.core.channel.DaemonChannel;
@@ -26,8 +23,12 @@ import org.cempaka.cyclone.resources.ParcelResource;
 import org.cempaka.cyclone.resources.TestExecutionResource;
 import org.cempaka.cyclone.resources.TestResource;
 import org.cempaka.cyclone.storage.MigrationRunner;
+import org.cempaka.cyclone.webjars.WebJarBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 public class CycloneDaemon extends Application<DaemonConfiguration>
 {

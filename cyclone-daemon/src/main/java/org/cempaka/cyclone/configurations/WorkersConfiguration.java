@@ -1,10 +1,9 @@
 package org.cempaka.cyclone.configurations;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import org.cempaka.cyclone.workers.WorkerConfiguration;
+import jakarta.validation.constraints.Min;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.annotation.Nullable;
 
 public class WorkersConfiguration
 {

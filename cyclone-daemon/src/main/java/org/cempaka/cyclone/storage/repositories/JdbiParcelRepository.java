@@ -6,8 +6,8 @@ import static java.util.stream.Collectors.toSet;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cempaka.cyclone.beans.Parcel;
 import org.cempaka.cyclone.storage.jdbi.ParcelDataAccess;
 

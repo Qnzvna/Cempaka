@@ -3,9 +3,9 @@ package org.cempaka.cyclone.configurations;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
-import javax.validation.Valid;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.cempaka.cyclone.services.NodeIdentifierProvider;
 import org.cempaka.cyclone.services.StaticNodeIdentifierProvider;
 
