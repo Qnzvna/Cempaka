@@ -67,7 +67,7 @@
         <guice.version>7.0.0</guice.version>
         <metrics-core.version>3.0.2</metrics-core.version>
         <httpclient.version>4.5.14</httpclient.version>
-        <postgresql.version>42.7.0</postgresql.version>
+        <postgresql.version>42.7.2</postgresql.version>
         <jdbi3.version>3.42.0</jdbi3.version>
         <flyway.version>9.22.3</flyway.version>
         <jackson.version>2.16.0</jackson.version>
